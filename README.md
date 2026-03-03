@@ -85,6 +85,4 @@ CT design tokens are configured in `tailwind.config.js`:
 - This is a prototype for dev evaluation, not production code
 - Focus on visual accuracy and component structure
 - Interactions and state management are secondary
-- Test at 1366px width (researcher hardware constraint)
-# etno-prototype
-# etno-prototype
+- Test at 1366px width 
