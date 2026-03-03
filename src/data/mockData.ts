@@ -177,6 +177,24 @@ export function getFilterableValue(doc: EtnoDocument, key: string): string[] {
   }
 }
 
+// ─── Helper: Check if document matches active filters ───────────────────────
+
+export function matchesFilters(
+  doc: EtnoDocument,
+  activeFilters: Record<string, string[]>
+): boolean {
+  const keys = Object.keys(activeFilters);
+  if (keys.length === 0) return true;
+  for (const key of keys) {
+    const selected = activeFilters[key];
+    if (!selected?.length) continue;
+    const docValues = getFilterableValue(doc, key);
+    const hasMatch = selected.some((v) => docValues.includes(v));
+    if (!hasMatch) return false;
+  }
+  return true;
+}
+
 // ─── Helper: Get unique values for a filter key ─────────────────────────────
 
 export function getUniqueValues(key: string): string[] {
