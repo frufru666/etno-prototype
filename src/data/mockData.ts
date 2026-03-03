@@ -172,6 +172,8 @@ export function getFilterableValue(doc: EtnoDocument, key: string): string[] {
       return [doc.collectionMethod];
     case "language":
       return doc.language ? [doc.language] : [];
+    case "studyPeriod":
+      return doc.studyPeriodStart ? [doc.studyPeriodStart] : [];
     default:
       return [];
   }
@@ -206,6 +208,21 @@ export function getUniqueValues(key: string): string[] {
     }
   }
   return Array.from(set).sort();
+}
+
+// ─── Helper: Get filter options with document counts ─────────────────────────
+
+export function getOptionsWithCounts(
+  key: string
+): { value: string; count: number }[] {
+  const values = getUniqueValues(key);
+  return values.map((value) => {
+    const count = DOCUMENTS.filter((doc) => {
+      const docValues = getFilterableValue(doc, key);
+      return docValues.includes(value);
+    }).length;
+    return { value, count };
+  });
 }
 
 // ─── Helper: Parse study period string ──────────────────────────────────────
