@@ -1,0 +1,62 @@
+# Collection Toolbox - Etno Prototype - Cursor Rules
+
+## Stack
+- Vue 3 + TypeScript + Vite
+- Tailwind CSS with CT design tokens
+- shadcn-vue components
+- Lucide Vue icons
+
+## CRITICAL:
+This is a Vue 3 project. NEVER generate React/JSX. Always use .vue SFC with <script setup lang="ts"> and <template>
+
+## Component Rules
+
+### 1. Use shadcn-vue components where possible
+ALWAYS use shadcn over custom HTML: Button, Input, Checkbox, Select, Card, ScrollArea, Dialog, Sheet, Tooltip, Badge, Separator, Toggle, Tabs. Import from @/components/ui/[component].
+
+### 2. Use Tailwind defaults where possible
+Prefer Tailwind built-in classes over custom CSS. Use CT design tokens in tailwind.config.js for colors (primary-*, secondary-*). Spacing: use Tailwind scale (p-4, gap-2, etc.).
+
+### 3. Componentize views
+- /views/ for page-level components
+- /components/ui/ for shadcn primitives
+- /components/ct/ for CT-specific compositions (ObjectCard, FilterPanel, etc.)
+- Keep components under 150 lines
+
+## File Structure
+- src/components/ui/ - shadcn primitives
+- src/components/ct/ - CT compositions  
+- src/views/ - page views
+- src/layouts/ - layout wrappers
+- src/lib/utils.ts - utility functions
+- src/data/ - mock data
+
+## Do NOT
+- Use style blocks - use Tailwind classes
+- Create custom buttons/inputs - use shadcn
+- Hardcode colors - use tokens (text-primary-500)
+- Nest components more than 3 levels deep
+
+## DO
+- Use semantic HTML (nav, main, aside, section)
+- Add aria-labels to icon-only buttons
+- Use v-model for form elements
+- Comment complex logic
+
+## Icons
+Use Lucide Vue: import { IconName } from lucide-vue-next. Size with Tailwind: class="h-4 w-4"
+
+## Responsive
+Mobile-first approach. Test at 1366px width (researcher hardware). Breakpoints: sm (640), md (768), lg (1024), xl (1280)
+
+## CT Design Tokens
+- Primary: primary-50 to primary-900 (blue)
+- Secondary: secondary-100 to secondary-900 (coral)
+- font-sans for UI, font-mono for data
+
+## Etno-Specific Patterns
+- Grid layout for results (3 columns desktop, 1 mobile)
+- Thumbnail cards with media type indicators
+- Filter sidebar with collapsible groups
+- Detail page: fixed media + scrolling metadata
+- Metadata sections: Tematicke, Geograficke, Formalne, Administrativne
