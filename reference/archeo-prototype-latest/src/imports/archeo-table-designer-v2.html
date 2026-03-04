@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archeo Table Designer v2 — Screenshot Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p50:#E5F0FF;--p100:#CCE1FF;--p200:#99C3FF;--p300:#66A5FF;--p400:#3384FF;--p500:#1A62FF;--p600:#0047E0;--p700:#0035A8;--p800:#002470;--p900:#05205D;
+  --n0:#FFF;--n50:#FAFAFA;--n100:#F5F5F5;--n200:#E5E5E5;--n300:#D4D4D4;--n400:#A3A3A3;--n500:#737373;--n600:#525252;--n700:#404040;--n800:#262626;--n900:#171717;
+  --g:#22C55E;--y:#F59E0B;--r:#EF4444;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;
+  --dat:#CCE1FF;--dat-t:#262626;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#E8E8E8; color:var(--n900); }
+
+/* Control Panel */
+.control-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--n900);
+  color: var(--n0);
+  padding: 10px 24px;
+  z-index: 100;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.control-group label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--n400);
+  white-space: nowrap;
+}
+.control-group input[type="number"] {
+  width: 52px;
+  padding: 5px 6px;
+  border: 1px solid var(--n600);
+  border-radius: 4px;
+  background: var(--n800);
+  color: var(--n0);
+  font-size: 11px;
+  font-family: 'Geist Mono', monospace;
+}
+.control-group input[type="number"]:focus {
+  outline: none;
+  border-color: var(--p500);
+}
+.control-group input[type="color"] {
+  width: 28px;
+  height: 24px;
+  border: 1px solid var(--n600);
+  border-radius: 3px;
+  background: var(--n800);
+  cursor: pointer;
+  padding: 0;
+}
+.control-section {
+  display: flex;
+  gap: 12px;
+  padding: 0 14px;
+  border-left: 1px solid var(--n700);
+  align-items: center;
+}
+.control-section:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.section-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--p400);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-right: 4px;
+}
+.view-toggle {
+  display: flex;
+  gap: 4px;
+}
+.view-toggle button {
+  padding: 5px 10px;
+  border: 1px solid var(--n600);
+  background: var(--n800);
+  color: var(--n400);
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.view-toggle button:hover {
+  border-color: var(--p500);
+  color: var(--n0);
+}
+.view-toggle button.active {
+  background: var(--p500);
+  border-color: var(--p500);
+  color: var(--n0);
+}
+.reset-btn {
+  padding: 5px 10px;
+  background: var(--n700);
+  border: 1px solid var(--n600);
+  color: var(--n300);
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.reset-btn:hover {
+  background: var(--n600);
+  color: var(--n0);
+}
+.width-warning {
+  font-size: 10px;
+  color: var(--y);
+  font-weight: 500;
+}
+.width-ok {
+  font-size: 10px;
+  color: var(--g);
+  font-weight: 500;
+}
+
+/* Column Width Sliders */
+.column-controls {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  background: var(--n800);
+  padding: 10px 24px;
+  z-index: 99;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--n700);
+  align-items: flex-end;
+}
+.col-control {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.col-control label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--n400);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.col-control .input-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.col-control input[type="range"] {
+  width: 60px;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--n600);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.col-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--p500);
+  border-radius: 50%;
+  cursor: grab;
+}
+.col-control input[type="number"] {
+  width: 44px;
+  padding: 3px 5px;
+  border: 1px solid var(--n600);
+  border-radius: 3px;
+  background: var(--n700);
+  color: var(--n0);
+  font-size: 10px;
+  font-family: 'Geist Mono', monospace;
+}
+.col-control.total-width {
+  background: var(--p900);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+.col-control.total-width label {
+  color: var(--p300);
+}
+.col-control.total-width input {
+  width: 56px;
+  background: var(--p800);
+  border-color: var(--p600);
+}
+.col-percent {
+  font-size: 9px;
+  color: var(--n500);
+  font-family: 'Geist Mono', monospace;
+  text-align: center;
+}
+
+/* Main Content */
+.page {
+  padding: 120px 24px 40px;
+}
+.page-head {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.page-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--n400);
+}
+.page-desc {
+  font-size: 12px;
+  color: var(--n500);
+}
+
+/* Table Styles */
+.tbl-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--n0);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--n200);
+  display: inline-block;
+}
+table.t {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.t th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--n400);
+  background: var(--n50);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+  position: relative;
+}
+.t th .resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+}
+.t th .resize-handle:hover,
+.t th .resize-handle.dragging {
+  background: var(--p500);
+}
+.t td {
+  padding: 10px;
+  vertical-align: top;
+  color: var(--n700);
+  word-break: break-word;
+}
+.t tr:hover td {
+  background: var(--p50);
+}
+
+/* Cell Types */
+.t .ti {
+  font-family: 'Geist Mono', monospace;
+  color: var(--p500);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.t .geo-cell {
+  line-height: 1.4;
+}
+.t .geo-obec {
+  font-weight: 600;
+  color: var(--n800);
+}
+.t .geo-ku {
+  color: var(--n500);
+}
+.t .geo-ku.same {
+  color: var(--n300);
+}
+.t .geo-okres {
+  color: var(--n500);
+}
+.t .pol-c {
+  color: var(--n500);
+  line-height: 1.5;
+}
+.t .st-cell {
+  vertical-align: top;
+  text-align: center;
+}
+.st-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.st-1 { background: var(--g); }
+.st-2 { background: var(--y); }
+.st-3 { background: var(--r); }
+
+/* Chips */
+.chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.ch {
+  font-weight: 500;
+  line-height: 1.3;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.ch-d { background: var(--dat); color: var(--dat-t); }
+.ch-s { background: var(--n100); color: var(--n600); }
+.ch-n { background: var(--n200); color: var(--n500); }
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--n500);
+}
+.stats-bar span {
+  font-family: 'Geist Mono', monospace;
+}
+
+/* Hidden class for view toggle */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="control-panel">
+  <div class="control-section">
+    <div class="view-toggle">
+      <button id="btn-a" class="active" onclick="setView('a')">A · Raw</button>
+      <button id="btn-b" onclick="setView('b')">B · Grouped</button>
+    </div>
+  </div>
+  
+  <div class="control-section">
+    <span class="section-title">Fonts</span>
+    <div class="control-group">
+      <label>Č.A.</label>
+      <input type="number" id="fs-id" value="12" min="9" max="16" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Head</label>
+      <input type="number" id="fs-header" value="10" min="8" max="14" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Geo</label>
+      <input type="number" id="fs-geo" value="13" min="10" max="16" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Poloha</label>
+      <input type="number" id="fs-poloha" value="12" min="10" max="15" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Chips</label>
+      <input type="number" id="fs-chips" value="11" min="9" max="14" onchange="renderTable()">
+    </div>
+  </div>
+  
+  <div class="control-section">
+    <span class="section-title">Cells</span>
+    <div class="control-group">
+      <label>Pad</label>
+      <input type="number" id="row-padding" value="10" min="4" max="20" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Border</label>
+      <input type="number" id="border-width" value="1" min="0" max="3" step="0.5" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Color</label>
+      <input type="color" id="border-color" value="#E5E5E5" onchange="renderTable()">
+    </div>
+  </div>
+  
+  <div class="control-section">
+    <span class="section-title">Dot</span>
+    <div class="control-group">
+      <label>Size</label>
+      <input type="number" id="dot-size" value="8" min="4" max="16" onchange="renderTable()">
+    </div>
+    <div class="control-group">
+      <label>Top</label>
+      <input type="number" id="dot-top" value="3" min="0" max="20" onchange="renderTable()">
+    </div>
+  </div>
+  
+  <button class="reset-btn" onclick="resetAll()">Reset</button>
+  <span id="width-status" class="width-ok">✓ Fits 1366px</span>
+</div>
+
+<div class="column-controls" id="colControls"></div>
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Archeo Table Designer v2</div>
+      <p class="page-desc">Set total width or adjust columns. Datovanie-Druh merged. Screenshot when ready.</p>
+    </div>
+  </div>
+  
+  <div class="stats-bar">
+    <span id="stats-rows">0 rows</span>
+    <span id="stats-width">Width: 0px</span>
+  </div>
+  
+  <div class="tbl-wrap" id="tableWrap">
+    <table class="t" id="mainTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Column definitions - merged Datovanie-Druh
+const COLUMNS = [
+  { id: 'ca', label: 'Č.A.', width: 72, min: 50, max: 120 },
+  { id: 'st', label: 'St.', width: 36, min: 28, max: 60 },
+  { id: 'obec', label: 'Obec', width: 130, min: 80, max: 220 },
+  { id: 'ku', label: 'KÚ', width: 110, min: 60, max: 180 },
+  { id: 'okres', label: 'Okres', width: 120, min: 70, max: 200 },
+  { id: 'poloha', label: 'Poloha', width: 240, min: 120, max: 400 },
+  { id: 'druh', label: 'Datovanie – Druh', width: 320, min: 150, max: 500 }
+];
+
+// Era name mappings
+const ERA_NAMES = {
+  PA:'Paleolit',ME:'Mezolit',NE:'Neolit',EN:'Eneolit',BZ:'Doba bronzová',
+  HA:'Doba halštatská',LT:'Doba laténska',RI:'Doba rímska',SN:'Sťahovanie národov',
+  ST:'Stredovek',NV:'Novovek',PK:'Pravek',NX:'Nedatovateľné',NG:'Negatívne'
+};
+
+// Real data with varied st values for visual testing
+const DATA = [
+  {id:'31270',obec:'Nové Zámky',ku:'Nové Zámky',okres:'Nové Zámky',poloha:'IBV Riverside, p.č. 304/1,2,26',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31272',obec:'Topoľčany',ku:'Topoľčany',okres:'Topoľčany',poloha:'Kulturpark, p.č. 304/1,2,26',st:2,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31271',obec:'Ostrá Lúka',ku:'Ostrá Lúka',okres:'Zvolen',poloha:'Hrad Peťuša, p.č. 1409',st:1,ceans:'ST-vr',rawTyp:['Stredovek - vrcholný - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{ST:['vr']}},
+  {id:'31273',obec:'Chotín',ku:'Chotín',okres:'Komárno',poloha:'INS FTTH Transport KOMA 03, Pri hradskej, p.č. 5415, 5449, 5479-5482',st:1,ceans:'NE-ze, EN-ba, RI-rb, ST, NV',rawTyp:['Neolit - želiezovská - sídlisko','Eneolit - badenská - sídlisko','Doba rímska - rímskobarbarská - sídlisko','Stredovek - sídlisko','Novovek - sídlisko'],sites:['sídlisko'],eras:{NE:['ze'],EN:['ba'],RI:['rb'],ST:[''],NV:['']}},
+  {id:'31274',obec:'Marcelová',ku:'Krátke Kesy',okres:'Komárno',poloha:'INS FTTH Transport KOMA 03, Nad chotínskou cestou, p.č. 1877/2',st:1,ceans:'EN-ba',rawTyp:['Eneolit - badenská - sídlisko'],sites:['sídlisko'],eras:{EN:['ba']}},
+  {id:'31275',obec:'Beckov',ku:'Beckov',okres:'Nové Mesto nad Váhom',poloha:'Hrad Beckov, obnova západného paláca a západnej bašty',st:3,ceans:'ST, NV-16, NV-17, NV-18',rawTyp:['Stredovek - sídlisko opevnené','Novovek - 16. storočie - sídlisko opevnené','Novovek - 17. storočie - sídlisko opevnené','Novovek - 18. storočie - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{ST:[''],NV:['16','17','18']}},
+  {id:'31276',obec:'Sľažany',ku:'Dolné Sľažany',okres:'Zlaté Moravce',poloha:'RD, Farská ul., p.č. 30/13',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31277',obec:'Zbehy',ku:'Andač',okres:'Nitra',poloha:'Kostol Narodenia Panny Márie, p.č. 45/11, 45/12, 75/1, 75/3',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31278',obec:'Komárno',ku:'Komárno',okres:'Komárno',poloha:'Obchodné centrum, Eötvösova ulica, p.č. 2454/8,69,70,83,84,86,88, 2464/1,3',st:1,ceans:'ST-ne, NV-16, NV-17, NV-18, NV-19',rawTyp:['Stredovek - neskorý - sídlisko','Novovek - 16. storočie - sídlisko','Novovek - 17. storočie - sídlisko','Novovek - 18. storočie - sídlisko','Novovek - 19. storočie - sídlisko'],sites:['sídlisko'],eras:{ST:['ne'],NV:['16','17','18','19']}},
+  {id:'31279',obec:'Dunajská Streda',ku:'Dunajská Streda',okres:'Dunajská Streda',poloha:'Rozšírenie areálu Metrans/Danubia, a.s., p.č. 1962/4,5, 1963/308,495,848',st:2,ceans:'PK, RI, NV',rawTyp:['Pravek - neurčiteľné','Doba rímska - neurčiteľné','Novovek - neurčiteľné'],sites:['neurčiteľné'],eras:{PK:[''],RI:[''],NV:['']}},
+  {id:'31280',obec:'Križovany nad Dudváhom',ku:'Križovany nad Dudváhom',okres:'Trnava',poloha:'IBV Križovany nad Dudváhom B lokalita: PANSKÉ TABLY, etapa 1. 10 RD, p.č. 2288/72,75,28, 124, 2288/424',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31281',obec:'Želiezovce',ku:'Želiezovce',okres:'Levice',poloha:'Novostavba haly drevovýroby, Letná ul., p.č. 2401/7',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31282',obec:'Lužianky',ku:'Lužianky',okres:'Nitra',poloha:'West park Lužianky – technická infraštruktúra, Squarebizz Nitra, Vedľa Kapitulského, ulica Čerešňová a Lipová, p.č. 2073/11,48',st:1,ceans:'NV-19, NV-20',rawTyp:['Novovek - 19. storočie - sídlisko','Novovek - 20. storočie - sídlisko'],sites:['sídlisko'],eras:{NV:['19','20']}},
+  {id:'31283',obec:'Turčianske Jaseno',ku:'Turčianske Jaseno',okres:'Martin',poloha:'Galov diel, p.č. 1052/2, 1052/1, 516/1',st:1,ceans:'NV',rawTyp:['Novovek - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{NV:['']}},
+  {id:'31284',obec:'Turčianske Jaseno',ku:'Turčianske Jaseno',okres:'Martin',poloha:'Tisové, p.č. 1048, 1049, 1050',st:3,ceans:'LT-pu',rawTyp:['Doba laténska - púchovská - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{LT:['pu']}},
+  {id:'31285',obec:'Banská Štiavnica',ku:'Banská Štiavnica',okres:'Banská Štiavnica',poloha:'Vodárenska 42. RD kópia baníckeho domu, p.č. 3288, 3289',st:1,ceans:'NV-18, NV-19',rawTyp:['Novovek - 18. storočie - sídlisko','Novovek - 19. storočie - sídlisko'],sites:['sídlisko'],eras:{NV:['18','19']}},
+  {id:'31286',obec:'Banská Bystrica',ku:'Radvaň',okres:'Banská Bystrica',poloha:'RD s trojgarážou a skladom, p.č. 2848, 2849',st:1,ceans:'NV-19',rawTyp:['Novovek - 19. storočie - sídlisko'],sites:['sídlisko'],eras:{NV:['19']}},
+  {id:'31287',obec:'Dolná Ždaňa',ku:'Dolná Ždaňa',okres:'Žiar nad Hronom',poloha:'Hlinické Pohronie – zásobovanie pitnou vodou obcí Horná a Dolná Ždaňa a Lovča',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31288',obec:'Rožňava',ku:'Rožňava',okres:'Rožňava',poloha:'Rekonštrukcia Šafárikovej ulice – II. etapa, p.č. 2226/1, 2236/2, 2222/1-3, 2223, 2224, 1/1, 1/2, 2226/4',st:2,ceans:'NV',rawTyp:['Novovek - sídlisko'],sites:['sídlisko'],eras:{NV:['']}},
+  {id:'31289',obec:'Špania Dolina',ku:'Špania Dolina',okres:'Banská Bystrica',poloha:'Rekonštrukcia baníckeho domu, p.č. 206',st:1,ceans:'NV-17',rawTyp:['Novovek - 17. storočie - sídlisko'],sites:['sídlisko'],eras:{NV:['17']}},
+  {id:'31290',obec:'Dolná Strehová',ku:'Dolná Strehová',okres:'Veľký Krtíš',poloha:'Rekreačná chata, p.č. 1103/28-31',st:1,ceans:'PK',rawTyp:['Pravek - sídlisko'],sites:['sídlisko'],eras:{PK:['']}},
+  {id:'31291',obec:'Banská Bystrica',ku:'Banská Bystrica',okres:'Banská Bystrica',poloha:'Obnova „meštianskeho domu" na Nám. SNP č. 9, p.č. 1477',st:1,ceans:'ST-15, NV-16',rawTyp:['Stredovek - 15. storočie - sídlisko','Novovek - 16. storočie - sídlisko'],sites:['sídlisko'],eras:{ST:['15'],NV:['16']}},
+  {id:'31292',obec:'Nesvady',ku:'Nesvady',okres:'Komárno',poloha:'Technická vybavenosť IBV 63 RD',st:1,ceans:'NE, EN, BZ, NV',rawTyp:['Neolit - sídlisko','Eneolit - sídlisko','Doba bronzová - sídlisko','Novovek - sídlisko'],sites:['sídlisko'],eras:{NE:[''],EN:[''],BZ:[''],NV:['']}},
+  {id:'31293',obec:'Tornaľa',ku:'Šafárikovo',okres:'Revúca',poloha:'Pošta Tornaľa - rekonštrukcia strechy a zateplenie fasády, p.č. 1173/1',st:1,ceans:'PK',rawTyp:['Pravek - neurčiteľné'],sites:['neurčiteľné'],eras:{PK:['']}},
+  {id:'31294',obec:'Banská Bystrica',ku:'Banská Bystrica',okres:'Banská Bystrica',poloha:'Havária vodovodnej prípojky, Námestie Š. Moysesa, p.č. 5419/3, 7/1',st:1,ceans:'ST-15, NV',rawTyp:['Stredovek - 15. storočie - sídlisko opevnené','Novovek - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{ST:['15'],NV:['']}},
+  {id:'31295',obec:'Sliač',ku:'Hájniky',okres:'Zvolen',poloha:'OC Billa, p.č. 646/45',st:1,ceans:'ST-15',rawTyp:['Stredovek - 15. storočie - neurčiteľné'],sites:['neurčiteľné'],eras:{ST:['15']}},
+  {id:'31296',obec:'Sliač',ku:'Hájniky',okres:'Zvolen',poloha:'Inžinierske siete Sliač Hájniky – JUH – Sielnický potok',st:3,ceans:'ST-15, NV-19',rawTyp:['Stredovek - 15. storočie - neurčiteľné','Novovek - 19. storočie - neurčiteľné'],sites:['neurčiteľné'],eras:{ST:['15'],NV:['19']}},
+  {id:'31297',obec:'Banská Bystrica',ku:'Banská Bystrica',okres:'Banská Bystrica',poloha:'Havária kanalizačnej prípojky, Námestie SNP, p.č. 5505/1',st:1,ceans:'NV',rawTyp:['Novovek - sídlisko'],sites:['sídlisko'],eras:{NV:['']}},
+  {id:'31298',obec:'Patince',ku:'Patince',okres:'Komárno',poloha:'Kostol sv. Vendelína, 1. etapa, p.č. 4494, 4495',st:1,ceans:'ST-13, ST-14, NV-18, NV-19',rawTyp:['Stredovek - 13. storočie - areál kultový','Stredovek - 14. storočie - areál kultový','Novovek - 18. storočie - areál kultový','Novovek - 19. storočie - areál kultový'],sites:['areál kultový'],eras:{ST:['13','14'],NV:['18','19']}},
+  {id:'31299',obec:'Nitrianske Pravno',ku:'Nitrianske Pravno',okres:'Prievidza',poloha:'Vodozádržné opatrenia, Námestie SNP, p.č. 1/1, 4/3, 413, 414/1, 6935, 6962...',st:2,ceans:'ST-14, ST-15, NV',rawTyp:['Stredovek - 14. storočie - sídlisko','Stredovek - 15. storočie - sídlisko'],sites:['sídlisko'],eras:{ST:['14','15'],NV:['']}},
+  {id:'31300',obec:'Banská Bystrica',ku:'Banská Bystrica',okres:'Banská Bystrica',poloha:'Uľanská cesta, garáž a kancelárske priestory so štúdiom, p.č. 93/3,4',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31301',obec:'Paňa',ku:'Paňa',okres:'Nitra',poloha:'Výstavba Bocianie hniezdo, p.č. 5/2,3, 6/1,2, 1225/1,2, 1226/2, 1227/1,2, 1228/301',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31302',obec:'Banská Bystrica',ku:'Banská Bystrica',okres:'Banská Bystrica',poloha:'Lazovná ul. č. 43, súp.č. 267, p.č. 2241/1,2,3',st:1,ceans:'NV-19',rawTyp:['Novovek - 19. storočie - neurčiteľné'],sites:['neurčiteľné'],eras:{NV:['19']}},
+  {id:'31303',obec:'Sklabinský Podzámok',ku:'Sklabinský Podzámok',okres:'Martin',poloha:'Hrad Sklabiňa, p.č. 234/10, 234/12',st:1,ceans:'ST-15, NV',rawTyp:['Stredovek - 15. storočie - sídlisko opevnené','Novovek - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{ST:['15'],NV:['']}},
+  {id:'31304',obec:'Badín',ku:'Badín',okres:'Banská Bystrica',poloha:'RD, p.č. 1244/19, 1244/4, 3196/1, 1100/8',st:1,ceans:'NX',rawTyp:['nedatovateľné'],sites:[],eras:{NX:['']}},
+  {id:'31305',obec:'Galanta',ku:'Galanta',okres:'Galanta',poloha:'RD, p.č. 5188/138,139,254,255',st:1,ceans:'NX',rawTyp:['nedatovateľné'],sites:[],eras:{NX:['']}},
+  {id:'31306',obec:'Špania Dolina',ku:'Špania Dolina',okres:'Banská Bystrica',poloha:'Sanácia bodovej závady, cesta III/2410 - 3,770-3900km, p.č. 1206/1',st:1,ceans:'NV-17, NV-19',rawTyp:['Novovek - 17. storočie - neurčiteľné','Novovek - 19. storočie - neurčiteľné'],sites:['neurčiteľné'],eras:{NV:['17','19']}},
+  {id:'31307',obec:'Sielnica',ku:'Sielnica',okres:'Zvolen',poloha:'Za ihriskom, rozšírenie NNK, p.č. 682/1, 683/1, 683/2',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31308',obec:'Cabaj - Čápor',ku:'Čápor',okres:'Nitra',poloha:'RD+prístrešok, p.č. 472/4, 472/6',st:1,ceans:'NE',rawTyp:['Neolit - sídlisko'],sites:['sídlisko'],eras:{NE:['']}},
+  {id:'31309',obec:'Špania Dolina',ku:'Špania Dolina',okres:'Banská Bystrica',poloha:'Do kúta, Obnova NKP - dom ľudový, súp.č. 153, p.č. 249, 251, 252, 253',st:1,ceans:'NV-17, NV-19',rawTyp:['Novovek - 17. storočie - sídlisko','Novovek - 19. storočie - sídlisko'],sites:['sídlisko'],eras:{NV:['17','19']}},
+  {id:'31310',obec:'Tornaľa',ku:'Šafárikovo',okres:'Revúca',poloha:'ul. Mierová, ul. Škultétyho, ul. Poštová, INS-FTTH-RA-TORN-00',st:1,ceans:'BZ-pi, NV-18, NV-19',rawTyp:['Doba bronzová - pilinská - sídlisko','Novovek - 18. storočie - sídlisko','Novovek - 19. storočie - sídlisko'],sites:['sídlisko'],eras:{BZ:['pi'],NV:['18','19']}},
+  {id:'31311',obec:'Sládkovičovo',ku:'Sládkovičovo',okres:'Galanta',poloha:'Pri železnici, RD, p.č. 3612/122',st:1,ceans:'PK',rawTyp:['Pravek - sídlisko'],sites:['sídlisko'],eras:{PK:['']}},
+  {id:'31312',obec:'Banská Štiavnica',ku:'Banská Štiavnica',okres:'Banská Štiavnica',poloha:'Ul. Novozámocká 135/6, Obnova NKP dom meštiansky, p.č. 2378/2379',st:1,ceans:'ST-14, ST-15, NV-16, NV-17, NV-18',rawTyp:['Stredovek - 14. storočie - sídlisko','Stredovek - 15. storočie - sídlisko','Novovek - 16. storočie - sídlisko','Novovek - 17. storočie - sídlisko','Novovek - 18. storočie - sídlisko'],sites:['sídlisko'],eras:{ST:['14','15'],NV:['16','17','18']}},
+  {id:'31313',obec:'Zvolen',ku:'Zvolen',okres:'Zvolen',poloha:'OC OBI Zvolen, Pod Strážou, ZV - Západ, II. etapa, p.č. 3445/52, 120, 124, 109',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31314',obec:'Koniarovce',ku:'Koniarovce',okres:'Topoľčany',poloha:'RD, p.č. 176/3',st:1,ceans:'RI-01, RI-02, RI-03, RI-04',rawTyp:['Doba rímska - 1. storočie - sídlisko','Doba rímska - 2. storočie - sídlisko','Doba rímska - 3. storočie - sídlisko','Doba rímska - 4. storočie - sídlisko'],sites:['sídlisko'],eras:{RI:['01','02','03','04']}},
+  {id:'31315',obec:'Badín',ku:'Badín',okres:'Banská Bystrica',poloha:'Nad Močidlami, ul. Osloboditeľov, Reštaurácia Koliba, p.č. 1024/1,2,4, 1492/5, 3172/1',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31316',obec:'Horná Streda',ku:'Horná Streda',okres:'Nové Mesto nad Váhom',poloha:'Dolné Pole, Centrum automatizácie a robotizácie automobilovej výroby Horná Streda - II.etapa',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]},
+  {id:'31317',obec:'Modrý Kameň',ku:'Modrý Kameň',okres:'Veľký Krtíš',poloha:'Hrad Modrý Kameň, ul. Zámocká, obnova mostu, p.č. 2, 4/1',st:1,ceans:'NV-16',rawTyp:['Novovek - 16. storočie - sídlisko opevnené'],sites:['sídlisko opevnené'],eras:{NV:['16']}},
+  {id:'31318',obec:'Nováky',ku:'Nováky',okres:'Prievidza',poloha:'Prístupová komunikácia a inžinierske siete, p.č. 586/30, 586/86...',st:1,ceans:'negatívne',rawTyp:['negatívne'],sites:[]}
+];
+
+let currentView = 'a';
+let columnWidths = {};
+let totalWidth = 1028; // Default total
+
+// Initialize column widths
+COLUMNS.forEach(col => { columnWidths[col.id] = col.width; });
+
+function getColumnSum() {
+  return COLUMNS.reduce((sum, col) => sum + columnWidths[col.id], 0);
+}
+
+function createColumnControls() {
+  const container = document.getElementById('colControls');
+  
+  // Total width control
+  let html = `
+    <div class="col-control total-width">
+      <label>Total Width</label>
+      <div class="input-row">
+        <input type="number" id="total-width" min="600" max="1920" value="${totalWidth}"
+               onchange="setTotalWidth(this.value)">
+      </div>
+    </div>
+  `;
+  
+  // Individual column controls
+  html += COLUMNS.map(col => {
+    const pct = Math.round((col.width / totalWidth) * 100);
+    return `
+    <div class="col-control">
+      <label>${col.label}</label>
+      <div class="input-row">
+        <input type="range" id="slider-${col.id}" min="${col.min}" max="${col.max}" value="${col.width}" 
+               oninput="updateColWidth('${col.id}', this.value)">
+        <input type="number" id="num-${col.id}" min="${col.min}" max="${col.max}" value="${col.width}"
+               onchange="updateColWidth('${col.id}', this.value)">
+      </div>
+      <div class="col-percent" id="pct-${col.id}">${pct}%</div>
+    </div>
+  `}).join('');
+  
+  container.innerHTML = html;
+}
+
+function setTotalWidth(value) {
+  const newTotal = parseInt(value);
+  const currentSum = getColumnSum();
+  const ratio = newTotal / currentSum;
+  
+  // Scale all columns proportionally
+  COLUMNS.forEach(col => {
+    let newWidth = Math.round(columnWidths[col.id] * ratio);
+    newWidth = Math.max(col.min, Math.min(col.max, newWidth));
+    columnWidths[col.id] = newWidth;
+    document.getElementById(`slider-${col.id}`).value = newWidth;
+    document.getElementById(`num-${col.id}`).value = newWidth;
+  });
+  
+  totalWidth = newTotal;
+  updatePercentages();
+  renderTable();
+  updateStats();
+}
+
+function updateColWidth(colId, value) {
+  const v = parseInt(value);
+  columnWidths[colId] = v;
+  document.getElementById(`slider-${colId}`).value = v;
+  document.getElementById(`num-${colId}`).value = v;
+  
+  // Update total to match sum
+  totalWidth = getColumnSum();
+  document.getElementById('total-width').value = totalWidth;
+  
+  updatePercentages();
+  renderTable();
+  updateStats();
+}
+
+function updatePercentages() {
+  const sum = getColumnSum();
+  COLUMNS.forEach(col => {
+    const pct = Math.round((columnWidths[col.id] / sum) * 100);
+    document.getElementById(`pct-${col.id}`).textContent = pct + '%';
+  });
+}
+
+function renderTable() {
+  renderTableHead();
+  renderTableBody();
+}
+
+function renderTableHead() {
+  const thead = document.getElementById('tableHead');
+  const fsHeader = document.getElementById('fs-header').value;
+  const borderWidth = document.getElementById('border-width').value;
+  const borderColor = document.getElementById('border-color').value;
+  
+  thead.innerHTML = `<tr>${COLUMNS.map((col,i) => `
+    <th style="font-size:${fsHeader}px; width:${columnWidths[col.id]}px; border-bottom:${borderWidth}px solid ${borderColor}">
+      ${col.label}
+      <div class="resize-handle" data-col="${i}"></div>
+    </th>
+  `).join('')}</tr>`;
+  
+  setupResizeHandles();
+}
+
+function renderTableBody() {
+  const tbody = document.getElementById('tableBody');
+  const table = document.getElementById('mainTable');
+  
+  const fsId = document.getElementById('fs-id').value;
+  const fsGeo = document.getElementById('fs-geo').value;
+  const fsPoloha = document.getElementById('fs-poloha').value;
+  const fsChips = document.getElementById('fs-chips').value;
+  const padding = document.getElementById('row-padding').value;
+  const borderWidth = document.getElementById('border-width').value;
+  const borderColor = document.getElementById('border-color').value;
+  
+  // Set table width
+  table.style.width = getColumnSum() + 'px';
+  
+  const dotSize = document.getElementById('dot-size').value;
+  const dotTop = document.getElementById('dot-top').value;
+  
+  const geoObecSize = fsGeo;
+  const geoKuSize = parseInt(fsGeo) - 1;
+  const geoOkresSize = parseInt(fsGeo) - 1;
+  
+  tbody.innerHTML = DATA.map((d, idx) => {
+    const isLast = idx === DATA.length - 1;
+    const borderStyle = isLast ? 'none' : `${borderWidth}px solid ${borderColor}`;
+    
+    // Datovanie-Druh merged cell
+    let druhCell = '';
+    if (currentView === 'a') {
+      // Raw view - show rawTyp chips
+      if (d.rawTyp.length && d.rawTyp[0] !== 'negatívne' && d.rawTyp[0] !== 'nedatovateľné') {
+        druhCell = `<div class="chips">${d.rawTyp.map(r => 
+          `<span class="ch ch-d" style="font-size:${fsChips}px">${r}</span>`
+        ).join('')}</div>`;
+      } else if (d.ceans === 'negatívne' || d.rawTyp[0] === 'negatívne') {
+        druhCell = `<span class="ch ch-n" style="font-size:${fsChips}px">negatívne</span>`;
+      } else if (d.ceans === 'NX' || d.rawTyp[0] === 'nedatovateľné') {
+        druhCell = `<span class="ch ch-n" style="font-size:${fsChips}px">nedatovateľné</span>`;
+      } else {
+        druhCell = '—';
+      }
+    } else {
+      // Grouped view - era chips + site chips
+      if (d.eras && Object.keys(d.eras).length) {
+        let chips = Object.keys(d.eras).map(era => {
+          const subs = d.eras[era].filter(s => s);
+          const isSpecial = ['PK','NX','NG'].includes(era);
+          let label = ERA_NAMES[era] || era;
+          if (subs.length) {
+            const nums = subs.filter(s => /^\d+$/.test(s)).map(Number).sort((a,b)=>a-b);
+            const alpha = subs.filter(s => !/^\d+$/.test(s));
+            let subStr = '';
+            if (nums.length >= 2 && nums.every((n,i) => i===0 || n === nums[i-1]+1)) {
+              subStr = nums[0] + '–' + nums[nums.length-1];
+            } else if (nums.length) {
+              subStr = nums.join(', ');
+            }
+            if (alpha.length) subStr = alpha.join(', ') + (subStr ? ' ' + subStr : '');
+            if (subStr) label += ' ' + subStr;
+          }
+          return `<span class="ch ${isSpecial ? 'ch-n' : 'ch-d'}" style="font-size:${fsChips}px">${label}</span>`;
+        }).join('');
+        
+        // Add site chips
+        if (d.sites.length) {
+          chips += d.sites.map(s => 
+            `<span class="ch ch-s" style="font-size:${fsChips}px">${s}</span>`
+          ).join('');
+        }
+        
+        druhCell = `<div class="chips">${chips}</div>`;
+      } else if (d.ceans === 'negatívne') {
+        druhCell = `<span class="ch ch-n" style="font-size:${fsChips}px">negatívne</span>`;
+      } else if (d.ceans === 'NX') {
+        druhCell = `<span class="ch ch-n" style="font-size:${fsChips}px">nedatovateľné</span>`;
+      } else {
+        druhCell = '—';
+      }
+    }
+    
+    // KU display - show in lighter color if same as Obec
+    const kuSame = d.ku === d.obec;
+    const kuDisplay = `<div class="geo-ku${kuSame ? ' same' : ''}" style="font-size:${geoKuSize}px">${d.ku}</div>`;
+    
+    return `<tr>
+      <td class="ti" style="font-size:${fsId}px; padding:${padding}px; width:${columnWidths['ca']}px; border-bottom:${borderStyle}">${d.id}</td>
+      <td class="st-cell" style="padding:${padding}px; width:${columnWidths['st']}px; border-bottom:${borderStyle}"><span class="st-dot st-${d.st}" style="width:${dotSize}px; height:${dotSize}px; margin-top:${dotTop}px"></span></td>
+      <td class="geo-cell" style="padding:${padding}px; width:${columnWidths['obec']}px; border-bottom:${borderStyle}">
+        <div class="geo-obec" style="font-size:${geoObecSize}px">${d.obec}</div>
+      </td>
+      <td class="geo-cell" style="padding:${padding}px; width:${columnWidths['ku']}px; border-bottom:${borderStyle}">
+        ${kuDisplay}
+      </td>
+      <td class="geo-cell" style="padding:${padding}px; width:${columnWidths['okres']}px; border-bottom:${borderStyle}">
+        <div class="geo-okres" style="font-size:${geoOkresSize}px">${d.okres}</div>
+      </td>
+      <td class="pol-c" style="font-size:${fsPoloha}px; padding:${padding}px; width:${columnWidths['poloha']}px; border-bottom:${borderStyle}">${d.poloha}</td>
+      <td style="padding:${padding}px; width:${columnWidths['druh']}px; border-bottom:${borderStyle}">${druhCell}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setupResizeHandles() {
+  document.querySelectorAll('.resize-handle').forEach(handle => {
+    handle.addEventListener('mousedown', startResize);
+  });
+}
+
+let resizing = null;
+let startX = 0;
+let startWidth = 0;
+
+function startResize(e) {
+  e.preventDefault();
+  const colIndex = parseInt(e.target.dataset.col);
+  resizing = COLUMNS[colIndex];
+  startX = e.clientX;
+  startWidth = columnWidths[resizing.id];
+  e.target.classList.add('dragging');
+  document.addEventListener('mousemove', doResize);
+  document.addEventListener('mouseup', stopResize);
+}
+
+function doResize(e) {
+  if (!resizing) return;
+  const diff = e.clientX - startX;
+  let newWidth = Math.max(resizing.min, Math.min(resizing.max, startWidth + diff));
+  updateColWidth(resizing.id, newWidth);
+}
+
+function stopResize() {
+  document.querySelectorAll('.resize-handle').forEach(h => h.classList.remove('dragging'));
+  resizing = null;
+  document.removeEventListener('mousemove', doResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + v).classList.add('active');
+  renderTableBody();
+}
+
+function updateStats() {
+  document.getElementById('stats-rows').textContent = DATA.length + ' rows';
+  const sum = getColumnSum();
+  document.getElementById('stats-width').textContent = 'Width: ' + sum + 'px';
+  
+  // Update status indicator
+  const status = document.getElementById('width-status');
+  if (sum <= 1320) { // 1366 - 46px for margins
+    status.className = 'width-ok';
+    status.textContent = '✓ Fits 1366px';
+  } else if (sum <= 1400) {
+    status.className = 'width-warning';
+    status.textContent = '⚠ Tight at 1366px';
+  } else {
+    status.className = 'width-warning';
+    status.textContent = '✗ Too wide for 1366px';
+  }
+}
+
+function resetAll() {
+  COLUMNS.forEach(col => {
+    columnWidths[col.id] = col.width;
+    document.getElementById(`slider-${col.id}`).value = col.width;
+    document.getElementById(`num-${col.id}`).value = col.width;
+  });
+  totalWidth = getColumnSum();
+  document.getElementById('total-width').value = totalWidth;
+  
+  document.getElementById('fs-id').value = 12;
+  document.getElementById('fs-header').value = 10;
+  document.getElementById('fs-geo').value = 13;
+  document.getElementById('fs-poloha').value = 12;
+  document.getElementById('fs-chips').value = 11;
+  document.getElementById('row-padding').value = 10;
+  document.getElementById('border-width').value = 1;
+  document.getElementById('border-color').value = '#E5E5E5';
+  document.getElementById('dot-size').value = 8;
+  document.getElementById('dot-top').value = 3;
+  
+  updatePercentages();
+  renderTable();
+  updateStats();
+}
+
+// Initialize
+createColumnControls();
+updatePercentages();
+renderTable();
+updateStats();
+</script>
+</body>
+</html>

@@ -761,6 +761,10 @@ export const DOCUMENTS: EtnoDocument[] = [
   },
 ];
 
+export function getDocumentById(id: string): EtnoDocument | undefined {
+  return DOCUMENTS.find((d) => d.id === id);
+}
+
 // ─── Map cluster utilities (simplified from Archeo) ─────────────────────────
 
 export interface MapPin {

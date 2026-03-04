@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import TopNav from '@/components/ct/TopNav.vue'
 import FilterSidebar from '@/components/ct/FilterSidebar.vue'
 import FilterChips from '@/components/ct/FilterChips.vue'
@@ -13,6 +14,7 @@ import {
 } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
+const route = useRoute()
 const isMobile = useIsMobile()
 const filterOpen = ref(false)
 const openSubPanelKey = ref<string | null>(null)
@@ -20,10 +22,28 @@ const activeFilters = ref<Record<string, string[]>>({})
 const sortKey = ref('id')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 
-// Desktop: filter open by default; mobile: closed
+// Build activeFilters from route.query (e.g. from Detail filter links)
+const filterKeys = [
+  'keywords', 'researchCollection', 'author', 'obec', 'okres', 'kraj', 'stat',
+  'documentType', 'studyPeriod', 'collectionMethod', 'language',
+]
+function syncFiltersFromQuery() {
+  const q = route.query
+  const next: Record<string, string[]> = {}
+  for (const key of filterKeys) {
+    const val = q[key]
+    if (val == null) continue
+    const arr = Array.isArray(val) ? val : [val]
+    if (arr.length) next[key] = arr
+  }
+  activeFilters.value = next
+}
+
 onMounted(() => {
   filterOpen.value = !isMobile.value
+  syncFiltersFromQuery()
 })
+watch(() => route.query, syncFiltersFromQuery, { deep: true })
 watch(isMobile, (mobile) => {
   if (mobile) filterOpen.value = false
   else filterOpen.value = true
