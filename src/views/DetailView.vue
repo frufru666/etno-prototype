@@ -8,6 +8,7 @@ import PdfViewer from '@/components/ct/detail/PdfViewer.vue'
 import AudioPlayer from '@/components/ct/detail/AudioPlayer.vue'
 import VideoPlayer from '@/components/ct/detail/VideoPlayer.vue'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { getDocumentById } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
@@ -55,6 +56,17 @@ const imageCount = computed(() => {
   return 1
 })
 
+// CTA label below mobile hero: "Zobraziť {mediaType}" per wireframe
+const mobileCtaLabel = computed(() => {
+  const doc = document.value
+  if (!doc) return 'Zobraziť'
+  if (doc.mediaType === 'image') return imageCount.value > 1 ? 'Zobraziť galériu' : 'Zobraziť obrázok'
+  if (doc.mediaType === 'pdf') return 'Zobraziť dokument'
+  if (doc.mediaType === 'audio') return 'Zobraziť nahrávku'
+  if (doc.mediaType === 'video') return 'Zobraziť video'
+  return 'Zobraziť'
+})
+
 // Redirect to Explore when document not found
 watch(
   document,
@@ -92,102 +104,108 @@ watch(
 
     <!-- Document found -->
     <template v-else>
-      <div class="flex pt-[49px] md:pt-[57px]">
+      <div class="flex flex-1 pt-[49px] md:pt-[57px] overflow-hidden">
         <!-- Left panel (desktop) or full width (mobile) -->
-        <div class="min-w-0 flex-1">
-          <!-- Desktop: media or map in left panel -->
+        <div class="min-w-0 flex-1 flex flex-col">
+          <!-- Desktop: single left column with absolute layers (Archeo-style) -->
           <template v-if="!isMobile">
-            <!-- Map in left panel (desktop) -->
-            <div
-              v-if="leftPanelView === 'map'"
-              class="relative h-[calc(100vh-57px)] w-full bg-neutral-200"
-            >
-              <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground">
-                <span>Map placeholder (fullscreen)</span>
-                <Button
-                  variant="secondary"
-                  @click="closeMapFullscreen"
-                >
-                  Zavrieť
-                </Button>
-              </div>
-            </div>
-            <!-- Media viewer (desktop) -->
-            <div
-              v-else
-              class="h-[calc(100vh-57px)] w-full"
-            >
-              <ImageViewer
-                v-if="document.mediaType === 'image'"
-                :document="document"
-                :image-count="imageCount"
-              />
-              <PdfViewer
-                v-else-if="document.mediaType === 'pdf'"
-                :document="document"
-              />
-              <AudioPlayer
-                v-else-if="document.mediaType === 'audio'"
-                :document="document"
-              />
-              <VideoPlayer
-                v-else-if="document.mediaType === 'video'"
-                :document="document"
-              />
+            <div class="flex-1 relative overflow-hidden h-[calc(100vh-57px)]">
+              <!-- Layer 1: media (default) -->
               <div
-                v-else
-                class="flex h-full items-center justify-center bg-neutral-200 text-muted-foreground"
+                class="absolute inset-0"
+                :class="{ invisible: leftPanelView !== 'media' }"
               >
-                Žiadny prehliadač pre tento typ dokumentu.
+                <ImageViewer
+                  v-if="document.mediaType === 'image'"
+                  :document="document"
+                  :image-count="imageCount"
+                />
+                <PdfViewer
+                  v-else-if="document.mediaType === 'pdf'"
+                  :document="document"
+                />
+                <AudioPlayer
+                  v-else-if="document.mediaType === 'audio'"
+                  :document="document"
+                />
+                <VideoPlayer
+                  v-else-if="document.mediaType === 'video'"
+                  :document="document"
+                />
+                <div
+                  v-else
+                  class="flex h-full items-center justify-center bg-neutral-200 text-muted-foreground"
+                >
+                  Žiadny prehliadač pre tento typ dokumentu.
+                </div>
+              </div>
+              <!-- Layer 2: map (on top when active) -->
+              <div
+                v-if="leftPanelView === 'map'"
+                class="absolute inset-0 z-30 bg-neutral-200"
+              >
+                <div class="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
+                  <span>Map placeholder (fullscreen)</span>
+                  <Button
+                    variant="secondary"
+                    @click="closeMapFullscreen"
+                  >
+                    Zavrieť
+                  </Button>
+                </div>
               </div>
             </div>
           </template>
 
-          <!-- Mobile: stacked layout -->
+          <!-- Mobile: stacked layout – static hero, then CTA, then panel -->
           <template v-else>
-            <!-- Inline media viewer (compact) -->
-            <div class="relative w-full bg-neutral-200">
-              <ImageViewer
-                v-if="document.mediaType === 'image'"
-                :document="document"
-                :image-count="imageCount"
-                :mobile="true"
-              />
-              <PdfViewer
-                v-else-if="document.mediaType === 'pdf'"
-                :document="document"
-                :mobile="true"
-              />
-              <AudioPlayer
-                v-else-if="document.mediaType === 'audio'"
-                :document="document"
-                :mobile="true"
-              />
-              <VideoPlayer
-                v-else-if="document.mediaType === 'video'"
-                :document="document"
-                :mobile="true"
-              />
-              <div
-                v-else
-                class="flex aspect-video items-center justify-center text-muted-foreground"
+            <!-- Static hero: thumbnail/placeholder only (no interaction; tap CTA to open viewer) -->
+            <div
+              class="relative w-full min-h-[280px] h-[280px] bg-neutral-200 flex items-center justify-center cursor-pointer"
+              role="button"
+              tabindex="0"
+              aria-label="Otvoriť prehliadač médií"
+              @click="openViewerFullscreen"
+              @keydown.enter.prevent="openViewerFullscreen"
+              @keydown.space.prevent="openViewerFullscreen"
+            >
+              <span class="text-muted-foreground text-sm">Náhľad obsahu</span>
+            </div>
+            <!-- Mobile header + CTA below hero (per wireframe: ID, title, author, type, then CTA) -->
+            <div class="px-4 py-4 bg-white border-b border-neutral-200 space-y-2">
+              <span
+                class="inline-block font-mono text-[13px] font-medium text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
               >
-                Žiadny prehliadač
-              </div>
-              <!-- Mobile: Zobraziť galériu for multi-image -->
+                {{ document.id }}
+              </span>
+              <h2 class="text-xl font-bold tracking-tight text-foreground">
+                {{ document.title }}
+              </h2>
+              <p
+                v-if="document.authors?.length"
+                class="text-[15px] text-muted-foreground"
+              >
+                Autor: {{ document.authors.map((a) => a.name).join(', ') }}
+              </p>
+              <Badge
+                variant="outline"
+                class="text-muted-foreground"
+              >
+                {{ document.documentType }}
+              </Badge>
               <Button
-                v-if="document.mediaType === 'image' && imageCount > 1"
-                class="absolute bottom-4 left-4 right-4"
+                class="w-full mt-2"
                 @click="openViewerFullscreen"
               >
-                Zobraziť galériu
+                {{ mobileCtaLabel }}
               </Button>
             </div>
             <!-- Right panel content stacked below (mobile) -->
-            <div class="min-h-[50vh] border-t border-neutral-200 bg-white">
+            <div class="flex-1 min-h-0 border-t border-neutral-200 bg-white">
               <DetailRightPanel
                 :document="document"
                 :mobile="true"
+                :hide-header="true"
                 @open-map-fullscreen="openMapFullscreen"
                 @show-transcript="() => {}"
               />
@@ -208,36 +226,38 @@ watch(
         </aside>
       </div>
 
-      <!-- Mobile: fullscreen viewer overlay -->
+      <!-- Mobile: fullscreen viewer overlay (interactive media viewer with thumb strip + transcript) -->
       <div
         v-if="isMobile && mobileViewerFullscreen"
-        class="fixed inset-0 z-[60] bg-white"
+        class="fixed inset-0 z-[60] flex flex-col bg-white"
       >
-        <ImageViewer
-          v-if="document.mediaType === 'image'"
-          :document="document"
-          :image-count="imageCount"
-          :fullscreen="true"
-          @close="closeViewerFullscreen"
-        />
-        <PdfViewer
-          v-else-if="document.mediaType === 'pdf'"
-          :document="document"
-          :fullscreen="true"
-          @close="closeViewerFullscreen"
-        />
-        <AudioPlayer
-          v-else-if="document.mediaType === 'audio'"
-          :document="document"
-          :fullscreen="true"
-          @close="closeViewerFullscreen"
-        />
-        <VideoPlayer
-          v-else-if="document.mediaType === 'video'"
-          :document="document"
-          :fullscreen="true"
-          @close="closeViewerFullscreen"
-        />
+        <div class="flex-1 min-h-0 flex flex-col">
+          <ImageViewer
+            v-if="document.mediaType === 'image'"
+            :document="document"
+            :image-count="imageCount"
+            :fullscreen="true"
+            @close="closeViewerFullscreen"
+          />
+          <PdfViewer
+            v-else-if="document.mediaType === 'pdf'"
+            :document="document"
+            :fullscreen="true"
+            @close="closeViewerFullscreen"
+          />
+          <AudioPlayer
+            v-else-if="document.mediaType === 'audio'"
+            :document="document"
+            :fullscreen="true"
+            @close="closeViewerFullscreen"
+          />
+          <VideoPlayer
+            v-else-if="document.mediaType === 'video'"
+            :document="document"
+            :fullscreen="true"
+            @close="closeViewerFullscreen"
+          />
+        </div>
       </div>
 
       <!-- Mobile: fullscreen map overlay -->

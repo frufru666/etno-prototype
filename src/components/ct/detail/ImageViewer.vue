@@ -41,7 +41,7 @@ const thumbIndices = computed(() =>
 
 <template>
   <div
-    class="relative flex h-full w-full flex-col bg-neutral-200"
+    class="relative flex h-full w-full min-h-0 flex-col bg-neutral-200"
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
     <!-- Top bar: close (when fullscreen) + transcript button (multi) -->

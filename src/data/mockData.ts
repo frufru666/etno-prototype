@@ -647,7 +647,7 @@ export const DOCUMENTS: EtnoDocument[] = [
     accessRight: "obmedzený prístup",
     license: "https://creativecommons.org/licenses/by-nc-nd/4.0/",
     note: "Po skončení projektu otvorený prístup",
-    hasTranscript: false,
+    hasTranscript: true,
     hasMap: true,
   },
 
@@ -763,6 +763,21 @@ export const DOCUMENTS: EtnoDocument[] = [
 
 export function getDocumentById(id: string): EtnoDocument | undefined {
   return DOCUMENTS.find((d) => d.id === id);
+}
+
+/** Five documents for review: single image, multi image, audio, video, pdf */
+const REVIEW_DOCUMENT_IDS = [
+  "AD017191",      // single image (diapozitív)
+  "RELIROMA-F001", // multi image (fotografia, hasTranscript)
+  "AU00001",       // audio
+  "RELIROMA-V001", // video
+  "AT00016",       // pdf
+]
+
+export function getReviewDocuments(): EtnoDocument[] {
+  return REVIEW_DOCUMENT_IDS
+    .map((id) => DOCUMENTS.find((d) => d.id === id))
+    .filter((d): d is EtnoDocument => d != null)
 }
 
 // ─── Map cluster utilities (simplified from Archeo) ─────────────────────────

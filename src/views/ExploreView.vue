@@ -8,7 +8,7 @@ import ResultsGrid from '@/components/ct/ResultsGrid.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
-  DOCUMENTS,
+  getReviewDocuments,
   matchesFilters,
   type EtnoDocument,
 } from '@/data/mockData'
@@ -50,7 +50,7 @@ watch(isMobile, (mobile) => {
 })
 
 const filteredDocuments = computed(() => {
-  const list = DOCUMENTS.filter((doc) =>
+  const list = getReviewDocuments().filter((doc) =>
     matchesFilters(doc, activeFilters.value)
   )
   const key = sortKey.value

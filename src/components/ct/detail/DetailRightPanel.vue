@@ -4,13 +4,18 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { METADATA_SECTIONS, type EtnoDocument } from '@/data/mockData'
+import { ExternalLink } from 'lucide-vue-next'
 
-const props = defineProps<{
-  document: EtnoDocument
-  mobile?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    document: EtnoDocument
+    mobile?: boolean
+    /** When true, hide ID/title/author (e.g. when shown in mobile hero block above) */
+    hideHeader?: boolean
+  }>(),
+  { hideHeader: false }
+)
 
 const emit = defineEmits<{
   (e: 'open-map-fullscreen'): void
@@ -28,11 +33,16 @@ function openExploreWithFilter(filterKey: string, value: string) {
   router.push({ name: 'explore', query: { [filterKey]: value } })
 }
 
-// Transcript preview text: use abstract or note, or placeholder
+// Transcript preview: abstract/note or longer placeholder for scrollability
 function transcriptPreview(doc: EtnoDocument): string {
   if (doc.abstract) return doc.abstract
   if (doc.note) return doc.note
-  return 'Transkript dokumentu…'
+  return (
+    'Transkript dokumentu. Dátum výskumu, Skupina, Heslo. Obec, č. d. Košická Nová Ves, 1.10.1974. Okres, Košice. Zapísal, Prameň, Predmet, Foto, Kresba. ' +
+    'Bezzemkovia si tu prenajímali pôdu od väčších gazdov, aby na nej pestovali uhorky, pre ktoré sú tu neobyčajne dobré podmienky. ' +
+    'Roľníci vysádzali priemerne na 1000–1200 m² uhorky, z čoho získali i 20 mechov po 60–70 metr.centov. Uhorky tu boli najdôležitejším výrobným artiklom a zdrojom peňazí. ' +
+    'Tento text slúži ako placeholder na ukážku scrollovateľnosti transkriptu.'
+  )
 }
 
 function formatCoords(doc: EtnoDocument): string {
@@ -41,24 +51,32 @@ function formatCoords(doc: EtnoDocument): string {
   }
   return ''
 }
+
+const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 </script>
 
 <template>
   <ScrollArea class="h-full">
-    <div class="flex flex-col gap-4 p-4">
-      <!-- 1. Header -->
-      <div class="space-y-2">
-        <Badge
-          class="bg-primary-500 px-2 py-0.5 font-mono text-white"
+    <div
+      class="flex flex-col"
+      :class="mobile ? 'px-4 py-5' : 'p-6'"
+    >
+      <!-- 1. Header (hidden on mobile when shown in hero block above) -->
+      <div
+        v-if="!hideHeader"
+        class="mb-5 space-y-1"
+      >
+        <span
+          class="inline-block font-mono text-[13px] font-medium text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
         >
           {{ document.id }}
-        </Badge>
-        <h3 class="text-lg font-semibold leading-tight">
+        </span>
+        <h2 class="text-2xl font-bold tracking-tight text-foreground">
           {{ document.title }}
-        </h3>
+        </h2>
         <p
           v-if="authorLine(document)"
-          class="text-sm text-muted-foreground"
+          class="text-[15px] text-muted-foreground"
         >
           Autor: {{ authorLine(document) }}
         </p>
@@ -73,14 +91,14 @@ function formatCoords(doc: EtnoDocument): string {
       <!-- 2. Transcript preview -->
       <Card
         v-if="document.hasTranscript"
-        class="bg-muted/30"
+        class="mb-7 border-neutral-200 bg-muted/20"
       >
         <CardHeader class="flex flex-row items-center justify-between space-y-0 py-2">
-          <span class="text-sm font-semibold">TRANSCRIPT</span>
+          <span class="text-sm font-semibold text-foreground">TRANSCRIPT</span>
           <Button
             variant="link"
             size="sm"
-            class="h-auto p-0 text-primary-600"
+            class="h-auto p-0 text-primary-500 hover:text-primary-600 hover:underline"
             @click="emit('show-transcript')"
           >
             Zobraziť
@@ -90,15 +108,15 @@ function formatCoords(doc: EtnoDocument): string {
           <p class="text-xs text-muted-foreground">
             Obrázok 1/28
           </p>
-          <p class="line-clamp-3 text-sm">
+          <p class="line-clamp-4 text-[14px] text-foreground">
             {{ transcriptPreview(document) }}
           </p>
         </CardContent>
       </Card>
 
       <!-- 3. Kľúčové slová -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div class="mb-7">
+        <h4 class="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
           KĽÚČOVÉ SLOVÁ
         </h4>
         <div class="flex flex-wrap gap-1.5">
@@ -106,7 +124,7 @@ function formatCoords(doc: EtnoDocument): string {
             v-for="kw in document.keywords"
             :key="kw"
             variant="outline"
-            class="cursor-pointer border-primary-200 text-primary-700 hover:bg-primary-50"
+            class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
             @click="openExploreWithFilter('keywords', kw)"
           >
             {{ kw }}
@@ -114,64 +132,67 @@ function formatCoords(doc: EtnoDocument): string {
         </div>
       </div>
 
-      <!-- 4. Údaje (metadata) -->
-      <div class="space-y-3">
-        <h4 class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          ÚDAJE
-        </h4>
-        <dl class="space-y-3">
-          <template
-            v-for="section in METADATA_SECTIONS"
-            :key="section.title"
-          >
-            <div class="space-y-1.5">
-              <dt class="text-xs font-medium text-muted-foreground">
-                {{ section.title }}
-              </dt>
-              <dd class="space-y-1 text-sm">
-                <template
-                  v-for="field in section.fields"
-                  :key="field.key"
-                >
-                  <div
-                    v-if="field.getValue(document) != null"
-                    class="flex flex-wrap gap-x-1"
+      <!-- 4. Údaje (DataRow structure from Archeo) -->
+      <div class="mb-4">
+        <h3 class="mb-5 border-b-2 border-foreground pb-3 text-base font-bold tracking-tight text-foreground">
+          Údaje
+        </h3>
+
+        <template
+          v-for="section in METADATA_SECTIONS"
+          :key="section.title"
+        >
+          <h4 class="mb-1 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
+            {{ section.title }}
+          </h4>
+          <div class="mb-6 flex flex-col">
+            <div
+              v-for="field in section.fields.filter((f) => f.getValue(document) != null)"
+              :key="field.key"
+              class="flex items-baseline border-b border-neutral-200 py-2.5 last:border-b-0"
+            >
+              <span
+                class="shrink-0 text-[13px] text-muted-foreground"
+                :class="labelWidthClass"
+              >
+                {{ field.label }}
+              </span>
+              <span class="min-w-0 flex-1 pl-2">
+                <template v-if="field.isLink && field.filterKey">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 text-[14px] font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                    @click="
+                      openExploreWithFilter(
+                        field.filterKey!,
+                        field.getValue(document)!
+                      )
+                    "
                   >
-                    <span class="text-muted-foreground">{{ field.label }}:</span>
-                    <template v-if="field.isLink">
-                      <button
-                        type="button"
-                        class="text-primary-600 hover:underline"
-                        @click="
-                          field.filterKey &&
-                            openExploreWithFilter(
-                              field.filterKey,
-                              field.getValue(document)!
-                            )
-                        "
-                      >
-                        {{ field.getValue(document) }}
-                      </button>
-                    </template>
-                    <template v-else>
-                      <a
-                        v-if="field.key === 'license' && document.license"
-                        :href="document.license"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-primary-600 hover:underline"
-                      >
-                        {{ field.getValue(document) }}
-                      </a>
-                      <span v-else>{{ field.getValue(document) }}</span>
-                    </template>
-                  </div>
+                    {{ field.getValue(document) }}
+                    <ExternalLink class="h-3 w-3 shrink-0" />
+                  </button>
                 </template>
-              </dd>
+                <a
+                  v-else-if="field.key === 'license' && document.license"
+                  :href="document.license"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-[14px] font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                >
+                  {{ field.getValue(document) }}
+                  <ExternalLink class="h-3 w-3 shrink-0" />
+                </a>
+                <span
+                  v-else
+                  class="text-[14px] font-medium text-foreground"
+                >
+                  {{ field.getValue(document) }}
+                </span>
+              </span>
             </div>
-            <Separator />
-          </template>
-        </dl>
+          </div>
+        </template>
       </div>
 
       <!-- 5. Lokalita -->
@@ -179,23 +200,23 @@ function formatCoords(doc: EtnoDocument): string {
         v-if="document.hasMap"
         class="space-y-2"
       >
-        <h4 class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 class="text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
-        <div class="relative aspect-square max-w-full overflow-hidden rounded-md bg-primary-100">
+        <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-neutral-200 bg-primary-50">
           <div class="absolute inset-0 flex items-center justify-center text-muted-foreground">
             Map placeholder
           </div>
           <div
             v-if="formatCoords(document)"
-            class="absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 font-mono text-xs"
+            class="absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
           >
             {{ formatCoords(document) }}
           </div>
           <Button
             variant="link"
             size="sm"
-            class="absolute bottom-2 right-2 text-primary-600"
+            class="absolute bottom-2 right-2 text-primary-500 hover:text-primary-600"
             @click="emit('open-map-fullscreen')"
           >
             Fullscreen →

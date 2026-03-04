@@ -117,7 +117,7 @@ const searchQuery = ref('')
       <Button
         variant="outline"
         size="sm"
-        class="gap-1.5"
+        class="gap-1.5 border-neutral-200 text-foreground"
         aria-label="Toggle right panel"
         @click="emit('toggle-right-panel')"
       >
@@ -139,7 +139,7 @@ const searchQuery = ref('')
     <template v-else>
       <RouterLink
         :to="{ name: 'explore' }"
-        class="flex-1 text-sm text-primary-600 hover:underline"
+        class="flex-1 text-sm text-primary-500 hover:text-primary-600 hover:underline"
       >
         ← Späť do Explore
       </RouterLink>

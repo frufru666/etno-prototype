@@ -10,6 +10,7 @@ import {
   FileText,
   Music,
   ImageIcon,
+  LayoutGrid,
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
@@ -24,6 +25,7 @@ function goToDetail() {
 }
 
 const mediaType = getMediaType(props.document.documentType)
+const isMultiImage = mediaType === 'image' && props.document.hasTranscript
 
 function participantLines(): { label: string; names: string }[] {
   const out: { label: string; names: string }[] = []
@@ -87,21 +89,30 @@ function participantLines(): { label: string; names: string }[] {
         <div
           class="absolute inset-0 flex items-center justify-center text-muted-foreground"
         >
-          <ImageIcon
-            v-if="mediaType === 'image'"
+          <LayoutGrid
+            v-if="isMultiImage"
             class="h-10 w-10"
+            aria-label="Galéria obrázkov"
+          />
+          <ImageIcon
+            v-else-if="mediaType === 'image'"
+            class="h-10 w-10"
+            aria-label="Obrázok"
           />
           <Play
             v-else-if="mediaType === 'video'"
             class="h-12 w-12 rounded-full border-2 border-current p-2"
+            aria-label="Video"
           />
           <FileText
             v-else-if="mediaType === 'pdf' || mediaType === 'document'"
             class="h-10 w-10"
+            aria-label="Dokument PDF"
           />
           <Music
             v-else-if="mediaType === 'audio'"
             class="h-10 w-10"
+            aria-label="Audio"
           />
           <FileText
             v-else
