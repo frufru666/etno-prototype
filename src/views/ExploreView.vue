@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import TopNav from '@/components/ct/TopNav.vue'
 import FilterSidebar from '@/components/ct/FilterSidebar.vue'
 import FilterChips from '@/components/ct/FilterChips.vue'
@@ -9,18 +9,22 @@ import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
   getReviewDocuments,
+  getMapPins,
   matchesFilters,
   type EtnoDocument,
 } from '@/data/mockData'
+import MapView from '@/components/ct/MapView.vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const route = useRoute()
+const router = useRouter()
 const isMobile = useIsMobile()
 const filterOpen = ref(false)
 const openSubPanelKey = ref<string | null>(null)
 const activeFilters = ref<Record<string, string[]>>({})
 const sortKey = ref('id')
 const sortOrder = ref<'asc' | 'desc'>('asc')
+const searchQuery = ref('')
 
 // Build activeFilters from route.query (e.g. from Detail filter links)
 const filterKeys = [
@@ -39,20 +43,39 @@ function syncFiltersFromQuery() {
   activeFilters.value = next
 }
 
+function matchesSearch(doc: EtnoDocument, q: string): boolean {
+  const term = q.trim().toLowerCase()
+  if (!term) return true
+  const title = (doc.title ?? '').toLowerCase()
+  const abstract = (doc.abstract ?? '').toLowerCase()
+  const note = (doc.note ?? '').toLowerCase()
+  const keywords = (doc.keywords ?? []).join(' ').toLowerCase()
+  const authorNames = (doc.authors ?? []).map((a) => a.name).join(' ').toLowerCase()
+  const searchable = [title, abstract, note, keywords, authorNames].join(' ')
+  return searchable.includes(term)
+}
+
 onMounted(() => {
   filterOpen.value = !isMobile.value
   syncFiltersFromQuery()
+  const q = route.query.q ?? route.query.query
+  if (typeof q === 'string') searchQuery.value = q
 })
-watch(() => route.query, syncFiltersFromQuery, { deep: true })
+watch(() => route.query, (query) => {
+  syncFiltersFromQuery()
+  const q = query.q ?? query.query
+  if (typeof q === 'string') searchQuery.value = q
+}, { deep: true })
 watch(isMobile, (mobile) => {
   if (mobile) filterOpen.value = false
   else filterOpen.value = true
 })
 
 const filteredDocuments = computed(() => {
-  const list = getReviewDocuments().filter((doc) =>
+  let list = getReviewDocuments().filter((doc) =>
     matchesFilters(doc, activeFilters.value)
   )
+  list = list.filter((doc) => matchesSearch(doc, searchQuery.value))
   const key = sortKey.value
   const order = sortOrder.value
   return [...list].sort((a, b) => {
@@ -83,6 +106,8 @@ const activeFilterCount = computed(() => {
   )
 })
 
+const mapPins = computed(() => getMapPins(filteredDocuments.value))
+
 function removeFilter(key: string, value: string) {
   const next = { ...activeFilters.value }
   const arr = next[key]?.filter((v) => v !== value) ?? []
@@ -93,6 +118,14 @@ function removeFilter(key: string, value: string) {
 
 function clearFilters() {
   activeFilters.value = {}
+}
+
+function onSearchQueryChange(value: string) {
+  searchQuery.value = value
+  const next = { ...route.query }
+  if (value.trim()) next.q = value.trim()
+  else delete next.q
+  router.replace({ query: next })
 }
 
 // Desktop: close sub-panel when clicking outside the filter aside
@@ -115,15 +148,17 @@ onUnmounted(() => {
     <TopNav
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"
+      :search-query="searchQuery"
       @toggle-filter="filterOpen = !filterOpen"
+      @update:search-query="onSearchQueryChange"
     />
     <div class="pt-[49px] md:pt-[57px]">
       <!-- Desktop: fixed floating FilterSidebar (Panel 1 + Panel 2 when category open) -->
       <aside
         v-if="filterOpen && !isMobile"
         ref="filterAsideRef"
-        class="fixed left-0 top-[57px] z-40 flex h-[calc(100vh-57px)] overflow-visible border-r border-neutral-200 bg-white shadow-lg transition-[width] duration-200"
-        :class="openSubPanelKey ? 'w-[624px]' : 'w-[304px]'"
+        class="fixed left-0 top-[57px] z-40 flex h-[calc(100vh-57px)] overflow-visible transition-[width] duration-200"
+        :class="openSubPanelKey ? 'w-[600px]' : 'w-[280px]'"
         aria-label="Filter panel"
       >
         <FilterSidebar
@@ -136,17 +171,13 @@ onUnmounted(() => {
       <!-- Map + content: shift right on desktop when filter open so sidebar doesn't cover -->
       <div
         class="transition-[margin] duration-200"
-        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[624px]' : 'md:ml-[304px]') : ''"
+        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[600px]' : 'md:ml-[280px]') : ''"
       >
         <!-- Map area: full viewport height below nav -->
         <div
           class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
         >
-          <div
-            class="absolute inset-0 flex items-center justify-center bg-neutral-200 text-muted-foreground"
-          >
-            Map placeholder
-          </div>
+          <MapView :pins="mapPins" />
         </div>
 
         <!-- FilterChips + ResultsGrid (scroll with page) -->
@@ -160,6 +191,7 @@ onUnmounted(() => {
           :documents="filteredDocuments"
           :sort-key="sortKey"
           :sort-order="sortOrder"
+          :search-query="searchQuery"
           @update:sort-key="sortKey = $event"
           @update:sort-order="sortOrder = $event"
         />

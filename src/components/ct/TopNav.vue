@@ -24,20 +24,22 @@ import { useIsMobile } from '@/composables/useIsMobile'
 const props = defineProps<{
   filterOpen: boolean
   activeFilterCount: number
+  /** Lifted from ExploreView for search filtering and URL sync */
+  searchQuery?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle-filter'): void
+  (e: 'update:searchQuery', value: string): void
 }>()
 
 const isMobile = useIsMobile()
 const mobileSheetOpen = ref(false)
-const searchQuery = ref('')
 </script>
 
 <template>
   <nav
-    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-neutral-200 bg-white px-4 md:px-6"
+    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-neutral-200 bg-white px-4 md:px-6 focus-within:outline-none"
     :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
     aria-label="Main navigation"
   >
@@ -74,16 +76,17 @@ const searchQuery = ref('')
           aria-hidden
         />
         <Input
-          v-model="searchQuery"
+          :model-value="searchQuery ?? ''"
           type="search"
-          class="h-9 pl-9"
+          class="h-9 rounded-lg pl-9 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500"
           placeholder="Hľadať v zbierke"
           aria-label="Search collection"
+          @update:model-value="emit('update:searchQuery', $event ?? '')"
         />
       </div>
     </div>
 
-    <!-- Right: desktop actions -->
+    <!-- Right: desktop actions (Archeo-style outline, border-neutral-200) -->
     <div
       v-if="!isMobile"
       class="flex flex-shrink-0 items-center gap-2"
@@ -91,7 +94,7 @@ const searchQuery = ref('')
       <Button
         variant="outline"
         size="sm"
-        class="gap-1.5"
+        class="gap-1.5 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Collections"
       >
         <FolderOpen class="h-4 w-4" />
@@ -99,14 +102,16 @@ const searchQuery = ref('')
       </Button>
       <Button
         variant="outline"
-        size="icon-sm"
+        size="icon"
+        class="h-9 w-9 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Info"
       >
         <Info class="h-4 w-4" />
       </Button>
       <Button
         variant="outline"
-        size="icon-sm"
+        size="icon"
+        class="h-9 w-9 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="User"
       >
         <User class="h-4 w-4" />
@@ -114,6 +119,7 @@ const searchQuery = ref('')
       <Button
         variant="outline"
         size="sm"
+        class="rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Language EN/SK"
       >
         EN/SK
@@ -127,7 +133,7 @@ const searchQuery = ref('')
           <Button
             variant="outline"
             size="icon"
-            class="h-9 w-9"
+            class="h-9 w-9 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
             aria-label="Open menu"
           >
             <Menu class="h-5 w-5" />

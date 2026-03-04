@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { METADATA_SECTIONS, type EtnoDocument } from '@/data/mockData'
 import { ExternalLink } from 'lucide-vue-next'
+import DetailMap from '@/components/ct/detail/DetailMap.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -197,26 +198,28 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 
       <!-- 5. Lokalita -->
       <div
-        v-if="document.hasMap"
+        v-if="document.hasMap && document.lat != null && document.lng != null"
         class="space-y-2"
       >
         <h4 class="text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
         <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-neutral-200 bg-primary-50">
-          <div class="absolute inset-0 flex items-center justify-center text-muted-foreground">
-            Map placeholder
-          </div>
+          <DetailMap
+            :lat="document.lat"
+            :lng="document.lng"
+            compact
+          />
           <div
             v-if="formatCoords(document)"
-            class="absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
+            class="absolute bottom-2 left-2 z-10 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
           >
             {{ formatCoords(document) }}
           </div>
           <Button
             variant="link"
             size="sm"
-            class="absolute bottom-2 right-2 text-primary-500 hover:text-primary-600"
+            class="absolute bottom-2 right-2 z-10 text-primary-500 hover:text-primary-600"
             @click="emit('open-map-fullscreen')"
           >
             Fullscreen →

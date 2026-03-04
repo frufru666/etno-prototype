@@ -50,11 +50,14 @@ function participantLines(): { label: string; names: string }[] {
 
 <template>
   <Card
-    class="cursor-pointer transition-shadow hover:shadow-md"
+    class="cursor-pointer rounded-xl border border-neutral-200 transition-all hover:border-neutral-300 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+    tabindex="0"
     @click="goToDetail"
+    @keydown.enter.prevent="goToDetail"
+    @keydown.space.prevent="goToDetail"
   >
     <CardHeader class="flex flex-row items-center justify-between gap-2 p-3 pb-0">
-      <Badge variant="outline" class="font-mono text-xs">
+      <Badge variant="outline" class="font-mono text-xs text-primary-500 border-primary-200">
         {{ document.id }}
       </Badge>
       <div class="flex items-center gap-2">

@@ -7,6 +7,7 @@ import ImageViewer from '@/components/ct/detail/ImageViewer.vue'
 import PdfViewer from '@/components/ct/detail/PdfViewer.vue'
 import AudioPlayer from '@/components/ct/detail/AudioPlayer.vue'
 import VideoPlayer from '@/components/ct/detail/VideoPlayer.vue'
+import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { getDocumentById } from '@/data/mockData'
@@ -46,6 +47,21 @@ function openViewerFullscreen() {
 
 function closeViewerFullscreen() {
   mobileViewerFullscreen.value = false
+}
+
+function openInMaps() {
+  const doc = document.value
+  if (doc?.lat != null && doc?.lng != null) {
+    window.open(`https://www.google.com/maps?q=${doc.lat},${doc.lng}`, '_blank')
+  }
+}
+
+async function copyGps() {
+  const doc = document.value
+  if (doc?.lat != null && doc?.lng != null) {
+    const text = `${doc.lat.toFixed(4)}° N, ${doc.lng.toFixed(4)}° E`
+    await navigator.clipboard.writeText(text)
+  }
 }
 
 // Multi-image count for ImageViewer (mock: 28 when hasTranscript and image)
@@ -142,16 +158,22 @@ watch(
               <!-- Layer 2: map (on top when active) -->
               <div
                 v-if="leftPanelView === 'map'"
-                class="absolute inset-0 z-30 bg-neutral-200"
+                class="absolute inset-0 z-30 flex flex-col bg-white"
               >
-                <div class="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
-                  <span>Map placeholder (fullscreen)</span>
-                  <Button
-                    variant="secondary"
-                    @click="closeMapFullscreen"
-                  >
-                    Zavrieť
-                  </Button>
+                <template v-if="document.lat != null && document.lng != null">
+                  <DetailMap :lat="document.lat" :lng="document.lng" />
+                  <div class="absolute right-2 top-2 z-10 flex gap-2">
+                    <Button variant="secondary" size="sm" @click="closeMapFullscreen">Zavrieť</Button>
+                    <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
+                    <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
+                  </div>
+                </template>
+                <div
+                  v-else
+                  class="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground"
+                >
+                  <span>Žiadne súradnice pre mapu</span>
+                  <Button variant="secondary" @click="closeMapFullscreen">Zavrieť</Button>
                 </div>
               </div>
             </div>
@@ -262,25 +284,20 @@ watch(
 
       <!-- Mobile: fullscreen map overlay -->
       <div
-        v-if="isMobile && mobileMapFullscreen"
+        v-if="isMobile && mobileMapFullscreen && document.lat != null && document.lng != null"
         class="fixed inset-0 z-[60] flex flex-col bg-white"
       >
         <div class="flex flex-shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            class="gap-1"
-            @click="closeMapFullscreen"
-          >
+          <Button variant="ghost" size="sm" class="gap-1" @click="closeMapFullscreen">
             × Zavrieť
           </Button>
         </div>
-        <div class="flex flex-1 items-center justify-center bg-primary-100 text-muted-foreground">
-          Map placeholder (fullscreen)
+        <div class="relative flex-1 min-h-0">
+          <DetailMap :lat="document.lat" :lng="document.lng" />
         </div>
         <div class="flex flex-shrink-0 justify-end gap-2 border-t border-neutral-200 p-4">
-          <Button variant="outline" size="sm">Otvoriť v Maps</Button>
-          <Button variant="outline" size="sm">Kopírovať GPS</Button>
+          <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
+          <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
         </div>
       </div>
     </template>

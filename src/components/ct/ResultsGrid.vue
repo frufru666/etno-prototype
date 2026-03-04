@@ -9,11 +9,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const props = defineProps<{
-  documents: EtnoDocument[]
-  sortKey: string
-  sortOrder: 'asc' | 'desc'
-}>()
+const props = withDefaults(
+  defineProps<{
+    documents: EtnoDocument[]
+    sortKey: string
+    sortOrder: 'asc' | 'desc'
+    /** When set and documents empty, show search empty state */
+    searchQuery?: string
+  }>(),
+  { searchQuery: '' }
+)
 
 const emit = defineEmits<{
   (e: 'update:sortKey', value: string): void
@@ -39,7 +44,7 @@ const sortOptions = [
           :model-value="sortKey"
           @update:model-value="(v) => emit('update:sortKey', v ?? 'id')"
         >
-          <SelectTrigger class="w-[180px]">
+          <SelectTrigger class="w-[180px] rounded-lg border-neutral-200 focus-visible:ring-2 focus-visible:ring-primary-500">
             <SelectValue placeholder="Vyberte" />
           </SelectTrigger>
           <SelectContent>
@@ -54,7 +59,16 @@ const sortOptions = [
         </Select>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div
+      v-if="documents.length === 0 && searchQuery?.trim()"
+      class="rounded-lg border border-neutral-200 bg-muted/30 px-6 py-8 text-center text-sm text-muted-foreground"
+    >
+      Pre hľadaný výraz „{{ searchQuery.trim() }}“ sa nenašli žiadne výsledky.
+    </div>
+    <div
+      v-else
+      class="grid grid-cols-1 gap-4 md:grid-cols-3"
+    >
       <ObjectCard
         v-for="doc in documents"
         :key="doc.id"
