@@ -211,13 +211,29 @@ export function getUniqueValues(key: string): string[] {
 }
 
 // ─── Helper: Get filter options with document counts ─────────────────────────
+// When activeFilters is provided, counts are "cascading": documents are first
+// narrowed by all OTHER active filter keys (AND), then counted per option value
+// for the requested key.  This lets the user see how many results each option
+// would yield given their current selections in other filters.
 
 export function getOptionsWithCounts(
-  key: string
+  key: string,
+  activeFilters?: Record<string, string[]>
 ): { value: string; count: number }[] {
   const values = getUniqueValues(key);
+
+  const otherFilters: Record<string, string[]> = {};
+  if (activeFilters) {
+    for (const [k, v] of Object.entries(activeFilters)) {
+      if (k !== key && v?.length) {
+        otherFilters[k] = v;
+      }
+    }
+  }
+  const baseDocs = DOCUMENTS.filter((doc) => matchesFilters(doc, otherFilters));
+
   return values.map((value) => {
-    const count = DOCUMENTS.filter((doc) => {
+    const count = baseDocs.filter((doc) => {
       const docValues = getFilterableValue(doc, key);
       return docValues.includes(value);
     }).length;

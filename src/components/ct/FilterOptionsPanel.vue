@@ -24,7 +24,7 @@ function isSelected(value: string): boolean {
 }
 
 const filteredOptions = computed(() => {
-  const options = getOptionsWithCounts(props.filterKey)
+  const options = getOptionsWithCounts(props.filterKey, props.activeFilters)
   const q = props.searchQuery.trim().toLowerCase()
   if (!q) return options
   return options.filter((o) => o.value.toLowerCase().includes(q))
