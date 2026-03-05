@@ -22,7 +22,7 @@ const searchQuery = ref('')
 
 <template>
   <nav
-    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-neutral-200 bg-white px-4 md:px-6"
+    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-border bg-background px-4 md:px-6"
     :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
     aria-label="Detail navigation"
   >
@@ -55,7 +55,7 @@ const searchQuery = ref('')
       <Button
         variant="outline"
         size="sm"
-        class="gap-1.5 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        class="gap-1.5 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Toggle right panel"
         @click="emit('toggle-right-panel')"
       >

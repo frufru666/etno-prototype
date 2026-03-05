@@ -99,7 +99,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
       <!-- 2. Transcript preview -->
       <Card
         v-if="document.hasTranscript"
-        class="mb-7 border-neutral-200 bg-muted/20"
+        class="mb-7 border-border bg-muted/20"
       >
         <CardHeader class="flex flex-row items-center justify-between space-y-0 py-2">
           <span class="text-sm font-semibold text-foreground">TRANSCRIPT</span>
@@ -157,7 +157,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
             <div
               v-for="field in section.fields.filter((f) => f.getValue(document) != null)"
               :key="field.key"
-              class="flex items-baseline border-b border-neutral-200 py-2.5 last:border-b-0"
+              class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
             >
               <span
                 class="shrink-0 text-label-small text-muted-foreground"
@@ -211,7 +211,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
-        <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-neutral-200 bg-primary-50">
+        <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-border bg-primary-50">
           <DetailMap
             :lat="document.lat"
             :lng="document.lng"

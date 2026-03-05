@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
@@ -25,7 +24,7 @@ const isMobile = useIsMobile()
   <!-- Desktop nav: single row -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-neutral-200 bg-white px-4 md:px-6 focus-within:outline-none"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6 focus-within:outline-none"
     aria-label="Main navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-2">
@@ -35,20 +34,24 @@ const isMobile = useIsMobile()
       <div class="relative">
         <Button
           type="button"
+          :variant="filterOpen ? 'default' : 'outline'"
           size="icon"
-          class="h-9 w-9 bg-primary-500 text-white hover:bg-primary-600"
+          :class="[
+            'h-9 w-9 rounded-lg',
+            filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
+          ]"
           aria-label="Toggle filters"
           @click="emit('toggle-filter')"
         >
           <SlidersHorizontal class="h-4 w-4" />
         </Button>
-        <Badge
+        <span
           v-if="activeFilterCount > 0"
-          class="absolute -right-1 -top-1 h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-          variant="secondary"
+          class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
+          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-primary-foreground'"
         >
           {{ activeFilterCount }}
-        </Badge>
+        </span>
       </div>
     </div>
 
@@ -68,7 +71,7 @@ const isMobile = useIsMobile()
   <!-- Mobile nav: two rows -->
   <nav
     v-else
-    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-neutral-200 bg-white"
+    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Main navigation"
   >
     <div class="flex h-[49px] items-center justify-between px-4">
@@ -81,21 +84,25 @@ const isMobile = useIsMobile()
       <div class="relative shrink-0">
         <Button
           type="button"
+          :variant="filterOpen ? 'default' : 'outline'"
           size="sm"
-          class="gap-1.5 bg-primary-500 text-white hover:bg-primary-600"
+          :class="[
+            'gap-1.5 rounded-lg text-sm font-semibold',
+            filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
+          ]"
           aria-label="Toggle filters"
           @click="emit('toggle-filter')"
         >
           <SlidersHorizontal class="h-4 w-4" />
           <span>Filter</span>
         </Button>
-        <Badge
+        <span
           v-if="activeFilterCount > 0"
-          class="absolute -right-1 -top-1 h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
-          variant="secondary"
+          class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
+          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-primary-foreground'"
         >
           {{ activeFilterCount }}
-        </Badge>
+        </span>
       </div>
       <SearchInput
         class="flex-1 min-w-0"

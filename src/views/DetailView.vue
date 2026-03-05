@@ -91,7 +91,7 @@ watch(document, (doc) => {
               <div class="absolute inset-0" :class="{ invisible: leftPanelView !== 'media' }">
                 <DetailMediaViewer :document="document" :image-count="imageCount" />
               </div>
-              <div v-if="leftPanelView === 'map'" class="absolute inset-0 z-30 flex flex-col bg-white">
+              <div v-if="leftPanelView === 'map'" class="absolute inset-0 z-30 flex flex-col bg-background">
                 <template v-if="document.lat != null && document.lng != null">
                   <DetailMap :lat="document.lat" :lng="document.lng" />
                   <div class="absolute right-2 top-2 z-10 flex gap-2">
@@ -115,7 +115,7 @@ watch(document, (doc) => {
               :cta-label="mobileCtaLabel"
               @open-viewer="mobileViewerFullscreen = true"
             />
-            <div class="border-t border-neutral-200 bg-white">
+            <div class="border-t border-border bg-background">
               <DetailRightPanel
                 :document="document"
                 :mobile="true"
@@ -129,14 +129,14 @@ watch(document, (doc) => {
 
         <aside
           v-if="!isMobile && rightPanelOpen"
-          class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-neutral-200 bg-white"
+          class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
         >
           <DetailRightPanel :document="document" @open-map-fullscreen="openMapFullscreen" @show-transcript="() => {}" />
         </aside>
       </div>
 
       <!-- Mobile: fullscreen viewer overlay -->
-      <div v-if="isMobile && mobileViewerFullscreen" class="fixed inset-0 z-[60] flex flex-col bg-white">
+      <div v-if="isMobile && mobileViewerFullscreen" class="fixed inset-0 z-[60] flex flex-col bg-background">
         <div class="flex-1 min-h-0 flex flex-col">
           <DetailMediaViewer :document="document" :image-count="imageCount" fullscreen @close="mobileViewerFullscreen = false" />
         </div>
@@ -145,15 +145,15 @@ watch(document, (doc) => {
       <!-- Mobile: fullscreen map overlay -->
       <div
         v-if="isMobile && mobileMapFullscreen && document.lat != null && document.lng != null"
-        class="fixed inset-0 z-[60] flex flex-col bg-white"
+        class="fixed inset-0 z-[60] flex flex-col bg-background"
       >
-        <div class="flex flex-shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-2">
+        <div class="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-2">
           <Button variant="ghost" size="sm" class="gap-1" @click="closeMapFullscreen">× Zavrieť</Button>
         </div>
         <div class="relative flex-1 min-h-0">
           <DetailMap :lat="document.lat" :lng="document.lng" />
         </div>
-        <div class="flex flex-shrink-0 justify-end gap-2 border-t border-neutral-200 p-4">
+        <div class="flex flex-shrink-0 justify-end gap-2 border-t border-border p-4">
           <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
           <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
         </div>

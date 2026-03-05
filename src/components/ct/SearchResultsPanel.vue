@@ -33,10 +33,10 @@ function resultCountLabel(count: number): string {
 
 <template>
   <div
-    class="flex flex-col overflow-hidden bg-white"
+    class="flex flex-col overflow-hidden bg-background"
     :class="mobile
       ? 'w-full min-h-[50vh]'
-      : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-neutral-200 shadow-lg'"
+      : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-border shadow-lg'"
   >
     <div class="shrink-0 px-4 pb-2 pt-4">
       <h2 class="text-base font-bold tracking-tight text-foreground">
@@ -49,7 +49,7 @@ function resultCountLabel(count: number): string {
           v-for="doc in documents"
           :key="doc.id"
           type="button"
-          class="flex cursor-pointer items-center gap-3 border-b border-neutral-100 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
+          class="flex cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-accent"
           @click="goToDetail(doc.id)"
         >
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">

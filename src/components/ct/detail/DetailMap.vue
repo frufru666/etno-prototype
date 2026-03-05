@@ -37,7 +37,7 @@ function initMap() {
   const el = document.createElement('div')
   el.className = 'mapboxgl-marker'
   el.style.cssText = `
-    width: 32px; height: 32px; background: #1A62FF;
+    width: 32px; height: 32px;
     border: 2px solid white; border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   `
@@ -75,7 +75,7 @@ watch(
     </template>
     <div
       v-else
-      class="absolute inset-0 flex items-center justify-center bg-neutral-200 text-muted-foreground text-sm"
+      class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm"
     >
       Mapa (VITE_MAPBOX_ACCESS_TOKEN)
     </div>

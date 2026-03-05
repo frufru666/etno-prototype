@@ -47,7 +47,7 @@ const filteredOptions = computed(() => {
           v-for="opt in filteredOptions"
           :key="opt.value"
           type="button"
-          class="flex cursor-pointer items-center justify-between border-b border-neutral-100 py-2.5 px-4 text-left transition-colors hover:bg-neutral-50"
+          class="flex cursor-pointer items-center justify-between border-b border-border py-2.5 px-4 text-left transition-colors hover:bg-accent"
           @click="emit('toggle', opt.value, !isSelected(opt.value))"
         >
           <div class="flex items-center gap-3">

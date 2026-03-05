@@ -26,7 +26,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="relative w-full min-h-[280px] h-[280px] bg-neutral-200 flex items-center justify-center cursor-pointer"
+    class="relative w-full min-h-[280px] h-[280px] bg-muted flex items-center justify-center cursor-pointer"
     role="button"
     tabindex="0"
     aria-label="Otvoriť prehliadač médií"
@@ -36,7 +36,7 @@ const emit = defineEmits<{
   >
     <span class="text-muted-foreground text-sm">Náhľad obsahu</span>
   </div>
-  <div class="px-4 py-4 bg-white border-b border-neutral-200 space-y-2">
+  <div class="px-4 py-4 bg-background border-b border-border space-y-2">
     <span class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded">
       {{ document.id }}
     </span>

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { FolderOpen, Info, User } from 'lucide-vue-next'
 
-const btnClass = 'rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 </script>
 
 <template>

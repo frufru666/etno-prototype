@@ -46,13 +46,13 @@ function getSelectedCount(key: string): number {
               v-for="filter in FILTER_CATEGORIES[catKey].filters"
               :key="filter.key"
               type="button"
-              class="flex h-9 w-full cursor-pointer items-center justify-between rounded-lg border px-3 transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              class="flex h-9 w-full cursor-pointer items-center justify-between rounded-lg border px-3 transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               :class="[
                 activeKey === filter.key
-                  ? 'border-2 border-primary-500 bg-white'
+                  ? 'border-2 border-primary-600 bg-background'
                   : getSelectedCount(filter.key) > 0
                     ? 'border border-primary-200 bg-primary-50'
-                    : 'border border-neutral-200 bg-white',
+                    : 'border border-border bg-background',
               ]"
               @click.stop="emit('select', filter.key)"
             >
@@ -65,7 +65,7 @@ function getSelectedCount(key: string): number {
                 </span>
                 <span
                   v-if="getSelectedCount(filter.key) > 0"
-                  class="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-primary-500 px-1.5 text-xs font-semibold text-white"
+                  class="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-primary-500 px-1.5 text-xs font-semibold text-primary-foreground"
                 >
                   {{ getSelectedCount(filter.key) }}
                 </span>

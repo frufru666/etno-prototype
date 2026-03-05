@@ -44,7 +44,7 @@ const sortOptions = [
           :model-value="sortKey"
           @update:model-value="(v) => emit('update:sortKey', v ?? 'id')"
         >
-          <SelectTrigger class="w-[180px] rounded-lg border-neutral-200 focus-visible:ring-2 focus-visible:ring-primary-500">
+          <SelectTrigger class="w-[180px] rounded-lg border-border focus-visible:ring-2 focus-visible:ring-primary-500">
             <SelectValue placeholder="Vyberte" />
           </SelectTrigger>
           <SelectContent>
@@ -61,7 +61,7 @@ const sortOptions = [
     </div>
     <div
       v-if="documents.length === 0 && searchQuery?.trim()"
-      class="rounded-lg border border-neutral-200 bg-muted/30 px-6 py-8 text-center text-sm text-muted-foreground"
+      class="rounded-lg border border-border bg-muted/30 px-6 py-8 text-center text-sm text-muted-foreground"
     >
       Pre hľadaný výraz „{{ searchQuery.trim() }}“ sa nenašli žiadne výsledky.
     </div>

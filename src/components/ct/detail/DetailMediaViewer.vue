@@ -44,7 +44,7 @@ defineEmits<{
   />
   <div
     v-else
-    class="flex h-full items-center justify-center bg-neutral-200 text-muted-foreground"
+    class="flex h-full items-center justify-center bg-muted text-muted-foreground"
   >
     Žiadny prehliadač pre tento typ dokumentu.
   </div>

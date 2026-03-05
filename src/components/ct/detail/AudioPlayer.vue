@@ -32,12 +32,12 @@ const transcriptText = computed(() => {
 
 <template>
   <div
-    class="relative flex h-full w-full flex-col bg-neutral-100"
+    class="relative flex h-full w-full flex-col bg-muted"
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
     <div
       v-if="fullscreen"
-      class="flex flex-shrink-0 items-center border-b border-neutral-200 bg-white px-4 py-2"
+      class="flex flex-shrink-0 items-center border-b border-border bg-background px-4 py-2"
     >
       <Button variant="ghost" size="sm" class="gap-1" aria-label="Zavrieť" @click="emit('close')">
         <span class="text-lg leading-none">×</span>

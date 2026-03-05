@@ -121,13 +121,13 @@ const totalActiveCount = computed(() =>
 <template>
   <div
     class="flex flex-col"
-    :class="mobile ? 'h-full w-full bg-white' : 'min-w-0 flex-1'"
+    :class="mobile ? 'h-full w-full bg-background' : 'min-w-0 flex-1'"
   >
     <!-- Desktop: two separate floating panels over map (wireframe) -->
     <template v-if="!mobile">
       <div class="flex items-start gap-3 min-w-0">
         <!-- Panel 1: category list — standalone floating card 280px -->
-        <div class="w-[280px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg">
+        <div class="w-[280px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           <div class="flex items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
               <SlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
@@ -156,7 +156,7 @@ const totalActiveCount = computed(() =>
         <div
           v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="w-[320px] shrink-0 flex flex-col h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg"
+          class="w-[320px] shrink-0 flex flex-col h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">
@@ -195,11 +195,11 @@ const totalActiveCount = computed(() =>
 
     <!-- Mobile: top bar per wireframe — left: title, right: close (Zavrieť filter + X) -->
     <template v-else>
-      <header class="flex shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-3">
+      <header class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
         <h2 class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</h2>
         <button
           type="button"
-          class="flex cursor-pointer items-center gap-2 rounded-lg bg-neutral-100 px-3 py-2 text-base font-semibold text-neutral-700 transition-colors hover:bg-neutral-200"
+          class="flex cursor-pointer items-center gap-2 rounded-lg bg-muted px-3 py-2 text-base font-semibold text-foreground transition-colors hover:bg-accent"
           @click="emit('close')"
         >
           <X class="h-5 w-5" aria-hidden />
@@ -232,7 +232,7 @@ const totalActiveCount = computed(() =>
               @toggle="(val, sel) => setValue(activePanelKey!, val, sel)"
             />
           </div>
-          <div class="flex flex-col gap-2 border-t border-neutral-200 p-3">
+          <div class="flex flex-col gap-2 border-t border-border p-3">
             <Button class="w-full gap-2" @click="emit('apply')">
               <span>Zobraziť {{ filteredCount }} výsledkov</span>
               <MapPin class="h-4 w-4" />
@@ -259,7 +259,7 @@ const totalActiveCount = computed(() =>
             />
           </div>
         </ScrollArea>
-        <div class="flex flex-col gap-2 border-t border-neutral-200 p-3">
+        <div class="flex flex-col gap-2 border-t border-border p-3">
           <Button class="w-full gap-2" @click="emit('apply')">
             <span>Zobraziť {{ filteredCount }} výsledkov</span>
             <MapPin class="h-4 w-4" />

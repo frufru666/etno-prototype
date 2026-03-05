@@ -42,7 +42,7 @@ function participantLines(): { label: string; names: string }[] {
 
 <template>
   <Card
-    class="cursor-pointer rounded-xl border border-neutral-200 transition-all hover:border-neutral-300 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+    class="cursor-pointer rounded-xl border border-border transition-all hover:border-primary-200 hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
     tabindex="0"
     @click="goToDetail"
     @keydown.enter.prevent="goToDetail"

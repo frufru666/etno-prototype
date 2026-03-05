@@ -41,7 +41,7 @@ const thumbIndices = computed(() =>
 
 <template>
   <div
-    class="relative flex h-full w-full min-h-0 flex-col bg-neutral-200"
+    class="relative flex h-full w-full min-h-0 flex-col bg-muted"
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
     <!-- Top bar: close (when fullscreen) + transcript button (multi) -->
@@ -156,7 +156,7 @@ const thumbIndices = computed(() =>
     <!-- Main image area (placeholder) -->
     <div class="flex flex-1 items-center justify-center p-4 pt-14">
       <div
-        class="flex aspect-[4/3] w-full max-w-4xl items-center justify-center rounded bg-neutral-300 text-muted-foreground"
+        class="flex aspect-[4/3] w-full max-w-4xl items-center justify-center rounded bg-muted text-muted-foreground"
       >
         Image viewer {{ isMulti ? `(${currentIndex + 1} / ${imageCount})` : '' }}
       </div>
@@ -165,7 +165,7 @@ const thumbIndices = computed(() =>
     <!-- Bottom thumbnail strip (multi only) -->
     <div
       v-if="isMulti"
-      class="border-t border-neutral-300 bg-white/90 p-2"
+      class="border-t border-border bg-background/90 p-2"
     >
       <p class="mb-2 text-xs font-medium text-muted-foreground">
         OBRÁZKY ({{ imageCount }})
@@ -179,7 +179,7 @@ const thumbIndices = computed(() =>
           :class="
             currentIndex === i - 1
               ? 'border-primary-500 bg-primary-50'
-              : 'border-transparent bg-neutral-200 hover:border-neutral-400'
+              : 'border-transparent bg-muted hover:border-primary-200'
           "
           @click="currentIndex = i - 1"
         >

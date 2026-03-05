@@ -34,7 +34,7 @@ function getPillLabel(pill: { label: string; value: string }) {
 <template>
   <div
     v-if="pills.length > 0"
-    class="flex flex-wrap items-center gap-2 border-b border-neutral-200 bg-white px-4 py-3 md:px-6"
+    class="flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3 md:px-6"
   >
     <span class="text-sm text-muted-foreground">Aplikované filtre:</span>
     <template v-for="pill in pills" :key="`${pill.key}-${pill.value}`">
