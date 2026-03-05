@@ -1,0 +1,17 @@
+<script setup lang="ts">
+import type { MediaType } from '@/data/mockData'
+import { Play, FileText, Music, ImageIcon, LayoutGrid } from 'lucide-vue-next'
+
+defineProps<{
+  mediaType: MediaType
+  hasTranscript?: boolean
+}>()
+</script>
+
+<template>
+  <LayoutGrid v-if="mediaType === 'image' && hasTranscript" aria-label="Galéria obrázkov" />
+  <ImageIcon v-else-if="mediaType === 'image'" aria-label="Obrázok" />
+  <Play v-else-if="mediaType === 'video'" aria-label="Video" />
+  <Music v-else-if="mediaType === 'audio'" aria-label="Audio" />
+  <FileText v-else aria-label="Dokument" />
+</template>

@@ -2,24 +2,10 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-import {
-  Search,
-  Menu,
-  FolderOpen,
-  Info,
-  User,
-  Languages,
-  PanelRightClose,
-  PanelRightOpen,
-} from 'lucide-vue-next'
+import NavActions from '@/components/ct/NavActions.vue'
+import MobileMenu from '@/components/ct/MobileMenu.vue'
+import SearchInput from '@/components/ct/SearchInput.vue'
+import { PanelRightClose, PanelRightOpen } from 'lucide-vue-next'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
@@ -31,7 +17,6 @@ const emit = defineEmits<{
 }>()
 
 const isMobile = useIsMobile()
-const mobileSheetOpen = ref(false)
 const searchQuery = ref('')
 </script>
 
@@ -41,7 +26,6 @@ const searchQuery = ref('')
     :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
     aria-label="Detail navigation"
   >
-    <!-- Left: branding + back -->
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
       <RouterLink
         to="/"
@@ -58,84 +42,32 @@ const searchQuery = ref('')
     </div>
 
     <!-- Center: search (desktop only) -->
-    <div
-      v-if="!isMobile"
-      class="flex flex-1 justify-center px-4"
-    >
-      <div class="relative w-full max-w-md">
-        <Search
-          class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden
-        />
-        <Input
-          v-model="searchQuery"
-          type="search"
-          class="h-9 pl-9"
-          placeholder="Search in collection"
-          aria-label="Search in collection"
-        />
-      </div>
+    <div v-if="!isMobile" class="flex flex-1 justify-center px-4">
+      <SearchInput
+        v-model="searchQuery"
+        class="w-full max-w-md"
+      />
     </div>
 
-    <!-- Right: desktop — nav buttons + panel toggle -->
-    <div
-      v-if="!isMobile"
-      class="flex flex-shrink-0 items-center gap-2"
-    >
+    <!-- Right: desktop actions + panel toggle -->
+    <div v-if="!isMobile" class="flex flex-shrink-0 items-center gap-2">
+      <NavActions />
       <Button
         variant="outline"
         size="sm"
-        class="gap-1.5"
-        aria-label="Collections"
-      >
-        <FolderOpen class="h-4 w-4" />
-        <span class="hidden sm:inline">Collections</span>
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        class="h-9 w-9"
-        aria-label="Info"
-      >
-        <Info class="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        class="h-9 w-9"
-        aria-label="User"
-      >
-        <User class="h-4 w-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        aria-label="Language EN/SK"
-      >
-        EN/SK
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        class="gap-1.5 border-neutral-200 text-foreground"
+        class="gap-1.5 rounded-lg border-neutral-200 text-foreground hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Toggle right panel"
         @click="emit('toggle-right-panel')"
       >
-        <PanelRightOpen
-          v-if="!rightPanelOpen"
-          class="h-4 w-4"
-        />
-        <PanelRightClose
-          v-else
-          class="h-4 w-4"
-        />
+        <PanelRightOpen v-if="!rightPanelOpen" class="h-4 w-4" />
+        <PanelRightClose v-else class="h-4 w-4" />
         <span class="hidden sm:inline">
           {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
         </span>
       </Button>
     </div>
 
-    <!-- Right: mobile — back + menu -->
+    <!-- Right: mobile -->
     <template v-else>
       <RouterLink
         :to="{ name: 'explore' }"
@@ -143,57 +75,7 @@ const searchQuery = ref('')
       >
         ← Späť do Explore
       </RouterLink>
-      <Sheet v-model:open="mobileSheetOpen">
-        <SheetTrigger as-child>
-          <Button
-            variant="outline"
-            size="icon"
-            class="h-9 w-9"
-            aria-label="Open menu"
-          >
-            <Menu class="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="right" class="w-[280px] sm:max-w-[320px]">
-          <SheetHeader>
-            <SheetTitle>Menu</SheetTitle>
-          </SheetHeader>
-          <div class="mt-6 flex flex-col gap-2">
-            <Button
-              variant="outline"
-              class="justify-start gap-2"
-              @click="mobileSheetOpen = false"
-            >
-              <FolderOpen class="h-4 w-4" />
-              Collections
-            </Button>
-            <Button
-              variant="outline"
-              class="justify-start gap-2"
-              @click="mobileSheetOpen = false"
-            >
-              <Info class="h-4 w-4" />
-              Info
-            </Button>
-            <Button
-              variant="outline"
-              class="justify-start gap-2"
-              @click="mobileSheetOpen = false"
-            >
-              <User class="h-4 w-4" />
-              User
-            </Button>
-            <Button
-              variant="outline"
-              class="justify-start gap-2"
-              @click="mobileSheetOpen = false"
-            >
-              <Languages class="h-4 w-4" />
-              EN/SK
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <MobileMenu />
     </template>
   </nav>
 </template>

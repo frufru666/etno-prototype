@@ -57,7 +57,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 </script>
 
 <template>
-  <ScrollArea class="h-full">
+  <component :is="mobile ? 'div' : ScrollArea" :class="mobile ? '' : 'h-full'">
     <div
       class="flex flex-col"
       :class="mobile ? 'px-4 py-5' : 'p-6'"
@@ -68,7 +68,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         class="mb-5 space-y-1"
       >
         <span
-          class="inline-block font-mono text-[13px] font-medium text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
+          class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
         >
           {{ document.id }}
         </span>
@@ -77,7 +77,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </h2>
         <p
           v-if="authorLine(document)"
-          class="text-[15px] text-muted-foreground"
+          class="text-sm text-muted-foreground"
         >
           Autor: {{ authorLine(document) }}
         </p>
@@ -109,7 +109,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           <p class="text-xs text-muted-foreground">
             Obrázok 1/28
           </p>
-          <p class="line-clamp-4 text-[14px] text-foreground">
+          <p class="line-clamp-4 text-sm text-foreground">
             {{ transcriptPreview(document) }}
           </p>
         </CardContent>
@@ -117,7 +117,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 
       <!-- 3. Kľúčové slová -->
       <div class="mb-7">
-        <h4 class="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
+        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           KĽÚČOVÉ SLOVÁ
         </h4>
         <div class="flex flex-wrap gap-1.5">
@@ -143,7 +143,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           v-for="section in METADATA_SECTIONS"
           :key="section.title"
         >
-          <h4 class="mb-1 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
+          <h4 class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
             {{ section.title }}
           </h4>
           <div class="mb-6 flex flex-col">
@@ -153,7 +153,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
               class="flex items-baseline border-b border-neutral-200 py-2.5 last:border-b-0"
             >
               <span
-                class="shrink-0 text-[13px] text-muted-foreground"
+                class="shrink-0 text-label-small text-muted-foreground"
                 :class="labelWidthClass"
               >
                 {{ field.label }}
@@ -162,7 +162,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                 <template v-if="field.isLink && field.filterKey">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-1 text-[14px] font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                    class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                     @click="
                       openExploreWithFilter(
                         field.filterKey!,
@@ -179,14 +179,14 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                   :href="document.license"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-[14px] font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                  class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                 >
                   {{ field.getValue(document) }}
                   <ExternalLink class="h-3 w-3 shrink-0" />
                 </a>
                 <span
                   v-else
-                  class="text-[14px] font-medium text-foreground"
+                  class="text-sm font-medium text-foreground"
                 >
                   {{ field.getValue(document) }}
                 </span>
@@ -201,7 +201,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         v-if="document.hasMap && document.lat != null && document.lng != null"
         class="space-y-2"
       >
-        <h4 class="text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
+        <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
         <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-neutral-200 bg-primary-50">
@@ -227,5 +227,5 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </div>
       </div>
     </div>
-  </ScrollArea>
+  </component>
 </template>

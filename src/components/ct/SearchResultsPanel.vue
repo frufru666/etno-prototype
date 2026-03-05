@@ -2,7 +2,7 @@
 import type { EtnoDocument } from '@/data/mockData'
 import { getMediaType } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Play, FileText, Music, ImageIcon, LayoutGrid } from 'lucide-vue-next'
+import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 import { useRouter } from 'vue-router'
 
 const props = withDefaults(
@@ -53,23 +53,11 @@ function resultCountLabel(count: number): string {
           @click="goToDetail(doc.id)"
         >
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-            <LayoutGrid
-              v-if="getDocMediaType(doc) === 'image' && doc.hasTranscript"
+            <MediaTypeIcon
+              :media-type="getDocMediaType(doc)"
+              :has-transcript="doc.hasTranscript"
               class="h-6 w-6"
             />
-            <ImageIcon
-              v-else-if="getDocMediaType(doc) === 'image'"
-              class="h-6 w-6"
-            />
-            <Play
-              v-else-if="getDocMediaType(doc) === 'video'"
-              class="h-6 w-6"
-            />
-            <Music
-              v-else-if="getDocMediaType(doc) === 'audio'"
-              class="h-6 w-6"
-            />
-            <FileText v-else class="h-6 w-6" />
           </div>
           <div class="min-w-0 flex-1">
             <p class="line-clamp-2 text-sm font-medium leading-tight text-foreground">

@@ -158,7 +158,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-background">
     <TopNav
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"

@@ -4,14 +4,8 @@ import { getMediaType } from '@/data/mockData'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Bookmark,
-  Play,
-  FileText,
-  Music,
-  ImageIcon,
-  LayoutGrid,
-} from 'lucide-vue-next'
+import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
+import { Bookmark } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -92,33 +86,9 @@ function participantLines(): { label: string; names: string }[] {
         <div
           class="absolute inset-0 flex items-center justify-center text-muted-foreground"
         >
-          <LayoutGrid
-            v-if="isMultiImage"
-            class="h-10 w-10"
-            aria-label="Galéria obrázkov"
-          />
-          <ImageIcon
-            v-else-if="mediaType === 'image'"
-            class="h-10 w-10"
-            aria-label="Obrázok"
-          />
-          <Play
-            v-else-if="mediaType === 'video'"
-            class="h-12 w-12 rounded-full border-2 border-current p-2"
-            aria-label="Video"
-          />
-          <FileText
-            v-else-if="mediaType === 'pdf' || mediaType === 'document'"
-            class="h-10 w-10"
-            aria-label="Dokument PDF"
-          />
-          <Music
-            v-else-if="mediaType === 'audio'"
-            class="h-10 w-10"
-            aria-label="Audio"
-          />
-          <FileText
-            v-else
+          <MediaTypeIcon
+            :media-type="mediaType"
+            :has-transcript="document.hasTranscript"
             class="h-10 w-10"
           />
         </div>

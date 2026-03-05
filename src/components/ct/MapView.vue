@@ -51,7 +51,7 @@ function updateMarkers() {
     el.className = 'mapboxgl-marker'
     el.setAttribute('aria-label', pin.title)
     el.style.cssText = `
-      width: 28px; height: 28px; background: var(--color-primary-500, #3b82f6);
+      width: 28px; height: 28px; background: #1A62FF;
       border: 2px solid white; border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     `
@@ -60,10 +60,10 @@ function updateMarkers() {
       .setPopup(
         new mapboxgl.Popup({ offset: 20 }).setHTML(
           `<div style="padding:10px 12px;min-width:180px;">
-            <div style="font-size:12px;font-weight:600;color:#737373;margin-bottom:4px;">${pin.documentType}</div>
+            <div style="font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin-bottom:4px;">${pin.documentType}</div>
             <div style="font-size:14px;font-weight:600;margin-bottom:8px;">${pin.title}</div>
             <button data-id="${pin.id}" class="detail-link" style="
-              width:100%;padding:6px 0;background:#3b82f6;color:white;border:none;border-radius:6px;
+              width:100%;padding:6px 0;background:#1A62FF;color:white;border:none;border-radius:6px;
               font-size:12px;font-weight:600;cursor:pointer;
             ">Detail dokumentu →</button>
           </div>`

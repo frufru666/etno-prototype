@@ -39,7 +39,7 @@ function getSelectedCount(key: string): number {
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-1 pr-1">
             <component :is="getSectionIcon(FILTER_CATEGORIES[catKey].icon)" class="h-4 w-4 text-muted-foreground" />
-            <span class="text-[12px] font-medium text-muted-foreground">{{ FILTER_CATEGORIES[catKey].label }}</span>
+            <span class="text-xs font-medium text-muted-foreground">{{ FILTER_CATEGORIES[catKey].label }}</span>
           </div>
           <div class="flex flex-col gap-2">
             <button
@@ -65,7 +65,7 @@ function getSelectedCount(key: string): number {
                 </span>
                 <span
                   v-if="getSelectedCount(filter.key) > 0"
-                  class="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-primary-500 px-1.5 text-[11px] font-semibold text-white"
+                  class="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-primary-500 px-1.5 text-xs font-semibold text-white"
                 >
                   {{ getSelectedCount(filter.key) }}
                 </span>
