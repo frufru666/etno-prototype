@@ -21,6 +21,7 @@ const rightPanelOpen = ref(true)
 const leftPanelView = ref<'media' | 'map'>('media')
 const mobileViewerFullscreen = ref(false)
 const mobileMapFullscreen = ref(false)
+const transcriptVisible = ref(false)
 
 function openMapFullscreen() {
   if (isMobile.value) mobileMapFullscreen.value = true
@@ -46,7 +47,7 @@ async function copyGps() {
 const imageCount = computed(() => {
   const doc = document.value
   if (!doc) return 1
-  return doc.mediaType === 'image' && doc.hasTranscript ? 28 : 1
+  return doc.mediaType === 'image' && doc.id === 'RELIROMA-F001' ? 28 : 1
 })
 
 const mobileCtaLabel = computed(() => {
@@ -61,6 +62,7 @@ const mobileCtaLabel = computed(() => {
 
 watch(document, (doc) => {
   if (doc == null && route.name === 'detail') router.replace({ name: 'explore' })
+  else transcriptVisible.value = false
 }, { immediate: true })
 </script>
 
@@ -89,7 +91,12 @@ watch(document, (doc) => {
           <template v-if="!isMobile">
             <div class="flex-1 relative overflow-hidden h-[calc(100vh-57px)]">
               <div class="absolute inset-0" :class="{ invisible: leftPanelView !== 'media' }">
-                <DetailMediaViewer :document="document" :image-count="imageCount" />
+                <DetailMediaViewer
+                  :document="document"
+                  :image-count="imageCount"
+                  :transcript-visible="transcriptVisible"
+                  @toggle-transcript="transcriptVisible = !transcriptVisible"
+                />
               </div>
               <div v-if="leftPanelView === 'map'" class="absolute inset-0 z-30 flex flex-col bg-background">
                 <template v-if="document.lat != null && document.lng != null">
@@ -121,7 +128,6 @@ watch(document, (doc) => {
                 :mobile="true"
                 :hide-header="true"
                 @open-map-fullscreen="openMapFullscreen"
-                @show-transcript="() => {}"
               />
             </div>
           </template>
@@ -131,14 +137,21 @@ watch(document, (doc) => {
           v-if="!isMobile && rightPanelOpen"
           class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
         >
-          <DetailRightPanel :document="document" @open-map-fullscreen="openMapFullscreen" @show-transcript="() => {}" />
+          <DetailRightPanel :document="document" @open-map-fullscreen="openMapFullscreen" />
         </aside>
       </div>
 
       <!-- Mobile: fullscreen viewer overlay -->
       <div v-if="isMobile && mobileViewerFullscreen" class="fixed inset-0 z-[60] flex flex-col bg-background">
         <div class="flex-1 min-h-0 flex flex-col">
-          <DetailMediaViewer :document="document" :image-count="imageCount" fullscreen @close="mobileViewerFullscreen = false" />
+          <DetailMediaViewer
+            :document="document"
+            :image-count="imageCount"
+            :transcript-visible="transcriptVisible"
+            fullscreen
+            @close="mobileViewerFullscreen = false"
+            @toggle-transcript="transcriptVisible = !transcriptVisible"
+          />
         </div>
       </div>
 

@@ -9,10 +9,12 @@ defineProps<{
   document: EtnoDocument
   imageCount?: number
   fullscreen?: boolean
+  transcriptVisible?: boolean
 }>()
 
 defineEmits<{
   (e: 'close'): void
+  (e: 'toggle-transcript'): void
 }>()
 </script>
 
@@ -22,7 +24,9 @@ defineEmits<{
     :document="document"
     :image-count="imageCount ?? 1"
     :fullscreen="fullscreen"
+    :transcript-visible="transcriptVisible"
     @close="$emit('close')"
+    @show-transcript="$emit('toggle-transcript')"
   />
   <PdfViewer
     v-else-if="document.mediaType === 'pdf'"
@@ -34,13 +38,17 @@ defineEmits<{
     v-else-if="document.mediaType === 'audio'"
     :document="document"
     :fullscreen="fullscreen"
+    :transcript-visible="transcriptVisible"
     @close="$emit('close')"
+    @show-transcript="$emit('toggle-transcript')"
   />
   <VideoPlayer
     v-else-if="document.mediaType === 'video'"
     :document="document"
     :fullscreen="fullscreen"
+    :transcript-visible="transcriptVisible"
     @close="$emit('close')"
+    @show-transcript="$emit('toggle-transcript')"
   />
   <div
     v-else

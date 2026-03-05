@@ -1246,6 +1246,33 @@ export function getDocumentById(id: string): EtnoDocument | undefined {
   return DOCUMENTS.find((d) => d.id === id);
 }
 
+// Normalize: transcript for all media except PDF; default abstract so Abstract section is visible
+const DEFAULT_ABSTRACT =
+  "Krátky popis dokumentu pre potreby prototypu. Tento text slúži na vizualizáciu sekcie Abstrakt.";
+DOCUMENTS.forEach((doc) => {
+  doc.hasTranscript = doc.mediaType !== "pdf";
+  if (!doc.abstract && !doc.note) doc.abstract = DEFAULT_ABSTRACT;
+});
+
+const MOCK_TRANSCRIPT =
+  "Dátum výskumu 1.10.1974. Skupina, Heslo Zeleninárstvo. Obec Košická Nová Ves, okres Košice. Zapísal prameň, predmet, foto, kresba.\n\n" +
+  "Bezzemkovia si tu prenajímali pôdu od väčších gazdov, aby na nej pestovali uhorky, pre ktoré sú tu neobyčajne dobré podmienky. Roľníci vysádzali priemerne na 1000–1200 m² uhorky, z čoho získali i 20 mechov po 60–70 metr.centov. Uhorky tu boli najdôležitejším výrobným artiklom a zdrojom peňazí.\n\n" +
+  "V obci sa dodnes zachovali staré remeslá, najmä hrnčiarstvo a tkáčstvo. Materiál z terénneho výskumu dokumentuje spôsob života a zvyky miestneho obyvateľstva v prvej polovici dvadsiateho storočia. Informátori spomínajú na spoločné práce pri žatve a na výmenu výpomoci medzi susedmi.";
+
+/** Transcript body text (abstract / note / long placeholder) for use in viewers and panels */
+export function transcriptPreview(doc: EtnoDocument): string {
+  if (doc.abstract && doc.abstract !== DEFAULT_ABSTRACT) return doc.abstract;
+  if (doc.note) return doc.note;
+  return MOCK_TRANSCRIPT;
+}
+
+/** Text for Abstract section in right panel (abstract / note / default so section is always visible) */
+export function abstractDisplay(doc: EtnoDocument): string {
+  if (doc.abstract) return doc.abstract;
+  if (doc.note) return doc.note;
+  return DEFAULT_ABSTRACT;
+}
+
 /** Five documents for review: single image, multi image, audio, video, pdf */
 const REVIEW_DOCUMENT_IDS = [
   "AD017191",      // single image (diapozitív)

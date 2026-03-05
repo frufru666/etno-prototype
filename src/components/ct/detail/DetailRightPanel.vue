@@ -2,9 +2,8 @@
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { METADATA_SECTIONS, type EtnoDocument } from '@/data/mockData'
+import { METADATA_SECTIONS, abstractDisplay, type EtnoDocument } from '@/data/mockData'
 import { ExternalLink } from 'lucide-vue-next'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 
@@ -38,18 +37,6 @@ function participantLines(doc: EtnoDocument): { label: string; names: string }[]
 
 function openExploreWithFilter(filterKey: string, value: string) {
   router.push({ name: 'explore', query: { [filterKey]: value } })
-}
-
-// Transcript preview: abstract/note or longer placeholder for scrollability
-function transcriptPreview(doc: EtnoDocument): string {
-  if (doc.abstract) return doc.abstract
-  if (doc.note) return doc.note
-  return (
-    'Transkript dokumentu. Dátum výskumu, Skupina, Heslo. Obec, č. d. Košická Nová Ves, 1.10.1974. Okres, Košice. Zapísal, Prameň, Predmet, Foto, Kresba. ' +
-    'Bezzemkovia si tu prenajímali pôdu od väčších gazdov, aby na nej pestovali uhorky, pre ktoré sú tu neobyčajne dobré podmienky. ' +
-    'Roľníci vysádzali priemerne na 1000–1200 m² uhorky, z čoho získali i 20 mechov po 60–70 metr.centov. Uhorky tu boli najdôležitejším výrobným artiklom a zdrojom peňazí. ' +
-    'Tento text slúži ako placeholder na ukážku scrollovateľnosti transkriptu.'
-  )
 }
 
 function formatCoords(doc: EtnoDocument): string {
@@ -96,31 +83,15 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </Badge>
       </div>
 
-      <!-- 2. Transcript preview -->
-      <Card
-        v-if="document.hasTranscript"
-        class="mb-7 border-border bg-muted/20"
-      >
-        <CardHeader class="flex flex-row items-center justify-between space-y-0 py-2">
-          <span class="text-sm font-semibold text-foreground">TRANSCRIPT</span>
-          <Button
-            variant="link"
-            size="sm"
-            class="h-auto p-0 text-primary-500 hover:text-primary-600 hover:underline"
-            @click="emit('show-transcript')"
-          >
-            Zobraziť
-          </Button>
-        </CardHeader>
-        <CardContent class="space-y-1 py-2 pt-0">
-          <p class="text-xs text-muted-foreground">
-            Obrázok 1/28
-          </p>
-          <p class="line-clamp-4 text-sm text-foreground">
-            {{ transcriptPreview(document) }}
-          </p>
-        </CardContent>
-      </Card>
+      <!-- 2. Abstract (inline, like keywords) -->
+      <div class="mb-7">
+        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          ABSTRAKT
+        </h4>
+        <p class="text-sm text-foreground">
+          {{ abstractDisplay(document) }}
+        </p>
+      </div>
 
       <!-- 3. Kľúčové slová -->
       <div class="mb-7">
