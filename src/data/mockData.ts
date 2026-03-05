@@ -150,7 +150,6 @@ export const FILTER_CATEGORIES: Record<string, FilterCategory> = {
       { key: "keywords", label: "Kľúčové slová", type: "checkbox" },
       { key: "researchCollection", label: "Výskumná zbierka", type: "checkbox" },
       { key: "author", label: "Autor", type: "checkbox" },
-      { key: "document", label: "Dokument (skupina)", type: "checkbox" },
     ],
   },
   geographic: {
