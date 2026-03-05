@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EtnoCollection } from '@/data/mockData'
-import { getCollectionDocuments } from '@/data/mockData'
+import { getCollectionItems } from '@/data/mockData'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'vue-router'
@@ -11,8 +11,8 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
-const documents = getCollectionDocuments(props.collection)
-const documentTypes = [...new Set(documents.map((d) => d.documentType))]
+const collectionItems = getCollectionItems(props.collection)
+const documentTypes = [...new Set(collectionItems.map((d) => d.documentType))]
 
 function goToCollection() {
   router.push({ name: 'collection-detail', params: { slug: props.collection.slug } })
@@ -37,7 +37,7 @@ function goToCollection() {
         {{ collection.title }}
       </h3>
       <p class="mt-0.5 text-sm text-muted-foreground">
-        {{ documents.length }} položiek v kolekcii
+        {{ collectionItems.length }} položiek v kolekcii
       </p>
       <p class="mt-2 line-clamp-3 text-sm text-foreground">
         {{ collection.perex }}

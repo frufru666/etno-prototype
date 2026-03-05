@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EtnoDocument } from '@/data/mockData'
+import type { EtnoItem } from '@/data/mockData'
 import ObjectCard from '@/components/ct/ObjectCard.vue'
 import {
   Select,
@@ -11,10 +11,10 @@ import {
 
 const props = withDefaults(
   defineProps<{
-    documents: EtnoDocument[]
+    items: EtnoItem[]
     sortKey: string
     sortOrder: 'asc' | 'desc'
-    /** When set and documents empty, show search empty state */
+    /** When set and items empty, show search empty state */
     searchQuery?: string
   }>(),
   { searchQuery: '' }
@@ -36,7 +36,7 @@ const sortOptions = [
   <section class="px-4 py-4 md:px-6">
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
       <p class="text-sm font-medium text-muted-foreground">
-        {{ documents.length }} Objektov
+        {{ items.length }} položiek
       </p>
       <div class="flex items-center gap-2">
         <span class="text-sm text-muted-foreground">Zoradiť podľa:</span>
@@ -60,7 +60,7 @@ const sortOptions = [
       </div>
     </div>
     <div
-      v-if="documents.length === 0 && searchQuery?.trim()"
+      v-if="items.length === 0 && searchQuery?.trim()"
       class="rounded-lg border border-border bg-muted/30 px-6 py-8 text-center text-sm text-muted-foreground"
     >
       Pre hľadaný výraz „{{ searchQuery.trim() }}“ sa nenašli žiadne výsledky.
@@ -70,9 +70,9 @@ const sortOptions = [
       class="grid grid-cols-1 gap-4 md:grid-cols-3"
     >
       <ObjectCard
-        v-for="doc in documents"
-        :key="doc.id"
-        :document="doc"
+        v-for="item in items"
+        :key="item.id"
+        :item="item"
       />
     </div>
   </section>

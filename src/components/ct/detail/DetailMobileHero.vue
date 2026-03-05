@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { EtnoDocument } from '@/data/mockData'
+import type { EtnoItem } from '@/data/mockData'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
 defineProps<{
-  document: EtnoDocument
+  item: EtnoItem
   ctaLabel: string
 }>()
 
-function participantLines(doc: EtnoDocument): { label: string; names: string }[] {
+function participantLines(item: EtnoItem): { label: string; names: string }[] {
   const out: { label: string; names: string }[] = []
-  if (doc.authors?.length)
-    out.push({ label: 'Autor:', names: doc.authors.map((a) => a.name).join(', ') })
-  if (doc.researchers?.length)
-    out.push({ label: 'Výskumník:', names: doc.researchers.map((a) => a.name).join(', ') })
-  if (doc.originators?.length)
-    out.push({ label: 'Pôvodca:', names: doc.originators.map((a) => a.name).join(', ') })
+  if (item.authors?.length)
+    out.push({ label: 'Autor:', names: item.authors.map((a) => a.name).join(', ') })
+  if (item.researchers?.length)
+    out.push({ label: 'Výskumník:', names: item.researchers.map((a) => a.name).join(', ') })
+  if (item.originators?.length)
+    out.push({ label: 'Pôvodca:', names: item.originators.map((a) => a.name).join(', ') })
   return out
 }
 
@@ -38,20 +38,20 @@ const emit = defineEmits<{
   </div>
   <div class="px-4 py-4 bg-background border-b border-border space-y-2">
     <span class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded">
-      {{ document.id }}
+      {{ item.id }}
     </span>
     <h2 class="text-xl font-bold tracking-tight text-foreground">
-      {{ document.title }}
+      {{ item.title }}
     </h2>
     <p
-      v-for="line in participantLines(document)"
+      v-for="line in participantLines(item)"
       :key="line.label"
       class="text-sm text-muted-foreground"
     >
       {{ line.label }} {{ line.names }}
     </p>
     <Badge variant="outline" class="text-muted-foreground">
-      {{ document.documentType }}
+      {{ item.documentType }}
     </Badge>
     <Button class="w-full mt-2" @click="emit('open-viewer')">
       {{ ctaLabel }}

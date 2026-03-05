@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { METADATA_SECTIONS, abstractDisplay, type EtnoDocument } from '@/data/mockData'
+import {
+  METADATA_SECTIONS,
+  abstractDisplay,
+  getCollectionsForItem,
+  getDocumentsForItem,
+  type EtnoItem,
+} from '@/data/mockData'
 import { ExternalLink } from 'lucide-vue-next'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 
 const props = withDefaults(
   defineProps<{
-    document: EtnoDocument
+    item: EtnoItem
     mobile?: boolean
     /** When true, hide ID/title/author (e.g. when shown in mobile hero block above) */
     hideHeader?: boolean
@@ -24,14 +30,17 @@ const emit = defineEmits<{
 
 const router = useRouter()
 
-function participantLines(doc: EtnoDocument): { label: string; names: string }[] {
+const collectionsForItem = () => getCollectionsForItem(props.item.id)
+const documentsForItem = () => getDocumentsForItem(props.item.id)
+
+function participantLines(item: EtnoItem): { label: string; names: string }[] {
   const out: { label: string; names: string }[] = []
-  if (doc.authors?.length)
-    out.push({ label: 'Autor:', names: doc.authors.map((a) => a.name).join(', ') })
-  if (doc.researchers?.length)
-    out.push({ label: 'Výskumník:', names: doc.researchers.map((a) => a.name).join(', ') })
-  if (doc.originators?.length)
-    out.push({ label: 'Pôvodca:', names: doc.originators.map((a) => a.name).join(', ') })
+  if (item.authors?.length)
+    out.push({ label: 'Autor:', names: item.authors.map((a) => a.name).join(', ') })
+  if (item.researchers?.length)
+    out.push({ label: 'Výskumník:', names: item.researchers.map((a) => a.name).join(', ') })
+  if (item.originators?.length)
+    out.push({ label: 'Pôvodca:', names: item.originators.map((a) => a.name).join(', ') })
   return out
 }
 
@@ -39,9 +48,9 @@ function openExploreWithFilter(filterKey: string, value: string) {
   router.push({ name: 'explore', query: { [filterKey]: value } })
 }
 
-function formatCoords(doc: EtnoDocument): string {
-  if (doc.lat != null && doc.lng != null) {
-    return `${doc.lat.toFixed(4)}° N, ${doc.lng.toFixed(4)}° E`
+function formatCoords(item: EtnoItem): string {
+  if (item.lat != null && item.lng != null) {
+    return `${item.lat.toFixed(4)}° N, ${item.lng.toFixed(4)}° E`
   }
   return ''
 }
@@ -63,13 +72,13 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         <span
           class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
         >
-          {{ document.id }}
+          {{ item.id }}
         </span>
         <h2 class="text-2xl font-bold tracking-tight text-foreground">
-          {{ document.title }}
+          {{ item.title }}
         </h2>
         <p
-          v-for="line in participantLines(document)"
+          v-for="line in participantLines(item)"
           :key="line.label"
           class="text-sm text-muted-foreground"
         >
@@ -79,7 +88,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           variant="outline"
           class="text-muted-foreground"
         >
-          {{ document.documentType }}
+          {{ item.documentType }}
         </Badge>
       </div>
 
@@ -89,7 +98,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           ABSTRAKT
         </h4>
         <p class="text-sm text-foreground">
-          {{ abstractDisplay(document) }}
+          {{ abstractDisplay(item) }}
         </p>
       </div>
 
@@ -100,7 +109,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </h4>
         <div class="flex flex-wrap gap-1.5">
           <Badge
-            v-for="kw in document.keywords"
+            v-for="kw in item.keywords"
             :key="kw"
             variant="outline"
             class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
@@ -126,7 +135,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           </h4>
           <div class="mb-6 flex flex-col">
             <div
-              v-for="field in section.fields.filter((f) => f.getValue(document) != null)"
+              v-for="field in section.fields.filter((f) => f.getValue(item) != null)"
               :key="field.key"
               class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
             >
@@ -144,29 +153,29 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                     @click="
                       openExploreWithFilter(
                         field.filterKey!,
-                        field.getValue(document)!
+                        field.getValue(item)!
                       )
                     "
                   >
-                    {{ field.getValue(document) }}
+                    {{ field.getValue(item) }}
                     <ExternalLink class="h-3 w-3 shrink-0" />
                   </button>
                 </template>
                 <a
-                  v-else-if="field.key === 'license' && document.license"
-                  :href="document.license"
+                  v-else-if="field.key === 'license' && item.license"
+                  :href="item.license"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                 >
-                  {{ field.getValue(document) }}
+                  {{ field.getValue(item) }}
                   <ExternalLink class="h-3 w-3 shrink-0" />
                 </a>
                 <span
                   v-else
                   class="text-sm font-medium text-foreground"
                 >
-                  {{ field.getValue(document) }}
+                  {{ field.getValue(item) }}
                 </span>
               </span>
             </div>
@@ -174,9 +183,49 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </template>
       </div>
 
-      <!-- 5. Lokalita -->
+      <!-- 5. Súčasť (collection / document membership) – always shown for testing -->
+      <div class="mb-7 space-y-2">
+        <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          SÚČASŤ
+        </h4>
+        <div class="flex flex-col gap-1.5">
+          <div class="flex flex-wrap items-baseline gap-x-2">
+            <span class="text-sm text-muted-foreground">Je súčasťou kolekcie:</span>
+            <template v-if="collectionsForItem().length">
+              <RouterLink
+                v-for="c in collectionsForItem()"
+                :key="c.id"
+                :to="{ name: 'collection-detail', params: { slug: c.slug } }"
+                class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+              >
+                {{ c.title }}
+                <ExternalLink class="h-3 w-3 shrink-0" />
+              </RouterLink>
+            </template>
+            <span v-else class="text-sm text-muted-foreground">—</span>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-2">
+            <span class="text-sm text-muted-foreground">Je súčasťou dokumentu:</span>
+            <template v-if="documentsForItem().length">
+              <button
+                v-for="d in documentsForItem()"
+                :key="d.id"
+                type="button"
+                class="inline-flex w-fit items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                @click="openExploreWithFilter('document', d.slug)"
+              >
+                {{ d.name }}
+                <ExternalLink class="h-3 w-3 shrink-0" />
+              </button>
+            </template>
+            <span v-else class="text-sm text-muted-foreground">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Lokalita -->
       <div
-        v-if="document.hasMap && document.lat != null && document.lng != null"
+        v-if="item.hasMap && item.lat != null && item.lng != null"
         class="space-y-2"
       >
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
@@ -184,15 +233,15 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </h4>
         <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-border bg-primary-50">
           <DetailMap
-            :lat="document.lat"
-            :lng="document.lng"
+            :lat="item.lat"
+            :lng="item.lng"
             compact
           />
           <div
-            v-if="formatCoords(document)"
+            v-if="formatCoords(item)"
             class="absolute bottom-2 left-2 z-10 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
           >
-            {{ formatCoords(document) }}
+            {{ formatCoords(item) }}
           </div>
           <Button
             variant="link"

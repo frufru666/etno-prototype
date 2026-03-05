@@ -9,10 +9,10 @@ import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
-  DOCUMENTS,
+  ITEMS,
   getMapPins,
   matchesFilters,
-  type EtnoDocument,
+  type EtnoItem,
 } from '@/data/mockData'
 import MapView from '@/components/ct/MapView.vue'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -30,7 +30,7 @@ const searchQuery = ref('')
 // Build activeFilters from route.query (e.g. from Detail filter links)
 const filterKeys = [
   'keywords', 'researchCollection', 'author', 'obec', 'okres', 'kraj', 'stat',
-  'documentType', 'studyPeriod', 'collectionMethod', 'language',
+  'documentType', 'studyPeriod', 'collectionMethod', 'language', 'document',
 ]
 function syncFiltersFromQuery() {
   const q = route.query
@@ -44,18 +44,18 @@ function syncFiltersFromQuery() {
   activeFilters.value = next
 }
 
-function matchesSearch(doc: EtnoDocument, q: string): boolean {
+function matchesSearch(item: EtnoItem, q: string): boolean {
   const term = q.trim().toLowerCase()
   if (!term) return true
   const parts = [
-    doc.id, doc.title, doc.subtitle, doc.abstract, doc.note,
-    doc.keywords?.join(' '),
-    doc.authors?.map((a) => a.name).join(' '),
-    doc.researchers?.map((a) => a.name).join(' '),
-    doc.originators?.map((a) => a.name).join(' '),
-    doc.obec, doc.okres, doc.kraj, doc.stat, doc.lokalita,
-    doc.documentType, doc.researchCollection, doc.collectionMethod,
-    doc.language,
+    item.id, item.title, item.subtitle, item.abstract, item.note,
+    item.keywords?.join(' '),
+    item.authors?.map((a) => a.name).join(' '),
+    item.researchers?.map((a) => a.name).join(' '),
+    item.originators?.map((a) => a.name).join(' '),
+    item.obec, item.okres, item.kraj, item.stat, item.lokalita,
+    item.documentType, item.researchCollection, item.collectionMethod,
+    item.language,
   ]
   const searchable = parts.filter(Boolean).join(' ').toLowerCase()
   return searchable.includes(term)
@@ -85,11 +85,11 @@ watch(isMobile, (mobile) => {
   else filterOpen.value = true
 })
 
-const filteredDocuments = computed(() => {
-  let list = DOCUMENTS.filter((doc) =>
-    matchesFilters(doc, activeFilters.value)
+const filteredItems = computed(() => {
+  let list = ITEMS.filter((item) =>
+    matchesFilters(item, activeFilters.value)
   )
-  list = list.filter((doc) => matchesSearch(doc, searchQuery.value))
+  list = list.filter((item) => matchesSearch(item, searchQuery.value))
   const key = sortKey.value
   const order = sortOrder.value
   return [...list].sort((a, b) => {
@@ -120,7 +120,7 @@ const activeFilterCount = computed(() => {
   )
 })
 
-const mapPins = computed(() => getMapPins(filteredDocuments.value))
+const mapPins = computed(() => getMapPins(filteredItems.value))
 
 function removeFilter(key: string, value: string) {
   const next = { ...activeFilters.value }
@@ -189,7 +189,7 @@ onUnmounted(() => {
         :style="{ left: searchPanelLeftPx + 'px' }"
       >
         <SearchResultsPanel
-          :documents="filteredDocuments"
+          :items="filteredItems"
           :query="searchQuery"
         />
       </div>
@@ -208,7 +208,7 @@ onUnmounted(() => {
         class="min-h-[50vh]"
       >
         <SearchResultsPanel
-          :documents="filteredDocuments"
+          :items="filteredItems"
           :query="searchQuery"
           mobile
         />
@@ -226,7 +226,7 @@ onUnmounted(() => {
           @clear="clearFilters"
         />
         <ResultsGrid
-          :documents="filteredDocuments"
+          :items="filteredItems"
           :sort-key="sortKey"
           :sort-order="sortOrder"
           :search-query="searchQuery"
@@ -247,7 +247,7 @@ onUnmounted(() => {
           <FilterSidebar
             mobile
             :active-filters="activeFilters"
-            :filtered-count="filteredDocuments.length"
+            :filtered-count="filteredItems.length"
             @update:active-filters="activeFilters = $event"
             @apply="filterOpen = false"
             @close="filterOpen = false"

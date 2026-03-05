@@ -41,7 +41,7 @@ export interface Participant {
   orcid?: string; // full URL: "https://orcid.org/0000-0001-..."
 }
 
-export interface EtnoDocument {
+export interface EtnoItem {
   id: string; // "AT00016", "AD017191", or "-" (unassigned)
   doi?: string;
 
@@ -134,6 +134,14 @@ export interface FilterCategory {
   filters: FilterDef[];
 }
 
+// Document (group of items) — distinct from EtnoItem (catalog item)
+export interface EtnoDocument {
+  id: string;
+  slug: string;
+  name: string;
+  itemIds: string[];
+}
+
 export const FILTER_CATEGORIES: Record<string, FilterCategory> = {
   thematic: {
     label: "Tematické a autorské údaje",
@@ -142,6 +150,7 @@ export const FILTER_CATEGORIES: Record<string, FilterCategory> = {
       { key: "keywords", label: "Kľúčové slová", type: "checkbox" },
       { key: "researchCollection", label: "Výskumná zbierka", type: "checkbox" },
       { key: "author", label: "Autor", type: "checkbox" },
+      { key: "document", label: "Dokument (skupina)", type: "checkbox" },
     ],
   },
   geographic: {
@@ -166,41 +175,43 @@ export const FILTER_CATEGORIES: Record<string, FilterCategory> = {
   },
 };
 
-// ─── Helper: Get filterable value from document ─────────────────────────────
+// ─── Helper: Get filterable value from item ─────────────────────────────────
 
-export function getFilterableValue(doc: EtnoDocument, key: string): string[] {
+export function getFilterableValue(item: EtnoItem, key: string): string[] {
   switch (key) {
     case "keywords":
-      return doc.keywords;
+      return item.keywords;
     case "researchCollection":
-      return [doc.researchCollection];
+      return [item.researchCollection];
     case "author":
-      return doc.authors.map((a) => a.name);
+      return item.authors.map((a) => a.name);
     case "obec":
-      return doc.obec ? [doc.obec] : [];
+      return item.obec ? [item.obec] : [];
     case "okres":
-      return doc.okres ? [doc.okres] : [];
+      return item.okres ? [item.okres] : [];
     case "kraj":
-      return doc.kraj ? [doc.kraj] : [];
+      return item.kraj ? [item.kraj] : [];
     case "stat":
-      return [doc.stat];
+      return [item.stat];
     case "documentType":
-      return [doc.documentType];
+      return [item.documentType];
     case "collectionMethod":
-      return [doc.collectionMethod];
+      return [item.collectionMethod];
     case "language":
-      return doc.language ? [doc.language] : [];
+      return item.language ? [item.language] : [];
     case "studyPeriod":
-      return doc.studyPeriodStart ? [doc.studyPeriodStart] : [];
+      return item.studyPeriodStart ? [item.studyPeriodStart] : [];
+    case "document":
+      return getDocumentsForItem(item.id).map((d) => d.slug);
     default:
       return [];
   }
 }
 
-// ─── Helper: Check if document matches active filters ───────────────────────
+// ─── Helper: Check if item matches active filters ──────────────────────────
 
 export function matchesFilters(
-  doc: EtnoDocument,
+  item: EtnoItem,
   activeFilters: Record<string, string[]>
 ): boolean {
   const keys = Object.keys(activeFilters);
@@ -208,8 +219,8 @@ export function matchesFilters(
   for (const key of keys) {
     const selected = activeFilters[key];
     if (!selected?.length) continue;
-    const docValues = getFilterableValue(doc, key);
-    const hasMatch = selected.some((v) => docValues.includes(v));
+    const itemValues = getFilterableValue(item, key);
+    const hasMatch = selected.some((v) => itemValues.includes(v));
     if (!hasMatch) return false;
   }
   return true;
@@ -219,8 +230,8 @@ export function matchesFilters(
 
 export function getUniqueValues(key: string): string[] {
   const set = new Set<string>();
-  for (const doc of DOCUMENTS) {
-    const values = getFilterableValue(doc, key);
+  for (const item of ITEMS) {
+    const values = getFilterableValue(item, key);
     for (const v of values) {
       if (v) set.add(v);
     }
@@ -228,11 +239,10 @@ export function getUniqueValues(key: string): string[] {
   return Array.from(set).sort();
 }
 
-// ─── Helper: Get filter options with document counts ─────────────────────────
-// When activeFilters is provided, counts are "cascading": documents are first
+// ─── Helper: Get filter options with item counts ─────────────────────────────
+// When activeFilters is provided, counts are "cascading": items are first
 // narrowed by all OTHER active filter keys (AND), then counted per option value
-// for the requested key.  This lets the user see how many results each option
-// would yield given their current selections in other filters.
+// for the requested key.
 
 export function getOptionsWithCounts(
   key: string,
@@ -248,12 +258,12 @@ export function getOptionsWithCounts(
       }
     }
   }
-  const baseDocs = DOCUMENTS.filter((doc) => matchesFilters(doc, otherFilters));
+  const baseItems = ITEMS.filter((item) => matchesFilters(item, otherFilters));
 
   return values.map((value) => {
-    const count = baseDocs.filter((doc) => {
-      const docValues = getFilterableValue(doc, key);
-      return docValues.includes(value);
+    const count = baseItems.filter((item) => {
+      const itemValues = getFilterableValue(item, key);
+      return itemValues.includes(value);
     }).length;
     return { value, count };
   });
@@ -270,9 +280,9 @@ function parseStudyPeriod(raw: string): { start?: string; end?: string } {
   return { start: raw };
 }
 
-// ─── Sample Documents (from real CSV data) ──────────────────────────────────
+// ─── Sample Items (catalog; from real CSV data) ─────────────────────────────
 
-export const DOCUMENTS: EtnoDocument[] = [
+export const ITEMS: EtnoItem[] = [
   // ── 1. AT00016 — výskumná správa, rich metadata ──
   {
     id: "AT00016",
@@ -1260,8 +1270,8 @@ export const DOCUMENTS: EtnoDocument[] = [
   },
 ];
 
-export function getDocumentById(id: string): EtnoDocument | undefined {
-  return DOCUMENTS.find((d) => d.id === id);
+export function getItemById(id: string): EtnoItem | undefined {
+  return ITEMS.find((d) => d.id === id);
 }
 
 // ─── Collections mock data ───────────────────────────────────────────────────
@@ -1305,18 +1315,41 @@ export function getCollectionBySlug(slug: string): EtnoCollection | undefined {
   return COLLECTIONS.find((c) => c.slug === slug);
 }
 
-export function getCollectionDocuments(collection: EtnoCollection): EtnoDocument[] {
+export function getCollectionItems(collection: EtnoCollection): EtnoItem[] {
   return collection.itemIds
-    .map((id) => getDocumentById(id))
-    .filter((d): d is EtnoDocument => d != null);
+    .map((id) => getItemById(id))
+    .filter((d): d is EtnoItem => d != null);
+}
+
+// ─── Document groups (group of items; no dedicated view in this phase) ────────
+
+export const DOCUMENT_GROUPS: EtnoDocument[] = [
+  { id: "doc-archiv-1", slug: "archivna-jednotka-vyskum", name: "Archívna jednotka – výskumné správy", itemIds: ["AT00016", "AT00288", "AT01443"] },
+  { id: "doc-reliroma", slug: "reliroma-dokumenty", name: "Reliroma – terénna dokumentácia", itemIds: ["RELIROMA-F001", "RELIROMA-V001", "AU00001"] },
+];
+
+export function getDocumentBySlug(slug: string): EtnoDocument | undefined {
+  return DOCUMENT_GROUPS.find((d) => d.slug === slug);
+}
+
+export function getDocumentItems(doc: EtnoDocument): EtnoItem[] {
+  return doc.itemIds.map((id) => getItemById(id)).filter((d): d is EtnoItem => d != null);
+}
+
+export function getDocumentsForItem(itemId: string): EtnoDocument[] {
+  return DOCUMENT_GROUPS.filter((d) => d.itemIds.includes(itemId));
+}
+
+export function getCollectionsForItem(itemId: string): EtnoCollection[] {
+  return COLLECTIONS.filter((c) => c.itemIds.includes(itemId));
 }
 
 // Normalize: transcript for all media except PDF; default abstract so Abstract section is visible
 const DEFAULT_ABSTRACT =
   "Krátky popis dokumentu pre potreby prototypu. Tento text slúži na vizualizáciu sekcie Abstrakt.";
-DOCUMENTS.forEach((doc) => {
-  doc.hasTranscript = doc.mediaType !== "pdf";
-  if (!doc.abstract && !doc.note) doc.abstract = DEFAULT_ABSTRACT;
+ITEMS.forEach((item) => {
+  item.hasTranscript = item.mediaType !== "pdf";
+  if (!item.abstract && !item.note) item.abstract = DEFAULT_ABSTRACT;
 });
 
 const MOCK_TRANSCRIPT =
@@ -1325,21 +1358,21 @@ const MOCK_TRANSCRIPT =
   "V obci sa dodnes zachovali staré remeslá, najmä hrnčiarstvo a tkáčstvo. Materiál z terénneho výskumu dokumentuje spôsob života a zvyky miestneho obyvateľstva v prvej polovici dvadsiateho storočia. Informátori spomínajú na spoločné práce pri žatve a na výmenu výpomoci medzi susedmi.";
 
 /** Transcript body text (abstract / note / long placeholder) for use in viewers and panels */
-export function transcriptPreview(doc: EtnoDocument): string {
-  if (doc.abstract && doc.abstract !== DEFAULT_ABSTRACT) return doc.abstract;
-  if (doc.note) return doc.note;
+export function transcriptPreview(item: EtnoItem): string {
+  if (item.abstract && item.abstract !== DEFAULT_ABSTRACT) return item.abstract;
+  if (item.note) return item.note;
   return MOCK_TRANSCRIPT;
 }
 
 /** Text for Abstract section in right panel (abstract / note / default so section is always visible) */
-export function abstractDisplay(doc: EtnoDocument): string {
-  if (doc.abstract) return doc.abstract;
-  if (doc.note) return doc.note;
+export function abstractDisplay(item: EtnoItem): string {
+  if (item.abstract) return item.abstract;
+  if (item.note) return item.note;
   return DEFAULT_ABSTRACT;
 }
 
-/** Five documents for review: single image, multi image, audio, video, pdf */
-const REVIEW_DOCUMENT_IDS = [
+/** Five items for review: single image, multi image, audio, video, pdf */
+const REVIEW_ITEM_IDS = [
   "AD017191",      // single image (diapozitív)
   "RELIROMA-F001", // multi image (fotografia, hasTranscript)
   "AU00001",       // audio
@@ -1347,10 +1380,10 @@ const REVIEW_DOCUMENT_IDS = [
   "AT00016",       // pdf
 ]
 
-export function getReviewDocuments(): EtnoDocument[] {
-  return REVIEW_DOCUMENT_IDS
-    .map((id) => DOCUMENTS.find((d) => d.id === id))
-    .filter((d): d is EtnoDocument => d != null)
+export function getReviewItems(): EtnoItem[] {
+  return REVIEW_ITEM_IDS
+    .map((id) => ITEMS.find((d) => d.id === id))
+    .filter((d): d is EtnoItem => d != null)
 }
 
 // ─── Map cluster utilities (simplified from Archeo) ─────────────────────────
@@ -1363,8 +1396,8 @@ export interface MapPin {
   documentType: DocumentType;
 }
 
-export function getMapPins(documents: EtnoDocument[]): MapPin[] {
-  return documents
+export function getMapPins(items: EtnoItem[]): MapPin[] {
+  return items
     .filter((d) => d.lat != null && d.lng != null)
     .map((d) => ({
       id: d.id,
@@ -1381,7 +1414,7 @@ export function getMapPins(documents: EtnoDocument[]): MapPin[] {
 export interface MetadataField {
   key: string;
   label: string;
-  getValue: (doc: EtnoDocument) => string | undefined;
+  getValue: (item: EtnoItem) => string | undefined;
   isLink?: boolean; // renders as blue clickable filter link
   filterKey?: string; // which filter key to use for cross-reference
 }

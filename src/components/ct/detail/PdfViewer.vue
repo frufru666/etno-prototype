@@ -3,10 +3,10 @@ import { ref, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
-import type { EtnoDocument } from '@/data/mockData'
+import type { EtnoItem } from '@/data/mockData'
 
 const props = defineProps<{
-  document: EtnoDocument
+  item: EtnoItem
   mobile?: boolean
   fullscreen?: boolean
 }>()
@@ -17,7 +17,7 @@ defineEmits<{
 
 // Mock page count (e.g. from document.size "245 strany" or default)
 const pageCount = computed(() => {
-  const s = props.document.size
+  const s = props.item.size
   if (s && /^\d+/.test(s)) return parseInt(s, 10)
   return 245
 })

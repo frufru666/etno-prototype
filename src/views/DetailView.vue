@@ -7,7 +7,7 @@ import DetailMediaViewer from '@/components/ct/detail/DetailMediaViewer.vue'
 import DetailMobileHero from '@/components/ct/detail/DetailMobileHero.vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import { Button } from '@/components/ui/button'
-import { getDocumentById } from '@/data/mockData'
+import { getItemById } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const route = useRoute()
@@ -15,7 +15,7 @@ const router = useRouter()
 const isMobile = useIsMobile()
 
 const id = computed(() => route.params.id as string)
-const document = computed(() => getDocumentById(id.value))
+const item = computed(() => getItemById(id.value))
 
 const rightPanelOpen = ref(true)
 const leftPanelView = ref<'media' | 'map'>('media')
@@ -32,36 +32,36 @@ function closeMapFullscreen() {
   else leftPanelView.value = 'media'
 }
 function openInMaps() {
-  const doc = document.value
-  if (doc?.lat != null && doc?.lng != null) {
-    window.open(`https://www.google.com/maps?q=${doc.lat},${doc.lng}`, '_blank')
+  const it = item.value
+  if (it?.lat != null && it?.lng != null) {
+    window.open(`https://www.google.com/maps?q=${it.lat},${it.lng}`, '_blank')
   }
 }
 async function copyGps() {
-  const doc = document.value
-  if (doc?.lat != null && doc?.lng != null) {
-    await navigator.clipboard.writeText(`${doc.lat.toFixed(4)}° N, ${doc.lng.toFixed(4)}° E`)
+  const it = item.value
+  if (it?.lat != null && it?.lng != null) {
+    await navigator.clipboard.writeText(`${it.lat.toFixed(4)}° N, ${it.lng.toFixed(4)}° E`)
   }
 }
 
 const imageCount = computed(() => {
-  const doc = document.value
-  if (!doc) return 1
-  return doc.mediaType === 'image' && doc.id === 'RELIROMA-F001' ? 28 : 1
+  const it = item.value
+  if (!it) return 1
+  return it.mediaType === 'image' && it.id === 'RELIROMA-F001' ? 28 : 1
 })
 
 const mobileCtaLabel = computed(() => {
-  const doc = document.value
-  if (!doc) return 'Zobraziť'
-  if (doc.mediaType === 'image') return imageCount.value > 1 ? 'Zobraziť galériu' : 'Zobraziť obrázok'
-  if (doc.mediaType === 'pdf') return 'Zobraziť dokument'
-  if (doc.mediaType === 'audio') return 'Zobraziť nahrávku'
-  if (doc.mediaType === 'video') return 'Zobraziť video'
+  const it = item.value
+  if (!it) return 'Zobraziť'
+  if (it.mediaType === 'image') return imageCount.value > 1 ? 'Zobraziť galériu' : 'Zobraziť obrázok'
+  if (it.mediaType === 'pdf') return 'Zobraziť dokument'
+  if (it.mediaType === 'audio') return 'Zobraziť nahrávku'
+  if (it.mediaType === 'video') return 'Zobraziť video'
   return 'Zobraziť'
 })
 
-watch(document, (doc) => {
-  if (doc == null && route.name === 'detail') router.replace({ name: 'explore' })
+watch(item, (it) => {
+  if (it == null && route.name === 'detail') router.replace({ name: 'explore' })
   else transcriptVisible.value = false
 }, { immediate: true })
 </script>
@@ -73,10 +73,10 @@ watch(document, (doc) => {
       @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
     />
 
-    <template v-if="!document">
+    <template v-if="!item">
       <main class="p-6 pt-[65px] md:pt-[73px]">
         <p class="text-muted-foreground">
-          Dokument s ID <strong>{{ id }}</strong> nebol nájdený.
+          Položka s ID <strong>{{ id }}</strong> nebola nájdená.
         </p>
         <Button variant="link" class="mt-4 p-0 text-primary-600" @click="router.push({ name: 'explore' })">
           ← Späť do Explore
@@ -92,15 +92,15 @@ watch(document, (doc) => {
             <div class="flex-1 relative overflow-hidden h-[calc(100vh-57px)]">
               <div class="absolute inset-0" :class="{ invisible: leftPanelView !== 'media' }">
                 <DetailMediaViewer
-                  :document="document"
+                  :item="item"
                   :image-count="imageCount"
                   :transcript-visible="transcriptVisible"
                   @toggle-transcript="transcriptVisible = !transcriptVisible"
                 />
               </div>
               <div v-if="leftPanelView === 'map'" class="absolute inset-0 z-30 flex flex-col bg-background">
-                <template v-if="document.lat != null && document.lng != null">
-                  <DetailMap :lat="document.lat" :lng="document.lng" />
+                <template v-if="item.lat != null && item.lng != null">
+                  <DetailMap :lat="item.lat" :lng="item.lng" />
                   <div class="absolute right-2 top-2 z-10 flex gap-2">
                     <Button variant="secondary" size="sm" @click="closeMapFullscreen">Zavrieť</Button>
                     <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
@@ -118,13 +118,13 @@ watch(document, (doc) => {
           <!-- Mobile: hero + metadata -->
           <template v-else>
             <DetailMobileHero
-              :document="document"
+              :item="item"
               :cta-label="mobileCtaLabel"
               @open-viewer="mobileViewerFullscreen = true"
             />
             <div class="border-t border-border bg-background">
               <DetailRightPanel
-                :document="document"
+                :item="item"
                 :mobile="true"
                 :hide-header="true"
                 @open-map-fullscreen="openMapFullscreen"
@@ -137,7 +137,7 @@ watch(document, (doc) => {
           v-if="!isMobile && rightPanelOpen"
           class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
         >
-          <DetailRightPanel :document="document" @open-map-fullscreen="openMapFullscreen" />
+          <DetailRightPanel :item="item" @open-map-fullscreen="openMapFullscreen" />
         </aside>
       </div>
 
@@ -145,7 +145,7 @@ watch(document, (doc) => {
       <div v-if="isMobile && mobileViewerFullscreen" class="fixed inset-0 z-[60] flex flex-col bg-background">
         <div class="flex-1 min-h-0 flex flex-col">
           <DetailMediaViewer
-            :document="document"
+            :item="item"
             :image-count="imageCount"
             :transcript-visible="transcriptVisible"
             fullscreen
@@ -157,14 +157,14 @@ watch(document, (doc) => {
 
       <!-- Mobile: fullscreen map overlay -->
       <div
-        v-if="isMobile && mobileMapFullscreen && document.lat != null && document.lng != null"
+        v-if="isMobile && mobileMapFullscreen && item.lat != null && item.lng != null"
         class="fixed inset-0 z-[60] flex flex-col bg-background"
       >
         <div class="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-2">
           <Button variant="ghost" size="sm" class="gap-1" @click="closeMapFullscreen">× Zavrieť</Button>
         </div>
         <div class="relative flex-1 min-h-0">
-          <DetailMap :lat="document.lat" :lng="document.lng" />
+          <DetailMap :lat="item.lat" :lng="item.lng" />
         </div>
         <div class="flex flex-shrink-0 justify-end gap-2 border-t border-border p-4">
           <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>

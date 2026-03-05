@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { X } from 'lucide-vue-next'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
-import { transcriptPreview, type EtnoDocument } from '@/data/mockData'
+import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
-  document: EtnoDocument
+  item: EtnoItem
   mobile?: boolean
   fullscreen?: boolean
   transcriptVisible?: boolean
@@ -48,7 +48,7 @@ function seek(seconds: number) {
       </Button>
       <div v-else />
       <Button
-        v-if="document.hasTranscript"
+        v-if="item.hasTranscript"
         variant="outline"
         size="sm"
         class="border-primary-500 bg-white/10 text-primary-300 hover:bg-white/20"
@@ -58,7 +58,7 @@ function seek(seconds: number) {
       </Button>
     </div>
     <div
-      v-if="document.hasTranscript || fullscreen"
+      v-if="item.hasTranscript || fullscreen"
       class="h-12 shrink-0"
     />
 
@@ -78,12 +78,12 @@ function seek(seconds: number) {
           />
         </div>
         <div
-          v-if="document.hasTranscript && transcriptVisible"
+          v-if="item.hasTranscript && transcriptVisible"
           class="flex w-80 shrink-0 flex-col border-l border-white/20 bg-black/40"
         >
           <ScrollArea class="flex-1 p-4">
             <p class="whitespace-pre-wrap text-sm text-neutral-200">
-              {{ transcriptPreview(document) }}
+              {{ transcriptPreview(item) }}
             </p>
           </ScrollArea>
         </div>
@@ -104,12 +104,12 @@ function seek(seconds: number) {
         @toggle-play="isPlaying = !isPlaying"
       />
       <div
-        v-if="document.hasTranscript && transcriptVisible"
+        v-if="item.hasTranscript && transcriptVisible"
         class="flex min-h-0 flex-1 flex-col border-t border-white/20 bg-black/40"
       >
         <ScrollArea class="flex-1 p-4">
           <p class="whitespace-pre-wrap text-sm text-neutral-200">
-            {{ transcriptPreview(document) }}
+            {{ transcriptPreview(item) }}
           </p>
         </ScrollArea>
       </div>

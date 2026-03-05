@@ -9,8 +9,8 @@ import ResultsGrid from '@/components/ct/ResultsGrid.vue'
 import { Separator } from '@/components/ui/separator'
 import {
   getCollectionBySlug,
-  getCollectionDocuments,
-  getDocumentById,
+  getCollectionItems,
+  getItemById,
   type CollectionBodyBlock,
 } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -24,10 +24,10 @@ const sortKey = ref('id')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const searchQuery = ref('')
 
-const documents = computed(() => {
+const items = computed(() => {
   const col = collection.value
   if (!col) return []
-  let list = getCollectionDocuments(col)
+  let list = getCollectionItems(col)
   const key = sortKey.value
   const order = sortOrder.value
   return [...list].sort((a, b) => {
@@ -51,9 +51,9 @@ const documents = computed(() => {
   })
 })
 
-function getDocForBlock(block: CollectionBodyBlock) {
+function getItemForBlock(block: CollectionBodyBlock) {
   if (block.type !== 'media' || !block.documentId) return null
-  return getDocumentById(block.documentId)
+  return getItemById(block.documentId)
 }
 </script>
 
@@ -132,14 +132,14 @@ function getDocForBlock(block: CollectionBodyBlock) {
               >
                 {{ block.text }}
               </h3>
-              <div v-else-if="block.type === 'media'" class="space-y-2">
+                <div v-else-if="block.type === 'media'" class="space-y-2">
                 <div
                   class="aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted"
                 >
                   <div
                     class="flex h-full items-center justify-center text-sm text-muted-foreground"
                   >
-                    {{ getDocForBlock(block)?.title ?? 'Mediálny obsah' }}
+                    {{ getItemForBlock(block)?.title ?? 'Mediálny obsah' }}
                   </div>
                 </div>
                 <p
@@ -156,7 +156,7 @@ function getDocForBlock(block: CollectionBodyBlock) {
         <Separator class="my-6 md:my-8" />
 
         <ResultsGrid
-          :documents="documents"
+          :items="items"
           :sort-key="sortKey"
           :sort-order="sortOrder"
           @update:sort-key="sortKey = $event"

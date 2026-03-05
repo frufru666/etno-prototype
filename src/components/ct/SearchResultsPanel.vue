@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EtnoDocument } from '@/data/mockData'
+import type { EtnoItem } from '@/data/mockData'
 import { getMediaType } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 
 const props = withDefaults(
   defineProps<{
-    documents: EtnoDocument[]
+    items: EtnoItem[]
     query: string
     mobile?: boolean
   }>(),
@@ -20,8 +20,8 @@ function goToDetail(id: string) {
   router.push({ name: 'detail', params: { id } })
 }
 
-function getDocMediaType(doc: EtnoDocument) {
-  return getMediaType(doc.documentType)
+function getItemMediaType(item: EtnoItem) {
+  return getMediaType(item.documentType)
 }
 
 function resultCountLabel(count: number): string {
@@ -40,33 +40,33 @@ function resultCountLabel(count: number): string {
   >
     <div class="shrink-0 px-4 pb-2 pt-4">
       <h2 class="text-base font-bold tracking-tight text-foreground">
-        {{ resultCountLabel(documents.length) }}
+        {{ resultCountLabel(items.length) }}
       </h2>
     </div>
     <ScrollArea class="flex-1 min-h-0">
       <div class="flex flex-col">
         <button
-          v-for="doc in documents"
-          :key="doc.id"
+          v-for="item in items"
+          :key="item.id"
           type="button"
           class="flex cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-accent"
-          @click="goToDetail(doc.id)"
+          @click="goToDetail(item.id)"
         >
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
             <MediaTypeIcon
-              :media-type="getDocMediaType(doc)"
-              :has-transcript="doc.hasTranscript"
+              :media-type="getItemMediaType(item)"
+              :has-transcript="item.hasTranscript"
               class="h-6 w-6"
             />
           </div>
           <div class="min-w-0 flex-1">
             <p class="line-clamp-2 text-sm font-medium leading-tight text-foreground">
-              {{ doc.title }}
+              {{ item.title }}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
-              <span class="font-mono">ID {{ doc.id }}</span>
+              <span class="font-mono">ID {{ item.id }}</span>
               <span class="mx-1.5">·</span>
-              <span class="capitalize">{{ doc.documentType }}</span>
+              <span class="capitalize">{{ item.documentType }}</span>
             </p>
           </div>
         </button>

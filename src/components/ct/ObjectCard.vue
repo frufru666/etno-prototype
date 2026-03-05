@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EtnoDocument } from '@/data/mockData'
+import type { EtnoItem } from '@/data/mockData'
 import { getMediaType } from '@/data/mockData'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -7,34 +7,34 @@ import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
-  document: EtnoDocument
+  item: EtnoItem
 }>()
 
 const router = useRouter()
 
 function goToDetail() {
-  router.push({ name: 'detail', params: { id: props.document.id } })
+  router.push({ name: 'detail', params: { id: props.item.id } })
 }
 
-const mediaType = getMediaType(props.document.documentType)
-const isMultiImage = mediaType === 'image' && props.document.hasTranscript
+const mediaType = getMediaType(props.item.documentType)
+const isMultiImage = mediaType === 'image' && props.item.hasTranscript
 
 function participantLines(): { label: string; names: string }[] {
   const out: { label: string; names: string }[] = []
-  if (props.document.authors?.length)
+  if (props.item.authors?.length)
     out.push({
       label: 'Autor:',
-      names: props.document.authors.map((a) => a.name).join(', '),
+      names: props.item.authors.map((a) => a.name).join(', '),
     })
-  if (props.document.researchers?.length)
+  if (props.item.researchers?.length)
     out.push({
       label: 'Výskumník:',
-      names: props.document.researchers.map((a) => a.name).join(', '),
+      names: props.item.researchers.map((a) => a.name).join(', '),
     })
-  if (props.document.originators?.length)
+  if (props.item.originators?.length)
     out.push({
       label: 'Pôvodca:',
-      names: props.document.originators.map((a) => a.name).join(', '),
+      names: props.item.originators.map((a) => a.name).join(', '),
     })
   return out
 }
@@ -50,10 +50,10 @@ function participantLines(): { label: string; names: string }[] {
   >
     <CardHeader class="flex flex-row items-center justify-between gap-2 p-3 pb-0">
       <Badge variant="outline" class="font-mono text-xs text-primary-500 border-primary-200">
-        {{ document.id }}
+        {{ item.id }}
       </Badge>
       <span
-        v-if="!document.hasMap"
+        v-if="!item.hasMap"
         class="text-xs text-destructive"
       >
         Nie je v mape
@@ -69,13 +69,13 @@ function participantLines(): { label: string; names: string }[] {
         >
           <MediaTypeIcon
             :media-type="mediaType"
-            :has-transcript="document.hasTranscript"
+            :has-transcript="item.hasTranscript"
             class="h-10 w-10"
           />
         </div>
       </div>
       <h3 class="line-clamp-2 font-medium leading-tight">
-        {{ document.title }}
+        {{ item.title }}
       </h3>
       <div class="space-y-0.5 text-xs text-muted-foreground">
         <p
@@ -88,7 +88,7 @@ function participantLines(): { label: string; names: string }[] {
       </div>
       <div class="flex flex-wrap gap-1 pt-1">
         <Badge variant="secondary" class="text-xs">
-          {{ document.documentType }}
+          {{ item.documentType }}
         </Badge>
       </div>
     </CardContent>

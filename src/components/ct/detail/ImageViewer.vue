@@ -12,13 +12,13 @@ import {
   X,
   Menu,
 } from 'lucide-vue-next'
-import { transcriptPreview, type EtnoDocument } from '@/data/mockData'
+import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const props = withDefaults(
   defineProps<{
-    document: EtnoDocument
+    item: EtnoItem
     initialIndex?: number
     mobile?: boolean
     fullscreen?: boolean
@@ -48,7 +48,7 @@ const thumbIndices = computed(() =>
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
     <!-- Mobile: transcript as separate full screen -->
-    <template v-if="isMobile && document.hasTranscript && transcriptVisible">
+    <template v-if="isMobile && item.hasTranscript && transcriptVisible">
       <div class="flex h-full flex-col bg-background">
         <div class="flex shrink-0 items-center justify-between border-b border-border px-4 py-2">
           <Button
@@ -66,7 +66,7 @@ const thumbIndices = computed(() =>
         </div>
         <ScrollArea class="flex-1 p-4">
           <p class="whitespace-pre-wrap text-sm text-foreground">
-            {{ transcriptPreview(document) }}
+            {{ transcriptPreview(item) }}
           </p>
         </ScrollArea>
       </div>
@@ -76,7 +76,7 @@ const thumbIndices = computed(() =>
     <template v-else>
       <!-- Top bar: close (when fullscreen) + transcript button -->
       <div
-        v-if="fullscreen || isMulti || document.hasTranscript"
+        v-if="fullscreen || isMulti || item.hasTranscript"
         class="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-2 bg-black/20 p-2"
       >
         <Button
@@ -92,7 +92,7 @@ const thumbIndices = computed(() =>
         </Button>
         <div v-else />
         <Button
-          v-if="document.hasTranscript"
+          v-if="item.hasTranscript"
           variant="outline"
           size="sm"
           class="border-primary-500 bg-white/90 text-primary-600"
@@ -114,7 +114,7 @@ const thumbIndices = computed(() =>
             <!-- Left toolbar -->
             <div
               class="absolute left-2 top-1/2 flex -translate-y-1/2 flex-col gap-1"
-              :class="{ 'top-[calc(50%+24px)]': fullscreen || isMulti || document.hasTranscript }"
+              :class="{ 'top-[calc(50%+24px)]': fullscreen || isMulti || item.hasTranscript }"
             >
               <Button
                 variant="secondary"
@@ -222,13 +222,13 @@ const thumbIndices = computed(() =>
         </div>
         <!-- Desktop: transcript panel to the right -->
         <div
-          v-if="!isMobile && document.hasTranscript && transcriptVisible"
+          v-if="!isMobile && item.hasTranscript && transcriptVisible"
           class="flex w-80 shrink-0 flex-col border-l border-border bg-background/95"
         >
           <ScrollArea class="flex-1 p-4">
             <h3 class="mb-2 text-sm font-semibold text-foreground">Transcript</h3>
             <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-              {{ transcriptPreview(document) }}
+              {{ transcriptPreview(item) }}
             </p>
           </ScrollArea>
         </div>

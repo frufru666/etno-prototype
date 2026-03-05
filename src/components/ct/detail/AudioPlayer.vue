@@ -3,10 +3,10 @@ import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
-import { transcriptPreview, type EtnoDocument } from '@/data/mockData'
+import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 
 const props = defineProps<{
-  document: EtnoDocument
+  item: EtnoItem
   mobile?: boolean
   fullscreen?: boolean
   transcriptVisible?: boolean
@@ -40,7 +40,7 @@ function seek(seconds: number) {
         Zavrieť
       </Button>
       <Button
-        v-if="document.hasTranscript"
+        v-if="item.hasTranscript"
         variant="outline"
         size="sm"
         @click="emit('show-transcript')"
@@ -49,7 +49,7 @@ function seek(seconds: number) {
       </Button>
     </div>
     <div
-      v-else-if="document.hasTranscript"
+      v-else-if="item.hasTranscript"
       class="flex flex-shrink-0 justify-end border-b border-border bg-background/80 px-4 py-2"
     >
       <Button
@@ -63,13 +63,13 @@ function seek(seconds: number) {
 
     <!-- Transcript above player: own scroll so transcript scrolls without player moving -->
     <div
-      v-if="document.hasTranscript && transcriptVisible"
+      v-if="item.hasTranscript && transcriptVisible"
       class="flex min-h-0 flex-1 flex-col border-b border-border bg-background/60"
     >
       <ScrollArea class="flex-1 p-4">
         <h3 class="mb-2 text-sm font-semibold text-foreground">Transcript</h3>
         <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-          {{ transcriptPreview(document) }}
+          {{ transcriptPreview(item) }}
         </p>
       </ScrollArea>
     </div>
