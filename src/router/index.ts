@@ -8,6 +8,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ExploreView.vue'),
   },
   {
+    path: '/collections',
+    name: 'collections',
+    component: () => import('@/views/CollectionsListView.vue'),
+  },
+  {
+    path: '/collections/:slug',
+    name: 'collection-detail',
+    component: () => import('@/views/CollectionDetailView.vue'),
+  },
+  {
     path: '/detail/:id',
     name: 'detail',
     component: () => import('@/views/DetailView.vue'),

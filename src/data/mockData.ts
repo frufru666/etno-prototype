@@ -102,6 +102,24 @@ export interface EtnoDocument {
   hasMap: boolean;
 }
 
+// ─── Collections (curated hand-picked groups with article content) ───────────
+
+export type CollectionBodyBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "heading2"; text: string }
+  | { type: "heading3"; text: string }
+  | { type: "media"; documentId?: string; caption?: string };
+
+export interface EtnoCollection {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle?: string;
+  perex: string;
+  body: CollectionBodyBlock[];
+  itemIds: string[];
+}
+
 // ─── Filter Configuration ───────────────────────────────────────────────────
 
 export interface FilterDef {
@@ -1244,6 +1262,53 @@ export const DOCUMENTS: EtnoDocument[] = [
 
 export function getDocumentById(id: string): EtnoDocument | undefined {
   return DOCUMENTS.find((d) => d.id === id);
+}
+
+// ─── Collections mock data ───────────────────────────────────────────────────
+
+export const COLLECTIONS: EtnoCollection[] = [
+  {
+    id: "col-reliroma",
+    slug: "reliroma",
+    title: "Reliroma",
+    subtitle: "Rómska religiozita a domáca zbožnosť",
+    perex:
+      "Kolekcia dokumentuje výskum rómskej religiozity a domácej zbožnosti v lokalite Jareček pri Spišskej Novej Vsi. Terénny výskum prebiehal v roku 2024 a zachytáva ústne podanie, materiálnu kultúru a vizuálnu dokumentáciu interiérov.",
+    body: [
+      { type: "paragraph", text: "Projekt Reliroma sa zameriava na dokumentáciu religióznych praktík a domácej zbožnosti v rómskych osadách na Spiši. Cieľom je zachytiť rozmanitosť vyjadrovania viery a prepojenie tradičných prvkov s kresťanskými vplyvmi." },
+      { type: "heading2", text: "Terénny výskum a metodológia" },
+      { type: "paragraph", text: "Výskum kombinuje hĺbkové rozhovory s informátormi, fotografickú dokumentáciu interiérov a exteriérov a audiovizuálne záznamy ceremonií a každodenných rituálov. Dôležitú úlohu zohráva kontext lokality Jareček ako miesta s dlhšou historiou osídlenia." },
+      { type: "heading3", text: "Dokumenty v kolekcii" },
+      { type: "paragraph", text: "V tejto kolekcii nájdete fotografie interiérov obydlí, videonahrávky z terénu a audionahrávky rozhovorov o tradičnom liečiteľstve a ľudovej viere. Materiál je doplnený o metadáta z výskumných správ Ústavu etnológie SAV." },
+      { type: "media", documentId: "RELIROMA-F001", caption: "Interiér rómskeho obydlia, Jareček – domáca nástenka a sakrálne prvky." },
+      { type: "media", documentId: "RELIROMA-V001", caption: "Videonahrávka z terénneho výskumu – dokumentácia miestnej zbožnosti." },
+    ],
+    itemIds: ["RELIROMA-F001", "RELIROMA-V001", "AU00001"],
+  },
+  {
+    id: "col-vyskumne-spravy",
+    slug: "vyskumne-spravy",
+    title: "Výskumné správy",
+    subtitle: "Terénna dokumentácia 20. storočia",
+    perex:
+      "Výber výskumných správ z archívu Ústavu etnológie SAV. Materiál pokrýva rôzne regióny Slovenska a tematické okruhy od textilnej výroby po ľudové zvyky.",
+    body: [
+      { type: "paragraph", text: "Výskumné správy tvoria jadro archívneho fondu Ústavu etnológie a sociálnej antropológie SAV. Dokumentujú terénny výskum realizovaný od polovice 20. storočia a slúžia ako primárny prameň pre štúdium ľudovej kultúry na Slovensku." },
+      { type: "heading2", text: "Obsah a štruktúra" },
+      { type: "paragraph", text: "Správy obsahujú popis lokality, informátorov, tematických okruhov a často sú doplnené o kresby, fotografie alebo dotazníkové údaje. V tejto kolekcii sú zastúpené správy z obdobia 1950–2004 z viacerých krajov." },
+    ],
+    itemIds: ["AT00016", "AT00288", "AT00230", "AT01443"],
+  },
+];
+
+export function getCollectionBySlug(slug: string): EtnoCollection | undefined {
+  return COLLECTIONS.find((c) => c.slug === slug);
+}
+
+export function getCollectionDocuments(collection: EtnoCollection): EtnoDocument[] {
+  return collection.itemIds
+    .map((id) => getDocumentById(id))
+    .filter((d): d is EtnoDocument => d != null);
 }
 
 // Normalize: transcript for all media except PDF; default abstract so Abstract section is visible

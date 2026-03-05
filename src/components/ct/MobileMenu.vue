@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -27,9 +28,11 @@ const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus
         <SheetTitle>Menu</SheetTitle>
       </SheetHeader>
       <div class="mt-6 flex flex-col gap-2">
-        <Button variant="outline" class="justify-start gap-2" @click="open = false">
-          <FolderOpen class="h-4 w-4" />
-          Collections
+        <Button variant="outline" class="justify-start gap-2" as-child>
+          <RouterLink to="/collections" class="flex items-center gap-2" @click="open = false">
+            <FolderOpen class="h-4 w-4" />
+            Collections
+          </RouterLink>
         </Button>
         <Button variant="outline" class="justify-start gap-2" @click="open = false">
           <Info class="h-4 w-4" />
