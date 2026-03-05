@@ -5,10 +5,11 @@ import TopNav from '@/components/ct/TopNav.vue'
 import FilterSidebar from '@/components/ct/FilterSidebar.vue'
 import FilterChips from '@/components/ct/FilterChips.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
+import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
-  getReviewDocuments,
+  DOCUMENTS,
   getMapPins,
   matchesFilters,
   type EtnoDocument,
@@ -46,14 +47,27 @@ function syncFiltersFromQuery() {
 function matchesSearch(doc: EtnoDocument, q: string): boolean {
   const term = q.trim().toLowerCase()
   if (!term) return true
-  const title = (doc.title ?? '').toLowerCase()
-  const abstract = (doc.abstract ?? '').toLowerCase()
-  const note = (doc.note ?? '').toLowerCase()
-  const keywords = (doc.keywords ?? []).join(' ').toLowerCase()
-  const authorNames = (doc.authors ?? []).map((a) => a.name).join(' ').toLowerCase()
-  const searchable = [title, abstract, note, keywords, authorNames].join(' ')
+  const parts = [
+    doc.id, doc.title, doc.subtitle, doc.abstract, doc.note,
+    doc.keywords?.join(' '),
+    doc.authors?.map((a) => a.name).join(' '),
+    doc.researchers?.map((a) => a.name).join(' '),
+    doc.originators?.map((a) => a.name).join(' '),
+    doc.obec, doc.okres, doc.kraj, doc.stat, doc.lokalita,
+    doc.documentType, doc.researchCollection, doc.collectionMethod,
+    doc.language,
+  ]
+  const searchable = parts.filter(Boolean).join(' ').toLowerCase()
   return searchable.includes(term)
 }
+
+const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
+
+const searchPanelLeftPx = computed(() => {
+  if (!filterOpen.value || isMobile.value) return 16
+  const base = 16 + 280 + 12
+  return openSubPanelKey.value ? base + 320 + 12 : base
+})
 
 onMounted(() => {
   filterOpen.value = !isMobile.value
@@ -72,7 +86,7 @@ watch(isMobile, (mobile) => {
 })
 
 const filteredDocuments = computed(() => {
-  let list = getReviewDocuments().filter((doc) =>
+  let list = DOCUMENTS.filter((doc) =>
     matchesFilters(doc, activeFilters.value)
   )
   list = list.filter((doc) => matchesSearch(doc, searchQuery.value))
@@ -152,7 +166,8 @@ onUnmounted(() => {
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
     />
-    <div class="relative pt-[49px] md:pt-[57px]">
+    <!-- Mobile nav is 2 rows (~96px), desktop is 57px -->
+    <div class="relative pt-[96px] md:pt-[57px]">
       <!-- Desktop: floating filter container over map (no layout shift) -->
       <div
         v-if="filterOpen && !isMobile"
@@ -167,15 +182,41 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- Map: always full width -->
+      <!-- Desktop: floating search results panel over map -->
       <div
+        v-if="isSearchActive && !isMobile"
+        class="fixed top-20 z-30 transition-[left] duration-200"
+        :style="{ left: searchPanelLeftPx + 'px' }"
+      >
+        <SearchResultsPanel
+          :documents="filteredDocuments"
+          :query="searchQuery"
+        />
+      </div>
+
+      <!-- Map: always full width (hidden on mobile when search active) -->
+      <div
+        v-if="!(isSearchActive && isMobile)"
         class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
       >
         <MapView :pins="mapPins" />
       </div>
 
+      <!-- Mobile: search results list (replaces map when searching) -->
+      <div
+        v-if="isSearchActive && isMobile"
+        class="min-h-[50vh]"
+      >
+        <SearchResultsPanel
+          :documents="filteredDocuments"
+          :query="searchQuery"
+          mobile
+        />
+      </div>
+
       <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
       <div
+        v-if="!isSearchActive"
         class="transition-[margin] duration-200"
         :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[628px]' : 'md:ml-[296px]') : ''"
       >
@@ -214,7 +255,7 @@ onUnmounted(() => {
         </SheetContent>
       </Sheet>
 
-      <Footer />
+      <Footer v-if="!isSearchActive" />
     </div>
   </div>
 </template>

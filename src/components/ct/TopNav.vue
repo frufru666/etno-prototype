@@ -18,13 +18,13 @@ import {
   Info,
   User,
   Languages,
+  X,
 } from 'lucide-vue-next'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const props = defineProps<{
   filterOpen: boolean
   activeFilterCount: number
-  /** Lifted from ExploreView for search filtering and URL sync */
   searchQuery?: string
 }>()
 
@@ -38,15 +38,15 @@ const mobileSheetOpen = ref(false)
 </script>
 
 <template>
+  <!-- Desktop nav: single row -->
   <nav
-    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-neutral-200 bg-white px-4 md:px-6 focus-within:outline-none"
-    :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
+    v-if="!isMobile"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-neutral-200 bg-white px-4 md:px-6 focus-within:outline-none"
     aria-label="Main navigation"
   >
-    <!-- Left: branding + filter toggle -->
     <div class="flex min-w-0 flex-shrink-0 items-center gap-2">
       <span class="truncate text-lg font-semibold text-primary-500">
-        Etno SAV Explorer
+        Etno Explorer SAV
       </span>
       <div class="relative">
         <Button
@@ -68,9 +68,8 @@ const mobileSheetOpen = ref(false)
       </div>
     </div>
 
-    <!-- Center: search -->
     <div class="flex flex-1 justify-center px-4">
-      <div class="relative w-full max-w-md">
+      <div class="relative w-full max-w-lg">
         <Search
           class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden
@@ -78,19 +77,24 @@ const mobileSheetOpen = ref(false)
         <Input
           :model-value="searchQuery ?? ''"
           type="search"
-          class="h-9 rounded-lg pl-9 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500"
-          placeholder="Hľadať v zbierke"
+          class="h-9 rounded-lg pl-9 pr-8 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 [&::-webkit-search-cancel-button]:hidden"
+          placeholder="Search in collection"
           aria-label="Search collection"
           @update:model-value="emit('update:searchQuery', $event ?? '')"
         />
+        <button
+          v-if="(searchQuery ?? '').length > 0"
+          type="button"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          aria-label="Clear search"
+          @click="emit('update:searchQuery', '')"
+        >
+          <X class="h-4 w-4" />
+        </button>
       </div>
     </div>
 
-    <!-- Right: desktop actions (Archeo-style outline, border-neutral-200) -->
-    <div
-      v-if="!isMobile"
-      class="flex flex-shrink-0 items-center gap-2"
-    >
+    <div class="flex flex-shrink-0 items-center gap-2">
       <Button
         variant="outline"
         size="sm"
@@ -125,9 +129,19 @@ const mobileSheetOpen = ref(false)
         EN/SK
       </Button>
     </div>
+  </nav>
 
-    <!-- Right: mobile hamburger + sheet -->
-    <div v-else class="flex flex-shrink-0">
+  <!-- Mobile nav: two rows -->
+  <nav
+    v-else
+    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-neutral-200 bg-white"
+    aria-label="Main navigation"
+  >
+    <!-- Row 1: branding + hamburger -->
+    <div class="flex h-[49px] items-center justify-between px-4">
+      <span class="truncate text-lg font-semibold text-primary-500">
+        Etno Explorer SAV
+      </span>
       <Sheet v-model:open="mobileSheetOpen">
         <SheetTrigger as-child>
           <Button
@@ -179,6 +193,51 @@ const mobileSheetOpen = ref(false)
           </div>
         </SheetContent>
       </Sheet>
+    </div>
+    <!-- Row 2: filter + search -->
+    <div class="flex items-center gap-2 px-4 pb-2.5">
+      <div class="relative shrink-0">
+        <Button
+          type="button"
+          size="sm"
+          class="gap-1.5 bg-primary-500 text-white hover:bg-primary-600"
+          aria-label="Toggle filters"
+          @click="emit('toggle-filter')"
+        >
+          <SlidersHorizontal class="h-4 w-4" />
+          <span>Filter</span>
+        </Button>
+        <Badge
+          v-if="activeFilterCount > 0"
+          class="absolute -right-1 -top-1 h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs"
+          variant="secondary"
+        >
+          {{ activeFilterCount }}
+        </Badge>
+      </div>
+      <div class="relative flex-1 min-w-0">
+        <Search
+          class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
+        <Input
+          :model-value="searchQuery ?? ''"
+          type="search"
+          class="h-9 rounded-lg pl-9 pr-8 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 [&::-webkit-search-cancel-button]:hidden"
+          placeholder="Search in collection"
+          aria-label="Search collection"
+          @update:model-value="emit('update:searchQuery', $event ?? '')"
+        />
+        <button
+          v-if="(searchQuery ?? '').length > 0"
+          type="button"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          aria-label="Clear search"
+          @click="emit('update:searchQuery', '')"
+        >
+          <X class="h-4 w-4" />
+        </button>
+      </div>
     </div>
   </nav>
 </template>
