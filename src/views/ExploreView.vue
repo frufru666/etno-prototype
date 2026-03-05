@@ -152,13 +152,12 @@ onUnmounted(() => {
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
     />
-    <div class="pt-[49px] md:pt-[57px]">
-      <!-- Desktop: fixed floating FilterSidebar (Panel 1 + Panel 2 when category open) -->
-      <aside
+    <div class="relative pt-[49px] md:pt-[57px]">
+      <!-- Desktop: floating filter container over map (no layout shift) -->
+      <div
         v-if="filterOpen && !isMobile"
         ref="filterAsideRef"
-        class="fixed left-0 top-[57px] z-40 flex h-[calc(100vh-57px)] overflow-visible transition-[width] duration-200"
-        :class="openSubPanelKey ? 'w-[600px]' : 'w-[280px]'"
+        class="fixed left-4 top-20 z-40 overflow-visible"
         aria-label="Filter panel"
       >
         <FilterSidebar
@@ -166,13 +165,10 @@ onUnmounted(() => {
           v-model:open-subpanel-key="openSubPanelKey"
           @update:active-filters="activeFilters = $event"
         />
-      </aside>
+      </div>
 
-      <!-- Map + content: shift right on desktop when filter open so sidebar doesn't cover -->
-      <div
-        class="transition-[margin] duration-200"
-        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[600px]' : 'md:ml-[280px]') : ''"
-      >
+      <!-- Map + content: full width; filter floats over map on desktop -->
+      <div>
         <!-- Map area: full viewport height below nav -->
         <div
           class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
@@ -213,6 +209,7 @@ onUnmounted(() => {
             :filtered-count="filteredDocuments.length"
             @update:active-filters="activeFilters = $event"
             @apply="filterOpen = false"
+            @close="filterOpen = false"
           />
         </SheetContent>
       </Sheet>

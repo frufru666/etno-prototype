@@ -20,6 +20,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:activeFilters', payload: Record<string, string[]>): void
   (e: 'apply'): void
+  (e: 'close'): void
   (e: 'update:openSubPanelKey', key: string | null): void
 }>()
 
@@ -103,8 +104,12 @@ function closeMobileSubPanel() {
   selectedCategoryKey.value = null
 }
 
-/** Desktop: open second panel for this category */
+/** Desktop: open second panel for this category; toggle off if same key */
 function openDesktopSubPanel(key: string) {
+  if (desktopSubPanelKey.value === key) {
+    closeDesktopSubPanel()
+    return
+  }
   desktopSubPanelKey.value = key
   emit('update:openSubPanelKey', key)
 }
@@ -130,14 +135,14 @@ const totalActiveCount = computed(() =>
 
 <template>
   <div
-    class="flex h-full flex-col bg-white"
-    :class="mobile ? 'w-full' : 'min-w-0 flex-1'"
+    class="flex flex-col"
+    :class="mobile ? 'h-full w-full bg-white' : 'min-w-0 flex-1'"
   >
-    <!-- Desktop: two-panel layout (Archeo-style rounded-xl shadow-lg) -->
+    <!-- Desktop: two separate floating panels over map (wireframe) -->
     <template v-if="!mobile">
-      <div class="flex h-full max-h-[calc(100vh-90px)] min-w-0 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg">
-        <!-- Panel 1: category list 280px -->
-        <div class="flex w-[280px] shrink-0 flex-col overflow-hidden">
+      <div class="flex items-start gap-3 min-w-0">
+        <!-- Panel 1: category list — standalone floating card 280px -->
+        <div class="w-[280px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg">
           <div class="flex items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
               <SlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
@@ -202,10 +207,10 @@ const totalActiveCount = computed(() =>
             </div>
           </ScrollArea>
         </div>
-        <!-- Panel 2: sub-panel 320px (Archeo: blue back, red Reset, search + option list) -->
+        <!-- Panel 2: sub-panel — standalone floating card 320px (Filter name / Obec options) -->
         <div
           v-if="desktopSubPanelKey"
-          class="flex w-[320px] shrink-0 flex-col border-l border-neutral-200 bg-white"
+          class="w-[320px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg"
         >
           <div class="flex items-center justify-between gap-2 px-1 pb-3 pt-4">
             <div class="flex items-center gap-2">
@@ -279,8 +284,26 @@ const totalActiveCount = computed(() =>
       </div>
     </template>
 
-    <!-- Mobile: single-panel layout (Archeo-style step flow + CTA with MapPin) -->
+    <!-- Mobile: header (Zavrieť filter + Reset) + step flow, matches FilterOpenMobile / FilterOverlayModal -->
     <template v-else>
+      <header class="flex h-10 shrink-0 items-center justify-between border-b border-neutral-200 px-2 py-1">
+        <button
+          type="button"
+          class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-primary-500 transition-opacity hover:opacity-90"
+          @click="emit('close')"
+        >
+          <ArrowLeft class="h-5 w-5" aria-hidden />
+          <span class="text-base font-semibold tracking-tight">Zavrieť filter</span>
+        </button>
+        <button
+          type="button"
+          class="rounded-lg px-2 py-1 text-base font-semibold text-destructive transition-opacity hover:opacity-80"
+          :class="totalActiveCount === 0 && 'opacity-50 pointer-events-none'"
+          @click="clearAll"
+        >
+          Reset
+        </button>
+      </header>
       <!-- Mobile step 2: sub-panel -->
       <template v-if="selectedCategoryKey">
         <div class="flex flex-1 flex-col overflow-hidden">
