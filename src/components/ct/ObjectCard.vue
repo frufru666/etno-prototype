@@ -3,9 +3,7 @@ import type { EtnoDocument } from '@/data/mockData'
 import { getMediaType } from '@/data/mockData'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
-import { Bookmark } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -38,7 +36,7 @@ function participantLines(): { label: string; names: string }[] {
       label: 'Pôvodca:',
       names: props.document.originators.map((a) => a.name).join(', '),
     })
-  return out.slice(0, 3)
+  return out
 }
 </script>
 
@@ -54,29 +52,12 @@ function participantLines(): { label: string; names: string }[] {
       <Badge variant="outline" class="font-mono text-xs text-primary-500 border-primary-200">
         {{ document.id }}
       </Badge>
-      <div class="flex items-center gap-2">
-        <span
-          v-if="document.hasMap"
-          class="text-xs text-muted-foreground"
-        >
-          V mape
-        </span>
-        <span
-          v-else
-          class="text-xs text-destructive"
-        >
-          Nie je v mape
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8"
-          aria-label="Pridať do záložiek"
-          @click.stop
-        >
-          <Bookmark class="h-4 w-4" />
-        </Button>
-      </div>
+      <span
+        v-if="!document.hasMap"
+        class="text-xs text-destructive"
+      >
+        Nie je v mape
+      </span>
     </CardHeader>
     <CardContent class="space-y-2 p-3 pt-2">
       <!-- Thumbnail 4:3 -->

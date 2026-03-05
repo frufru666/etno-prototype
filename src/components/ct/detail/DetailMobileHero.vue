@@ -8,6 +8,17 @@ defineProps<{
   ctaLabel: string
 }>()
 
+function participantLines(doc: EtnoDocument): { label: string; names: string }[] {
+  const out: { label: string; names: string }[] = []
+  if (doc.authors?.length)
+    out.push({ label: 'Autor:', names: doc.authors.map((a) => a.name).join(', ') })
+  if (doc.researchers?.length)
+    out.push({ label: 'Výskumník:', names: doc.researchers.map((a) => a.name).join(', ') })
+  if (doc.originators?.length)
+    out.push({ label: 'Pôvodca:', names: doc.originators.map((a) => a.name).join(', ') })
+  return out
+}
+
 const emit = defineEmits<{
   (e: 'open-viewer'): void
 }>()
@@ -32,8 +43,12 @@ const emit = defineEmits<{
     <h2 class="text-xl font-bold tracking-tight text-foreground">
       {{ document.title }}
     </h2>
-    <p v-if="document.authors?.length" class="text-sm text-muted-foreground">
-      Autor: {{ document.authors.map((a) => a.name).join(', ') }}
+    <p
+      v-for="line in participantLines(document)"
+      :key="line.label"
+      class="text-sm text-muted-foreground"
+    >
+      {{ line.label }} {{ line.names }}
     </p>
     <Badge variant="outline" class="text-muted-foreground">
       {{ document.documentType }}

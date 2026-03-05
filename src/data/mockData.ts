@@ -1301,9 +1301,33 @@ export interface MetadataSection {
 
 export const METADATA_SECTIONS: MetadataSection[] = [
   {
+    title: "TEMATICKÉ A AUTORSKÉ ÚDAJE",
+    fields: [
+      {
+        key: "authors",
+        label: "Autor",
+        getValue: (d) => d.authors?.length ? d.authors.map((a) => a.name).join(", ") : undefined,
+        isLink: true,
+        filterKey: "author",
+      },
+      {
+        key: "researchers",
+        label: "Výskumník",
+        getValue: (d) => d.researchers?.length ? d.researchers.map((a) => a.name).join(", ") : undefined,
+      },
+      {
+        key: "originators",
+        label: "Pôvodca",
+        getValue: (d) => d.originators?.length ? d.originators.map((a) => a.name).join(", ") : undefined,
+      },
+      { key: "doi", label: "DOI", getValue: (d) => d.doi },
+    ],
+  },
+  {
     title: "GEOGRAFICKÉ ÚDAJE",
     fields: [
       { key: "obec", label: "Obec", getValue: (d) => d.obec, isLink: true, filterKey: "obec" },
+      { key: "castObce", label: "Časť obce", getValue: (d) => d.castObce },
       { key: "okres", label: "Okres", getValue: (d) => d.okres, isLink: true, filterKey: "okres" },
       { key: "kraj", label: "Kraj", getValue: (d) => d.kraj, isLink: true, filterKey: "kraj" },
       { key: "stat", label: "Štát", getValue: (d) => d.stat, isLink: true, filterKey: "stat" },
@@ -1329,6 +1353,7 @@ export const METADATA_SECTIONS: MetadataSection[] = [
           return d.studyPeriodStart;
         },
       },
+      { key: "submissionDate", label: "Dátum odovzdania", getValue: (d) => d.submissionDate },
       {
         key: "collectionMethod",
         label: "Spôsob zberu",
@@ -1336,6 +1361,7 @@ export const METADATA_SECTIONS: MetadataSection[] = [
         isLink: true,
         filterKey: "collectionMethod",
       },
+      { key: "acquisitionMethod", label: "Spôsob nadobudnutia", getValue: (d) => d.acquisitionMethod },
       {
         key: "size",
         label: "Veľkosť",
@@ -1362,12 +1388,17 @@ export const METADATA_SECTIONS: MetadataSection[] = [
         filterKey: "researchCollection",
       },
       { key: "institution", label: "Inštitúcia", getValue: (d) => d.institution },
+      {
+        key: "institutionRor",
+        label: "ROR",
+        getValue: (d) => d.institutionRor,
+        isLink: true,
+      },
       { key: "accessRight", label: "Prístup", getValue: (d) => d.accessRight },
       {
         key: "license",
         label: "Licencia",
         getValue: (d) => {
-          // Shorten full URLs to readable labels
           if (d.license.includes("by-nc-nd")) return "CC BY-NC-ND 4.0";
           if (d.license.includes("by-nc-sa")) return "CC BY-NC-SA";
           return d.license;

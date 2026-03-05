@@ -25,9 +25,15 @@ const emit = defineEmits<{
 
 const router = useRouter()
 
-function authorLine(doc: EtnoDocument): string {
-  if (!doc.authors?.length) return ''
-  return doc.authors.map((a) => a.name).join(', ')
+function participantLines(doc: EtnoDocument): { label: string; names: string }[] {
+  const out: { label: string; names: string }[] = []
+  if (doc.authors?.length)
+    out.push({ label: 'Autor:', names: doc.authors.map((a) => a.name).join(', ') })
+  if (doc.researchers?.length)
+    out.push({ label: 'Výskumník:', names: doc.researchers.map((a) => a.name).join(', ') })
+  if (doc.originators?.length)
+    out.push({ label: 'Pôvodca:', names: doc.originators.map((a) => a.name).join(', ') })
+  return out
 }
 
 function openExploreWithFilter(filterKey: string, value: string) {
@@ -76,10 +82,11 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           {{ document.title }}
         </h2>
         <p
-          v-if="authorLine(document)"
+          v-for="line in participantLines(document)"
+          :key="line.label"
           class="text-sm text-muted-foreground"
         >
-          Autor: {{ authorLine(document) }}
+          {{ line.label }} {{ line.names }}
         </p>
         <Badge
           variant="outline"
