@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { FILTER_CATEGORIES, getOptionsWithCounts } from '@/data/mockData'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -114,11 +114,26 @@ function openDesktopSubPanel(key: string) {
   emit('update:openSubPanelKey', key)
 }
 
-/** Desktop: close second panel */
+/** Desktop: close second panel (keeps selection) */
 function closeDesktopSubPanel() {
   desktopSubPanelKey.value = null
   emit('update:openSubPanelKey', null)
 }
+
+// Desktop: close second panel on click outside it (selection is kept)
+const desktopSubPanelRef = ref<HTMLElement | null>(null)
+function onDocumentMousedown(e: MouseEvent) {
+  if (props.mobile) return
+  if (!desktopSubPanelKey.value || !desktopSubPanelRef.value) return
+  const target = e.target as Node
+  if (!desktopSubPanelRef.value.contains(target)) closeDesktopSubPanel()
+}
+onMounted(() => {
+  document.addEventListener('mousedown', onDocumentMousedown)
+})
+onUnmounted(() => {
+  document.removeEventListener('mousedown', onDocumentMousedown)
+})
 
 function getCategoryLabel(filterKey: string): string {
   for (const cat of Object.values(FILTER_CATEGORIES)) {
@@ -174,7 +189,7 @@ const totalActiveCount = computed(() =>
                         class="flex h-9 w-full cursor-pointer items-center justify-between rounded-lg border px-3 transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                         :class="[
                           desktopSubPanelKey === filter.key
-                            ? 'border-2 border-primary-600 bg-white'
+                            ? 'border-2 border-primary-500 bg-white'
                             : getSelectedCount(filter.key) > 0
                               ? 'border border-primary-200 bg-primary-50'
                               : 'border border-neutral-200 bg-white',
@@ -207,12 +222,13 @@ const totalActiveCount = computed(() =>
             </div>
           </ScrollArea>
         </div>
-        <!-- Panel 2: sub-panel — standalone floating card 320px (Filter name / Obec options) -->
+        <!-- Panel 2: sub-panel — standalone floating card 320px (closes on click outside) -->
         <div
           v-if="desktopSubPanelKey"
+          ref="desktopSubPanelRef"
           class="w-[320px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg"
         >
-          <div class="flex items-center justify-between gap-2 px-1 pb-3 pt-4">
+          <div class="flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">
               <Button
                 type="button"
@@ -235,12 +251,12 @@ const totalActiveCount = computed(() =>
             </button>
           </div>
           <div class="flex flex-1 flex-col overflow-hidden px-4 pb-4">
-            <div class="relative mb-2">
+            <div class="relative mb-2 top-px">
               <Search class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
               <Input
                 :model-value="getSearchKey(desktopSubPanelKey)"
                 type="search"
-                class="h-10 pl-10 pr-8 rounded-lg border-neutral-300 focus:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500"
+                class="h-10 pl-10 pr-8 rounded-lg border-neutral-300 focus:border-primary-500 [&::-webkit-search-cancel-button]:hidden"
                 placeholder="Hľadať..."
                 @update:model-value="setSearchKey(desktopSubPanelKey, $event)"
               />
@@ -284,30 +300,23 @@ const totalActiveCount = computed(() =>
       </div>
     </template>
 
-    <!-- Mobile: header (Zavrieť filter + Reset) + step flow, matches FilterOpenMobile / FilterOverlayModal -->
+    <!-- Mobile: top bar per wireframe — left: title, right: close (Zavrieť filter + X) -->
     <template v-else>
-      <header class="flex h-10 shrink-0 items-center justify-between border-b border-neutral-200 px-2 py-1">
+      <header class="flex shrink-0 items-center justify-between border-b border-neutral-200 px-4 py-3">
+        <h2 class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</h2>
         <button
           type="button"
-          class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-primary-500 transition-opacity hover:opacity-90"
+          class="flex cursor-pointer items-center gap-2 rounded-lg bg-neutral-100 px-3 py-2 text-base font-semibold text-neutral-700 transition-colors hover:bg-neutral-200"
           @click="emit('close')"
         >
-          <ArrowLeft class="h-5 w-5" aria-hidden />
-          <span class="text-base font-semibold tracking-tight">Zavrieť filter</span>
-        </button>
-        <button
-          type="button"
-          class="rounded-lg px-2 py-1 text-base font-semibold text-destructive transition-opacity hover:opacity-80"
-          :class="totalActiveCount === 0 && 'opacity-50 pointer-events-none'"
-          @click="clearAll"
-        >
-          Reset
+          <X class="h-5 w-5" aria-hidden />
+          <span>Zavrieť filter</span>
         </button>
       </header>
       <!-- Mobile step 2: sub-panel -->
       <template v-if="selectedCategoryKey">
         <div class="flex flex-1 flex-col overflow-hidden">
-          <div class="flex items-center justify-between gap-2 px-1 pb-3 pt-4">
+          <div class="flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">
               <Button
                 type="button"
@@ -322,12 +331,12 @@ const totalActiveCount = computed(() =>
             </div>
           </div>
           <div class="flex flex-1 flex-col overflow-hidden px-4 pb-4">
-            <div class="relative mb-2">
+            <div class="relative mb-2 top-px">
               <Search class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
               <Input
                 :model-value="getSearchKey(selectedCategoryKey)"
                 type="search"
-                class="h-10 pl-10 pr-8 rounded-lg"
+                class="h-10 pl-10 pr-8 rounded-lg [&::-webkit-search-cancel-button]:hidden"
                 placeholder="Hľadať..."
                 @update:model-value="setSearchKey(selectedCategoryKey, $event)"
               />
@@ -372,25 +381,22 @@ const totalActiveCount = computed(() =>
               <span>Zobraziť {{ filteredCount }} výsledkov</span>
               <MapPin class="h-4 w-4" />
             </Button>
+            <button
+              v-if="totalActiveCount > 0"
+              type="button"
+              class="w-full py-2 text-center text-sm font-semibold text-destructive transition-opacity hover:opacity-80"
+              @click="clearAll"
+            >
+              Resetovať všetky filtre ({{ totalActiveCount }})
+            </button>
           </div>
         </div>
       </template>
 
-      <!-- Mobile step 1: category list -->
+      <!-- Mobile step 1: category list (title is in top bar) -->
       <template v-else>
-        <div class="flex items-center justify-between border-b border-neutral-200 p-4 pb-0 mb-3">
-          <span class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</span>
-          <button
-            type="button"
-            class="text-sm font-semibold text-destructive transition-opacity hover:opacity-80"
-            :class="totalActiveCount === 0 && 'opacity-50 pointer-events-none'"
-            @click="clearAll"
-          >
-            Reset all
-          </button>
-        </div>
         <ScrollArea class="flex-1">
-          <div class="flex flex-col gap-4 px-4 pb-4">
+          <div class="flex flex-col gap-4 px-4 pt-4 pb-4">
             <template v-for="catKey in categoryOrder" :key="catKey">
               <template v-if="FILTER_CATEGORIES[catKey]">
                 <div class="flex flex-col gap-2">
@@ -429,6 +435,7 @@ const totalActiveCount = computed(() =>
             <span>Zobraziť {{ filteredCount }} výsledkov</span>
             <MapPin class="h-4 w-4" />
           </Button>
+          <!-- Reset below CTA when a selection is made (wireframe) -->
           <button
             v-if="totalActiveCount > 0"
             type="button"

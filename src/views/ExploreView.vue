@@ -167,18 +167,19 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- Map + content: full width; filter floats over map on desktop -->
-      <div>
-        <!-- Map area: full viewport height below nav -->
-        <div
-          class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
-        >
-          <MapView :pins="mapPins" />
-        </div>
+      <!-- Map: always full width -->
+      <div
+        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
+      >
+        <MapView :pins="mapPins" />
+      </div>
 
-        <!-- FilterChips + ResultsGrid (scroll with page) -->
-        <div>
-          <FilterChips
+      <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
+      <div
+        class="transition-[margin] duration-200"
+        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[628px]' : 'md:ml-[296px]') : ''"
+      >
+        <FilterChips
           :active-filters="activeFilters"
           @remove="removeFilter"
           @clear="clearFilters"
@@ -191,7 +192,6 @@ onUnmounted(() => {
           @update:sort-key="sortKey = $event"
           @update:sort-order="sortOrder = $event"
         />
-        </div>
       </div>
 
       <!-- Mobile: Sheet from top when filter open -->
