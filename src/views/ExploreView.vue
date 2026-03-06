@@ -12,6 +12,7 @@ import {
   ITEMS,
   getMapPins,
   matchesFilters,
+  matchesSearch,
   type EtnoItem,
 } from '@/data/mockData'
 import MapView from '@/components/ct/MapView.vue'
@@ -32,7 +33,10 @@ const filterKeys = [
   'keywords', 'researchCollection', 'author', 'obec', 'okres', 'kraj', 'stat',
   'documentType', 'studyPeriod', 'collectionMethod', 'language', 'document',
 ]
+
+let syncingFromQuery = false
 function syncFiltersFromQuery() {
+  syncingFromQuery = true
   const q = route.query
   const next: Record<string, string[]> = {}
   for (const key of filterKeys) {
@@ -42,32 +46,12 @@ function syncFiltersFromQuery() {
     if (arr.length) next[key] = arr
   }
   activeFilters.value = next
-}
-
-function matchesSearch(item: EtnoItem, q: string): boolean {
-  const term = q.trim().toLowerCase()
-  if (!term) return true
-  const parts = [
-    item.id, item.title, item.subtitle, item.abstract, item.note,
-    item.keywords?.join(' '),
-    item.authors?.map((a) => a.name).join(' '),
-    item.researchers?.map((a) => a.name).join(' '),
-    item.originators?.map((a) => a.name).join(' '),
-    item.obec, item.okres, item.kraj, item.stat, item.lokalita,
-    item.documentType, item.researchCollection, item.collectionMethod,
-    item.language,
-  ]
-  const searchable = parts.filter(Boolean).join(' ').toLowerCase()
-  return searchable.includes(term)
+  queueMicrotask(() => {
+    syncingFromQuery = false
+  })
 }
 
 const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
-
-const searchPanelLeftPx = computed(() => {
-  if (!filterOpen.value || isMobile.value) return 16
-  const base = 16 + 280 + 12
-  return openSubPanelKey.value ? base + 320 + 12 : base
-})
 
 onMounted(() => {
   filterOpen.value = !isMobile.value
@@ -79,6 +63,22 @@ watch(() => route.query, (query) => {
   syncFiltersFromQuery()
   const q = query.q ?? query.query
   if (typeof q === 'string') searchQuery.value = q
+}, { deep: true })
+
+watch(activeFilters, (filters) => {
+  if (syncingFromQuery) return
+  const nextQuery: Record<string, unknown> = { ...route.query }
+
+  // remove existing filter keys from query
+  for (const key of filterKeys) delete nextQuery[key]
+
+  // add active filters into query (so they persist on back navigation)
+  for (const [key, values] of Object.entries(filters)) {
+    if (!values?.length) continue
+    nextQuery[key] = values.length === 1 ? values[0] : values
+  }
+
+  router.replace({ query: nextQuery })
 }, { deep: true })
 watch(isMobile, (mobile) => {
   if (mobile) filterOpen.value = false
@@ -182,41 +182,25 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- Desktop: floating search results panel over map -->
       <div
-        v-if="isSearchActive && !isMobile"
-        class="fixed top-20 z-30 transition-[left] duration-200"
-        :style="{ left: searchPanelLeftPx + 'px' }"
+        v-if="isSearchActive"
+        class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
       >
         <SearchResultsPanel
           :items="filteredItems"
           :query="searchQuery"
+          :mobile="isMobile"
         />
       </div>
 
-      <!-- Map: always full width (hidden on mobile when search active) -->
       <div
-        v-if="!(isSearchActive && isMobile)"
         class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
       >
         <MapView :pins="mapPins" />
       </div>
 
-      <!-- Mobile: search results list (replaces map when searching) -->
-      <div
-        v-if="isSearchActive && isMobile"
-        class="min-h-[50vh]"
-      >
-        <SearchResultsPanel
-          :items="filteredItems"
-          :query="searchQuery"
-          mobile
-        />
-      </div>
-
       <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
       <div
-        v-if="!isSearchActive"
         class="transition-[margin] duration-200"
         :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[628px]' : 'md:ml-[296px]') : ''"
       >
@@ -255,7 +239,7 @@ onUnmounted(() => {
         </SheetContent>
       </Sheet>
 
-      <Footer v-if="!isSearchActive" />
+      <Footer />
     </div>
   </div>
 </template>

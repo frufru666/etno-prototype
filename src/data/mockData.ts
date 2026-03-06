@@ -225,6 +225,35 @@ export function matchesFilters(
   return true;
 }
 
+// ─── Helper: Check if item matches search query (for global search) ─────────
+
+export function matchesSearch(item: EtnoItem, q: string): boolean {
+  const term = q.trim().toLowerCase();
+  if (!term) return true;
+  const parts = [
+    item.id,
+    item.title,
+    item.subtitle,
+    item.abstract,
+    item.note,
+    item.keywords?.join(" "),
+    item.authors?.map((a) => a.name).join(" "),
+    item.researchers?.map((a) => a.name).join(" "),
+    item.originators?.map((a) => a.name).join(" "),
+    item.obec,
+    item.okres,
+    item.kraj,
+    item.stat,
+    item.lokalita,
+    item.documentType,
+    item.researchCollection,
+    item.collectionMethod,
+    item.language,
+  ];
+  const searchable = parts.filter(Boolean).join(" ").toLowerCase();
+  return searchable.includes(term);
+}
+
 // ─── Helper: Get unique values for a filter key ─────────────────────────────
 
 export function getUniqueValues(key: string): string[] {

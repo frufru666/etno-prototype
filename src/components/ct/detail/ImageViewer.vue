@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import {
   ZoomIn,
@@ -33,6 +34,7 @@ const emit = defineEmits<{
   (e: 'show-transcript'): void
 }>()
 
+const router = useRouter()
 const isMobile = useIsMobile()
 const currentIndex = ref(props.initialIndex)
 const isMulti = computed(() => props.imageCount > 1)
@@ -40,6 +42,11 @@ const isMulti = computed(() => props.imageCount > 1)
 const thumbIndices = computed(() =>
   Array.from({ length: props.imageCount }, (_, i) => i)
 )
+
+function goBackToExplore() {
+  if (window.history.length > 1) router.back()
+  else router.push({ name: 'explore' })
+}
 </script>
 
 <template>
@@ -74,28 +81,39 @@ const thumbIndices = computed(() =>
 
     <!-- Main view: image (or desktop with transcript panel on right) -->
     <template v-else>
-      <!-- Top bar: close (when fullscreen) + transcript button -->
+      <!-- Floating controls: close + transcript -->
       <div
-        v-if="fullscreen || isMulti || item.hasTranscript"
-        class="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-2 bg-black/20 p-2"
+        v-if="fullscreen || isMulti || item.hasTranscript || !isMobile"
+        class="absolute left-2 right-2 top-2 z-10 flex items-center justify-between gap-2"
       >
         <Button
-          v-if="fullscreen"
-          variant="secondary"
+          v-if="!isMobile"
+          variant="default"
           size="sm"
-          class="gap-1"
+          class="gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+          aria-label="Späť do Explore"
+          @click="goBackToExplore"
+        >
+          <ChevronLeft class="h-4 w-4" />
+          <span>Späť do Explore</span>
+        </Button>
+        <Button
+          v-if="fullscreen"
+          variant="ghost"
+          size="sm"
+          class="gap-1 bg-transparent text-foreground hover:bg-white/10"
           aria-label="Zavrieť"
           @click="emit('close')"
         >
           <X class="h-4 w-4" />
           Zavrieť
         </Button>
-        <div v-else />
+        <div class="flex-1" />
         <Button
           v-if="item.hasTranscript"
-          variant="outline"
+          variant="ghost"
           size="sm"
-          class="border-primary-500 bg-white/90 text-primary-600"
+          class="bg-transparent text-primary-100 hover:bg-white/10 hover:text-primary-50"
           @click="emit('show-transcript')"
         >
           {{ transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript' }}

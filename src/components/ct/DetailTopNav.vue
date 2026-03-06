@@ -1,29 +1,42 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
-import { PanelRightClose, PanelRightOpen } from 'lucide-vue-next'
+import { ChevronLeft, PanelRightClose, PanelRightOpen } from 'lucide-vue-next'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
   rightPanelOpen: boolean
+  searchQuery?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle-right-panel'): void
+  (e: 'update:searchQuery', value: string): void
+  (e: 'searchSubmit', value: string): void
 }>()
 
+const router = useRouter()
 const isMobile = useIsMobile()
-const searchQuery = ref('')
+
+function goBackToExplore() {
+  if (window.history.length > 1) router.back()
+  else router.push({ name: 'explore' })
+}
+
+function onSearchSubmit(value: string) {
+  emit('searchSubmit', value)
+  router.push({ name: 'explore', query: value.trim() ? { q: value.trim() } : {} })
+}
 </script>
 
 <template>
+  <!-- Desktop nav: single row -->
   <nav
-    class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-border bg-background px-4 md:px-6"
-    :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
+    v-if="!isMobile"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
     aria-label="Detail navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
@@ -33,24 +46,18 @@ const searchQuery = ref('')
       >
         Etno Explorer SAV
       </RouterLink>
-      <RouterLink
-        :to="{ name: 'explore' }"
-        class="hidden shrink-0 text-sm text-muted-foreground hover:text-foreground md:inline"
-      >
-        ← Späť do Explore
-      </RouterLink>
     </div>
 
-    <!-- Center: search (desktop only) -->
-    <div v-if="!isMobile" class="flex flex-1 justify-center px-4">
+    <div class="flex flex-1 items-center justify-center px-4">
       <SearchInput
-        v-model="searchQuery"
+        :model-value="searchQuery ?? ''"
         class="w-full max-w-md"
+        @update:model-value="emit('update:searchQuery', $event)"
+        @submit="onSearchSubmit"
       />
     </div>
 
-    <!-- Right: desktop actions + panel toggle -->
-    <div v-if="!isMobile" class="flex flex-shrink-0 items-center gap-2">
+    <div class="flex flex-shrink-0 items-center gap-2">
       <NavActions />
       <Button
         variant="outline"
@@ -66,16 +73,40 @@ const searchQuery = ref('')
         </span>
       </Button>
     </div>
+  </nav>
 
-    <!-- Right: mobile -->
-    <template v-else>
+  <!-- Mobile nav: two rows (title + menu, then back button + search) -->
+  <nav
+    v-else
+    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
+    aria-label="Detail navigation"
+  >
+    <div class="flex h-[49px] items-center justify-between px-4">
       <RouterLink
-        :to="{ name: 'explore' }"
-        class="flex-1 text-sm text-primary-500 hover:text-primary-600 hover:underline"
+        to="/"
+        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
       >
-        ← Späť do Explore
+        Etno Explorer SAV
       </RouterLink>
       <MobileMenu />
-    </template>
+    </div>
+    <div class="flex items-center gap-2 px-4 pb-2.5">
+      <Button
+        variant="default"
+        size="sm"
+        class="gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        aria-label="Späť do Explore"
+        @click="goBackToExplore"
+      >
+        <ChevronLeft class="h-4 w-4" />
+        <span>Späť do Explore</span>
+      </Button>
+      <SearchInput
+        :model-value="searchQuery ?? ''"
+        class="flex-1 min-w-0"
+        @update:model-value="emit('update:searchQuery', $event)"
+        @submit="onSearchSubmit"
+      />
+    </div>
   </nav>
 </template>

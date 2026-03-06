@@ -8,12 +8,19 @@ withDefaults(
     placeholder?: string
     inputClass?: string
   }>(),
-  { placeholder: 'Search in collection', inputClass: '' }
+  { placeholder: 'Hľadať v databáze', inputClass: '' }
 )
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
+  (e: 'submit', value: string): void
 }>()
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter') {
+    emit('submit', (e.target as HTMLInputElement).value ?? '')
+  }
+}
 </script>
 
 <template>
@@ -26,7 +33,8 @@ defineEmits<{
       :class="inputClass"
       :placeholder="placeholder"
       aria-label="Search"
-      @update:model-value="$emit('update:modelValue', $event ?? '')"
+      @update:model-value="emit('update:modelValue', $event ?? '')"
+      @keydown="onKeydown"
     />
     <button
       v-if="modelValue.length > 0"

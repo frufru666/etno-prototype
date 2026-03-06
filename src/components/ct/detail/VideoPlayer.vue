@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { X } from 'lucide-vue-next'
+import { ChevronLeft, X } from 'lucide-vue-next'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -19,6 +20,7 @@ const emit = defineEmits<{
   (e: 'show-transcript'): void
 }>()
 
+const router = useRouter()
 const isMobile = useIsMobile()
 const isPlaying = ref(false)
 const currentTime = ref(15)
@@ -26,6 +28,11 @@ const duration = ref(93)
 
 function seek(seconds: number) {
   currentTime.value = Math.max(0, Math.min(duration.value, currentTime.value + seconds))
+}
+
+function goBackToExplore() {
+  if (window.history.length > 1) router.back()
+  else router.push({ name: 'explore' })
 }
 </script>
 
@@ -36,22 +43,33 @@ function seek(seconds: number) {
   >
     <div class="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
       <Button
-        v-if="fullscreen"
-        variant="secondary"
+        v-if="!isMobile"
+        variant="default"
         size="sm"
-        class="gap-1"
+        class="gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        aria-label="Späť do Explore"
+        @click="goBackToExplore"
+      >
+        <ChevronLeft class="h-4 w-4" />
+        <span>Späť do Explore</span>
+      </Button>
+      <Button
+        v-if="fullscreen"
+        variant="ghost"
+        size="sm"
+        class="gap-1 bg-transparent text-foreground hover:bg-white/10"
         aria-label="Zavrieť"
         @click="emit('close')"
       >
         <X class="h-4 w-4" />
         Zavrieť
       </Button>
-      <div v-else />
+      <div v-else class="flex-1" />
       <Button
         v-if="item.hasTranscript"
-        variant="outline"
+        variant="ghost"
         size="sm"
-        class="border-primary-500 bg-white/10 text-primary-300 hover:bg-white/20"
+        class="bg-transparent text-primary-100 hover:bg-white/10 hover:text-primary-50"
         @click="emit('show-transcript')"
       >
         {{ transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript' }}

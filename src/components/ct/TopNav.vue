@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
@@ -15,6 +16,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'toggle-filter'): void
   (e: 'update:searchQuery', value: string): void
+  (e: 'searchSubmit', value: string): void
 }>()
 
 const isMobile = useIsMobile()
@@ -28,9 +30,12 @@ const isMobile = useIsMobile()
     aria-label="Main navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-2">
-      <span class="truncate text-lg font-semibold text-primary-500">
+      <RouterLink
+        to="/"
+        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
+      >
         Etno Explorer SAV
-      </span>
+      </RouterLink>
       <div class="relative">
         <Button
           type="button"
@@ -60,6 +65,7 @@ const isMobile = useIsMobile()
         class="w-full max-w-lg"
         :model-value="searchQuery ?? ''"
         @update:model-value="emit('update:searchQuery', $event)"
+        @submit="emit('searchSubmit', $event)"
       />
     </div>
 
@@ -75,9 +81,12 @@ const isMobile = useIsMobile()
     aria-label="Main navigation"
   >
     <div class="flex h-[49px] items-center justify-between px-4">
-      <span class="truncate text-lg font-semibold text-primary-500">
+      <RouterLink
+        to="/"
+        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
+      >
         Etno Explorer SAV
-      </span>
+      </RouterLink>
       <MobileMenu />
     </div>
     <div class="flex items-center gap-2 px-4 pb-2.5">
@@ -108,6 +117,7 @@ const isMobile = useIsMobile()
         class="flex-1 min-w-0"
         :model-value="searchQuery ?? ''"
         @update:model-value="emit('update:searchQuery', $event)"
+        @submit="emit('searchSubmit', $event)"
       />
     </div>
   </nav>

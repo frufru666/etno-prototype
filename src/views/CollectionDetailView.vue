@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
+import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
 import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
 import {
   getCollectionBySlug,
   getCollectionItems,
   getItemById,
+  ITEMS,
+  matchesSearch,
   type CollectionBodyBlock,
 } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { ChevronLeft } from 'lucide-vue-next'
 
 const route = useRoute()
+const router = useRouter()
 const isMobile = useIsMobile()
 const slug = computed(() => route.params.slug as string)
 const collection = computed(() => getCollectionBySlug(slug.value))
@@ -55,13 +61,23 @@ function getItemForBlock(block: CollectionBodyBlock) {
   if (block.type !== 'media' || !block.documentId) return null
   return getItemById(block.documentId)
 }
+
+const searchFilteredItems = computed(() =>
+  ITEMS.filter((item) => matchesSearch(item, searchQuery.value))
+)
+const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
+
+function onSearchSubmit(value: string) {
+  router.push({ name: 'explore', query: value.trim() ? { q: value.trim() } : {} })
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-background">
+    <!-- Desktop nav: single row -->
     <nav
-      class="fixed top-0 left-0 right-0 z-50 flex items-center border-b border-border bg-background px-4 md:px-6"
-      :class="isMobile ? 'h-[49px]' : 'h-[57px]'"
+      v-if="!isMobile"
+      class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
       aria-label="Collection navigation"
     >
       <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
@@ -71,32 +87,74 @@ function getItemForBlock(block: CollectionBodyBlock) {
         >
           Etno Explorer SAV
         </RouterLink>
-        <RouterLink
-          :to="{ name: 'collections' }"
-          class="hidden shrink-0 text-sm text-muted-foreground hover:text-foreground md:inline"
+      </div>
+      <div class="flex flex-1 justify-center px-4">
+        <Button
+          variant="outline"
+          size="sm"
+          class="mr-2 gap-1.5 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+          aria-label="Späť do Kolekcií"
+          @click="router.push({ name: 'collections' })"
         >
-          ← Späť do Kolekcií
-        </RouterLink>
+          <ChevronLeft class="h-4 w-4" />
+          <span class="hidden lg:inline">Späť do Kolekcií</span>
+        </Button>
+        <SearchInput
+          v-model="searchQuery"
+          class="w-full max-w-md"
+          @submit="onSearchSubmit"
+        />
       </div>
-      <div v-if="!isMobile" class="flex flex-1 justify-center px-4">
-        <SearchInput v-model="searchQuery" class="w-full max-w-md" />
-      </div>
-      <div v-if="!isMobile" class="flex flex-shrink-0 items-center gap-2">
+      <div class="flex flex-shrink-0 items-center gap-2">
         <NavActions />
       </div>
-      <template v-else>
+    </nav>
+
+    <!-- Mobile nav: two rows (title + menu, then back button + search) -->
+    <nav
+      v-else
+      class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
+      aria-label="Collection navigation"
+    >
+      <div class="flex h-[49px] items-center justify-between px-4">
         <RouterLink
-          :to="{ name: 'collections' }"
-          class="flex-1 text-sm text-primary-500 hover:text-primary-600 hover:underline"
+          to="/"
+          class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
         >
-          ← Kolekcie
+          Etno Explorer SAV
         </RouterLink>
         <MobileMenu />
-      </template>
+      </div>
+      <div class="flex items-center gap-2 px-4 pb-2.5">
+        <Button
+          variant="outline"
+          size="icon"
+          class="h-9 w-9 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+          aria-label="Späť do Kolekcií"
+          @click="router.push({ name: 'collections' })"
+        >
+          <ChevronLeft class="h-4 w-4" />
+        </Button>
+        <SearchInput
+          v-model="searchQuery"
+          class="flex-1 min-w-0"
+          @submit="onSearchSubmit"
+        />
+      </div>
     </nav>
 
     <template v-if="collection">
-      <div class="pt-[49px] md:pt-[57px]">
+      <div class="pt-[96px] md:pt-[57px]">
+        <div
+          v-if="isSearchActive"
+          class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
+        >
+          <SearchResultsPanel
+            :items="searchFilteredItems"
+            :query="searchQuery"
+            :mobile="isMobile"
+          />
+        </div>
         <article class="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
           <h1 class="text-2xl font-semibold text-foreground md:text-3xl lg:text-4xl">
             {{ collection.title }}

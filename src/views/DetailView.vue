@@ -6,13 +6,20 @@ import DetailRightPanel from '@/components/ct/detail/DetailRightPanel.vue'
 import DetailMediaViewer from '@/components/ct/detail/DetailMediaViewer.vue'
 import DetailMobileHero from '@/components/ct/detail/DetailMobileHero.vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
+import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
 import { Button } from '@/components/ui/button'
-import { getItemById } from '@/data/mockData'
+import { getItemById, ITEMS, matchesSearch } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const route = useRoute()
 const router = useRouter()
 const isMobile = useIsMobile()
+const searchQuery = ref('')
+
+const searchFilteredItems = computed(() =>
+  ITEMS.filter((it) => matchesSearch(it, searchQuery.value))
+)
+const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
 
 const id = computed(() => route.params.id as string)
 const item = computed(() => getItemById(id.value))
@@ -70,7 +77,10 @@ watch(item, (it) => {
   <div class="min-h-screen bg-background">
     <DetailTopNav
       :right-panel-open="rightPanelOpen"
+      :search-query="searchQuery"
       @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
+      @update:search-query="searchQuery = $event"
+      @search-submit="(v: string) => { router.push({ name: 'explore', query: v.trim() ? { q: v.trim() } : {} }) }"
     />
 
     <template v-if="!item">
@@ -85,7 +95,19 @@ watch(item, (it) => {
     </template>
 
     <template v-else>
-      <div class="pt-[49px] md:flex md:flex-1 md:pt-[57px] md:overflow-hidden">
+      <div
+        v-if="isSearchActive"
+        class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
+      >
+        <SearchResultsPanel
+          :items="searchFilteredItems"
+          :query="searchQuery"
+          :mobile="isMobile"
+        />
+      </div>
+      <div
+        class="pt-[96px] md:flex md:flex-1 md:pt-[57px] md:overflow-hidden"
+      >
         <div class="min-w-0 md:flex-1 flex flex-col">
           <!-- Desktop: layered media + map -->
           <template v-if="!isMobile">

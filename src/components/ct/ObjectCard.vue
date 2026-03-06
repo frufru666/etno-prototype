@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
-import { getMediaType } from '@/data/mockData'
+import { getCollectionsForItem, getDocumentsForItem, getMediaType } from '@/data/mockData'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
@@ -18,6 +18,8 @@ function goToDetail() {
 
 const mediaType = getMediaType(props.item.documentType)
 const isMultiImage = mediaType === 'image' && props.item.hasTranscript
+const collections = getCollectionsForItem(props.item.id)
+const documents = getDocumentsForItem(props.item.id)
 
 function participantLines(): { label: string; names: string }[] {
   const out: { label: string; names: string }[] = []
@@ -89,6 +91,22 @@ function participantLines(): { label: string; names: string }[] {
       <div class="flex flex-wrap gap-1 pt-1">
         <Badge variant="secondary" class="text-xs">
           {{ item.documentType }}
+        </Badge>
+        <Badge
+          v-for="c in collections"
+          :key="'col-' + c.id"
+          variant="outline"
+          class="text-xs border-primary-200 text-primary-600"
+        >
+          Kolekcia: {{ c.title }}
+        </Badge>
+        <Badge
+          v-for="d in documents"
+          :key="'doc-' + d.id"
+          variant="outline"
+          class="text-xs border-muted-foreground/40 text-muted-foreground"
+        >
+          Dokument: {{ d.name }}
         </Badge>
       </div>
     </CardContent>
