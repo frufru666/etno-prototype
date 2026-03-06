@@ -35,7 +35,7 @@ function resultCountLabel(count: number): string {
   <div
     class="flex flex-col overflow-hidden bg-background"
     :class="mobile
-      ? 'w-full min-h-[50vh]'
+      ? 'w-full max-h-[calc(100dvh-112px)] rounded-xl border border-border shadow-lg'
       : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-border shadow-lg'"
   >
     <div class="shrink-0 px-4 pb-2 pt-4">

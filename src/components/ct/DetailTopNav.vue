@@ -10,6 +10,8 @@ import { useIsMobile } from '@/composables/useIsMobile'
 defineProps<{
   rightPanelOpen: boolean
   searchQuery?: string
+  mobileContextLabel?: string
+  mobileContextId?: string
 }>()
 
 const emit = defineEmits<{
@@ -22,13 +24,11 @@ const router = useRouter()
 const isMobile = useIsMobile()
 
 function goBackToExplore() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'explore' })
+  router.push({ name: 'explore' })
 }
 
 function onSearchSubmit(value: string) {
   emit('searchSubmit', value)
-  router.push({ name: 'explore', query: value.trim() ? { q: value.trim() } : {} })
 }
 </script>
 
@@ -82,12 +82,17 @@ function onSearchSubmit(value: string) {
     aria-label="Detail navigation"
   >
     <div class="flex h-[49px] items-center justify-between px-4">
-      <RouterLink
-        to="/"
-        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-      >
-        Etno Explorer SAV
-      </RouterLink>
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="rounded bg-primary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-primary-600">
+          {{ mobileContextLabel ?? 'Detail' }}
+        </span>
+        <span
+          v-if="mobileContextId"
+          class="truncate font-mono text-xs text-muted-foreground"
+        >
+          {{ mobileContextId }}
+        </span>
+      </div>
       <MobileMenu />
     </div>
     <div class="flex items-center gap-2 px-4 pb-2.5">

@@ -158,7 +158,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="min-h-dvh bg-background flex flex-col">
     <TopNav
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"
@@ -167,7 +167,7 @@ onUnmounted(() => {
       @update:search-query="onSearchQueryChange"
     />
     <!-- Mobile nav is 2 rows (~96px), desktop is 57px -->
-    <div class="relative pt-[96px] md:pt-[57px]">
+    <div class="relative flex-1 pt-[96px] md:pt-[57px]">
       <!-- Desktop: floating filter container over map (no layout shift) -->
       <div
         v-if="filterOpen && !isMobile"
@@ -202,7 +202,7 @@ onUnmounted(() => {
       <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
       <div
         class="transition-[margin] duration-200"
-        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[628px]' : 'md:ml-[296px]') : ''"
+        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]' : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]') : ''"
       >
         <FilterChips
           :active-filters="activeFilters"

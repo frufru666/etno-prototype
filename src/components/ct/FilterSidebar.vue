@@ -127,7 +127,7 @@ const totalActiveCount = computed(() =>
     <template v-if="!mobile">
       <div class="flex items-start gap-3 min-w-0">
         <!-- Panel 1: category list — standalone floating card 280px -->
-        <div class="w-[280px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+        <div class="w-[220px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:w-[240px] xl:w-[280px]">
           <div class="flex shrink-0 items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
               <SlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
@@ -158,7 +158,7 @@ const totalActiveCount = computed(() =>
         <div
           v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="w-[320px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+          class="w-[260px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:w-[280px] xl:w-[320px]"
         >
           <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">

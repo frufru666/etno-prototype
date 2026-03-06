@@ -78,13 +78,15 @@ watch(item, (it) => {
     <DetailTopNav
       :right-panel-open="rightPanelOpen"
       :search-query="searchQuery"
+      mobile-context-label="Detail"
+      :mobile-context-id="item?.id"
       @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
       @update:search-query="searchQuery = $event"
       @search-submit="(v: string) => { router.push({ name: 'explore', query: v.trim() ? { q: v.trim() } : {} }) }"
     />
 
     <template v-if="!item">
-      <main class="p-6 pt-[65px] md:pt-[73px]">
+      <main class="p-6 pt-[96px] md:pt-[57px]">
         <p class="text-muted-foreground">
           Položka s ID <strong>{{ id }}</strong> nebola nájdená.
         </p>

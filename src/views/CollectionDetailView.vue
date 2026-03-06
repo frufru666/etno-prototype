@@ -7,6 +7,7 @@ import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
 import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
+import Footer from '@/components/ct/Footer.vue'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import {
@@ -73,7 +74,7 @@ function onSearchSubmit(value: string) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="min-h-dvh bg-background flex flex-col">
     <!-- Desktop nav: single row -->
     <nav
       v-if="!isMobile"
@@ -144,7 +145,7 @@ function onSearchSubmit(value: string) {
     </nav>
 
     <template v-if="collection">
-      <div class="pt-[96px] md:pt-[57px]">
+      <div class="flex-1 flex flex-col pt-[96px] md:pt-[57px]">
         <div
           v-if="isSearchActive"
           class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
@@ -227,6 +228,7 @@ function onSearchSubmit(value: string) {
           @update:sort-key="sortKey = $event"
           @update:sort-order="sortOrder = $event"
         />
+        <Footer />
       </div>
     </template>
   </div>

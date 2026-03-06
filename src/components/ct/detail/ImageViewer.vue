@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ZoomIn, ZoomOut, ChevronLeft, X } from 'lucide-vue-next'
@@ -26,16 +26,60 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const isMobile = useIsMobile()
-const currentIndex = ref(props.initialIndex)
-const isMulti = computed(() => props.imageCount > 1)
+const currentIndex = ref(0)
+const safeImageCount = computed(() => Math.max(props.imageCount, 1))
+const isMulti = computed(() => safeImageCount.value > 1)
 
 const thumbIndices = computed(() =>
-  Array.from({ length: props.imageCount }, (_, i) => i)
+  Array.from({ length: safeImageCount.value }, (_, i) => i)
+)
+
+watch(
+  [() => props.initialIndex, safeImageCount],
+  ([initial, count]) => {
+    const normalized = Number.isFinite(initial) ? initial : 0
+    currentIndex.value = Math.min(Math.max(normalized, 0), count - 1)
+  },
+  { immediate: true }
+)
+
+function splitTranscriptByImage(text: string, imageCount: number): string[] {
+  const normalized = text.trim()
+  if (!normalized) return Array.from({ length: imageCount }, () => '')
+  if (imageCount <= 1) return [normalized]
+
+  const paragraphs = normalized.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
+  if (paragraphs.length >= imageCount) {
+    return paragraphs.slice(0, imageCount)
+  }
+
+  const sentences = normalized
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const source = sentences.length ? sentences : [normalized]
+  const chunks = Array.from({ length: imageCount }, () => '')
+  source.forEach((part, idx) => {
+    const chunkIndex = idx % imageCount
+    chunks[chunkIndex] = chunks[chunkIndex] ? `${chunks[chunkIndex]} ${part}` : part
+  })
+
+  return chunks.map(
+    (chunk, idx) =>
+      chunk || `Pre obrázok ${idx + 1} zatiaľ nie je dostupný samostatný prepis.`
+  )
+}
+
+const transcriptChunks = computed(() =>
+  splitTranscriptByImage(transcriptPreview(props.item), safeImageCount.value)
+)
+
+const activeTranscript = computed(
+  () => transcriptChunks.value[currentIndex.value] ?? transcriptChunks.value[0] ?? ''
 )
 
 function goBackToExplore() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'explore' })
+  router.push({ name: 'explore' })
 }
 </script>
 
@@ -62,25 +106,12 @@ function goBackToExplore() {
           <div class="w-14" />
         </div>
         <ScrollArea class="flex-1 p-4">
-          <template v-if="isMulti">
-            <div
-              v-for="(_, idx) in thumbIndices"
-              :key="idx"
-              class="mb-6"
-            >
-              <h3 class="mb-2 text-sm font-semibold text-foreground">
-                Obrázok {{ idx + 1 }}/{{ imageCount }}
-              </h3>
-              <p class="whitespace-pre-wrap text-sm text-foreground">
-                {{ transcriptPreview(item) }}
-              </p>
-            </div>
-          </template>
-          <template v-else>
-            <p class="whitespace-pre-wrap text-sm text-foreground">
-              {{ transcriptPreview(item) }}
-            </p>
-          </template>
+          <h3 class="mb-2 text-sm font-semibold text-foreground">
+            {{ isMulti ? `Obrázok ${currentIndex + 1}/${safeImageCount}` : 'Transcript' }}
+          </h3>
+          <p class="whitespace-pre-wrap text-sm text-foreground">
+            {{ activeTranscript }}
+          </p>
         </ScrollArea>
       </div>
     </template>
@@ -133,7 +164,7 @@ function goBackToExplore() {
             <div
               class="flex aspect-[4/3] w-full max-w-4xl items-center justify-center rounded bg-muted text-muted-foreground"
             >
-              Image viewer {{ isMulti ? `(${currentIndex + 1} / ${imageCount})` : '' }}
+              Image viewer {{ isMulti ? `(${currentIndex + 1} / ${safeImageCount})` : '' }}
             </div>
             <!-- Left toolbar: zoom only -->
             <div
@@ -164,28 +195,12 @@ function goBackToExplore() {
             class="flex w-80 shrink-0 flex-col border-l border-border bg-background/95"
           >
             <ScrollArea class="min-h-0 flex-1 p-4">
-              <template v-if="isMulti">
-                <div
-                  v-for="(_, idx) in thumbIndices"
-                  :key="idx"
-                  class="mb-6"
-                >
-                  <h3 class="mb-2 text-sm font-semibold text-foreground">
-                    Obrázok {{ idx + 1 }}/{{ imageCount }}
-                  </h3>
-                  <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-                    {{ transcriptPreview(item) }}
-                  </p>
-                </div>
-              </template>
-              <template v-else>
-                <h3 class="mb-2 text-sm font-semibold text-foreground">
-                  Transcript
-                </h3>
-                <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-                  {{ transcriptPreview(item) }}
-                </p>
-              </template>
+              <h3 class="mb-2 text-sm font-semibold text-foreground">
+                {{ isMulti ? `Obrázok ${currentIndex + 1}/${safeImageCount}` : 'Transcript' }}
+              </h3>
+              <p class="whitespace-pre-wrap text-sm text-muted-foreground">
+                {{ activeTranscript }}
+              </p>
             </ScrollArea>
           </div>
         </div>
@@ -195,23 +210,23 @@ function goBackToExplore() {
           class="shrink-0 border-t border-border bg-background/90 p-2"
         >
           <p class="mb-2 text-xs font-medium text-muted-foreground">
-            OBRÁZKY ({{ imageCount }})
+            OBRÁZKY ({{ safeImageCount }})
           </p>
           <div class="flex gap-2 overflow-x-auto pb-2">
             <button
               v-for="i in thumbIndices"
-              :key="i - 1"
+              :key="i"
               type="button"
               class="h-14 w-14 shrink-0 overflow-hidden rounded border-2 transition-colors"
               :class="
-                currentIndex === i - 1
+                currentIndex === i
                   ? 'border-primary-500 bg-primary-50'
                   : 'border-transparent bg-muted hover:border-primary-200'
               "
-              @click="currentIndex = i - 1"
+              @click="currentIndex = i"
             >
               <span class="flex h-full w-full items-center justify-center text-xs">
-                {{ i }}
+                {{ i + 1 }}
               </span>
             </button>
           </div>
