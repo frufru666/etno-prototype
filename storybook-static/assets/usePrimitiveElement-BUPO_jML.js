@@ -1,0 +1,1 @@
+import{e as r,r as i}from"./iframe-Zdi-dMOP.js";import{a as l}from"./index-B6mZJ3-0.js";function a(){const e=i(),m=r(()=>{var t,n;return["#text","#comment"].includes((t=e.value)==null?void 0:t.$el.nodeName)?(n=e.value)==null?void 0:n.$el.nextElementSibling:l(e)});return{primitiveElement:e,currentElement:m}}export{a as u};

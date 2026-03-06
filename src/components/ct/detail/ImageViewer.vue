@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import { ZoomIn, ZoomOut, ChevronLeft, X } from 'lucide-vue-next'
+import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCaretLeft, PhX } from '@phosphor-icons/vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -99,7 +99,7 @@ function goBackToExplore() {
             aria-label="Späť"
             @click="emit('show-transcript')"
           >
-            <ChevronLeft class="h-4 w-4" />
+            <PhCaretLeft class="h-4 w-4" />
             Späť
           </Button>
           <span class="text-sm font-medium">Transcript</span>
@@ -131,7 +131,7 @@ function goBackToExplore() {
           aria-label="Späť do Explore"
           @click="goBackToExplore"
         >
-          <ChevronLeft class="h-4 w-4" />
+          <PhCaretLeft class="h-4 w-4" />
           <span>Späť do Explore</span>
         </Button>
         <Button
@@ -142,7 +142,7 @@ function goBackToExplore() {
           aria-label="Zavrieť"
           @click="emit('close')"
         >
-          <X class="h-4 w-4" />
+          <PhX class="h-4 w-4" />
           Zavrieť
         </Button>
         <div class="flex-1" />
@@ -177,7 +177,7 @@ function goBackToExplore() {
                 class="h-8 w-8 bg-white/90"
                 aria-label="Priblížiť"
               >
-                <ZoomIn class="h-4 w-4" />
+                <PhMagnifyingGlassPlus class="h-4 w-4" />
               </Button>
               <Button
                 variant="secondary"
@@ -185,7 +185,7 @@ function goBackToExplore() {
                 class="h-8 w-8 bg-white/90"
                 aria-label="Oddialiť"
               >
-                <ZoomOut class="h-4 w-4" />
+                <PhMagnifyingGlassMinus class="h-4 w-4" />
               </Button>
             </div>
           </div>

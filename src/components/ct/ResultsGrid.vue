@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ChevronDown, ChevronUp } from 'lucide-vue-next'
+import { PhCaretDown, PhCaretUp } from '@phosphor-icons/vue'
 
 const props = withDefaults(
   defineProps<{
@@ -70,11 +70,11 @@ function toggleSortOrder() {
           aria-label="Zmeniť smer zoradenia"
           @click="toggleSortOrder"
         >
-          <ChevronUp
+          <PhCaretUp
             v-if="sortOrder === 'asc'"
             class="h-4 w-4"
           />
-          <ChevronDown
+          <PhCaretDown
             v-else
             class="h-4 w-4"
           />

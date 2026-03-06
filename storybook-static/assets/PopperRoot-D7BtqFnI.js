@@ -1,0 +1,1 @@
+import{c as t}from"./createContext-DpoLpYbb.js";import{d as r,a as p,r as a}from"./iframe-Zdi-dMOP.js";const[f,n]=t("PopperRoot");var s=r({inheritAttrs:!1,__name:"PopperRoot",setup(_){const o=a();return n({anchor:o,onAnchorChange:e=>o.value=e}),(e,u)=>p(e.$slots,"default")}}),l=s;export{l as P,f as i};

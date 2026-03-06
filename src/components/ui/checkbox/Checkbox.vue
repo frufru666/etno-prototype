@@ -2,7 +2,7 @@
 import type { CheckboxRootEmits, CheckboxRootProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { reactiveOmit } from "@vueuse/core"
-import { Check } from "lucide-vue-next"
+import { PhCheck } from "@phosphor-icons/vue"
 import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from "reka-ui"
 import { cn } from "@/lib/utils"
 
@@ -23,7 +23,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
   >
     <CheckboxIndicator class="grid place-content-center text-current">
       <slot>
-        <Check class="h-4 w-4" />
+        <PhCheck class="h-4 w-4" />
       </slot>
     </CheckboxIndicator>
   </CheckboxRoot>

@@ -10,7 +10,7 @@ import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { useSearchOverlay } from '@/composables/useSearchOverlay'
 import { pushExploreSearch } from '@/lib/navigation'
-import { ExternalLink } from 'lucide-vue-next'
+import { PhArrowSquareOut } from '@phosphor-icons/vue'
 
 const router = useRouter()
 const isMobile = useIsMobile()
@@ -106,7 +106,7 @@ function sectionTag(level: InfoSection['level']) {
                 >
                   <CardContent class="flex items-center justify-between p-4">
                     <span class="font-medium text-foreground">{{ link.label }}</span>
-                    <ExternalLink class="h-4 w-4 shrink-0 text-primary-500" />
+                    <PhArrowSquareOut class="h-4 w-4 shrink-0 text-primary-500" />
                   </CardContent>
                 </a>
               </Card>

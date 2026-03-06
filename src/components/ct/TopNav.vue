@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
-import { SlidersHorizontal } from 'lucide-vue-next'
+import { PhSlidersHorizontal } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
@@ -55,7 +55,7 @@ const showFilter = computed(() => route.name === 'explore')
           :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
-          <SlidersHorizontal class="h-4 w-4" />
+          <PhSlidersHorizontal class="h-4 w-4" />
           <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
         </Button>
         <span
@@ -114,7 +114,7 @@ const showFilter = computed(() => route.name === 'explore')
           :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
-          <SlidersHorizontal class="h-4 w-4" />
+          <PhSlidersHorizontal class="h-4 w-4" />
           <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
         </Button>
         <span

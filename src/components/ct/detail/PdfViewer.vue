@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
+import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCaretLeft, PhCaretRight, PhX } from '@phosphor-icons/vue'
 import type { EtnoItem } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
@@ -51,7 +51,7 @@ function goBackToExplore() {
           aria-label="Späť do Explore"
           @click="goBackToExplore"
         >
-          <ChevronLeft class="h-4 w-4" />
+          <PhCaretLeft class="h-4 w-4" />
           <span>Späť do Explore</span>
         </Button>
         <Button
@@ -61,15 +61,15 @@ function goBackToExplore() {
           aria-label="Zavrieť"
           @click="$emit('close')"
         >
-          <X class="h-4 w-4" />
+          <PhX class="h-4 w-4" />
           Zavrieť
         </Button>
         <div class="flex items-center gap-1">
           <Button variant="outline" size="icon" class="h-8 w-8" aria-label="Zoom out">
-            <ZoomOut class="h-4 w-4" />
+            <PhMagnifyingGlassMinus class="h-4 w-4" />
           </Button>
           <Button variant="outline" size="icon" class="h-8 w-8" aria-label="Zoom in">
-            <ZoomIn class="h-4 w-4" />
+            <PhMagnifyingGlassPlus class="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -82,7 +82,7 @@ function goBackToExplore() {
           aria-label="Previous page"
           @click="currentPage = Math.max(1, currentPage - 1)"
         >
-          <ChevronLeft class="h-4 w-4" />
+          <PhCaretLeft class="h-4 w-4" />
         </Button>
         <span class="min-w-[6rem] text-center text-sm text-muted-foreground">
           ( {{ currentPage }} / {{ pageCount }} )
@@ -95,7 +95,7 @@ function goBackToExplore() {
           aria-label="Next page"
           @click="currentPage = Math.min(pageCount, currentPage + 1)"
         >
-          <ChevronRight class="h-4 w-4" />
+          <PhCaretRight class="h-4 w-4" />
         </Button>
       </div>
     </div>

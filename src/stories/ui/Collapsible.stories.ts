@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
-import { ChevronDown } from "lucide-vue-next"
+import { PhCaretDown } from "@phosphor-icons/vue"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -22,7 +22,7 @@ export const Default: Story = {
       Collapsible,
       CollapsibleTrigger,
       CollapsibleContent,
-      ChevronDown,
+      PhCaretDown,
       Button,
     },
     template: `
@@ -30,7 +30,7 @@ export const Default: Story = {
         <CollapsibleTrigger as-child>
           <Button variant="ghost" class="flex w-full justify-between">
             Tematické filtre
-            <ChevronDown class="h-4 w-4" />
+            <PhCaretDown class="h-4 w-4" />
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent class="space-y-2 px-2 pb-2 pt-1 text-sm">

@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useAuth } from '@/composables/useAuth'
-import { Menu, FolderOpen, Info, User, Languages, LogIn, UserPlus, LogOut } from 'lucide-vue-next'
+import { PhList, PhFolderOpen, PhInfo, PhUser, PhTranslate, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
 
 const open = ref(false)
 const userDialogOpen = ref(false)
@@ -52,7 +52,7 @@ function handleLogout() {
   <Sheet v-model:open="open">
     <SheetTrigger as-child>
       <Button variant="outline" size="icon" :class="['h-9 w-9', btnClass]" aria-label="Open menu">
-        <Menu class="h-5 w-5" />
+        <PhList class="h-5 w-5" />
       </Button>
     </SheetTrigger>
     <SheetContent side="right" class="w-[280px] sm:max-w-[320px]">
@@ -62,13 +62,13 @@ function handleLogout() {
       <div class="mt-6 flex flex-col gap-2">
         <Button variant="outline" class="justify-start gap-2" as-child>
           <RouterLink to="/collections" class="flex items-center gap-2" @click="open = false">
-            <FolderOpen class="h-4 w-4" />
+            <PhFolderOpen class="h-4 w-4" />
             Collections
           </RouterLink>
         </Button>
         <Button variant="outline" class="justify-start gap-2" as-child>
           <RouterLink to="/info" class="flex items-center gap-2" @click="open = false">
-            <Info class="h-4 w-4" />
+            <PhInfo class="h-4 w-4" />
             Info
           </RouterLink>
         </Button>
@@ -78,7 +78,7 @@ function handleLogout() {
           class="justify-start gap-2"
           @click="openLoginModal"
         >
-          <LogIn class="h-4 w-4" />
+          <PhSignIn class="h-4 w-4" />
           Prihlásiť sa
         </Button>
         <Button
@@ -87,7 +87,7 @@ function handleLogout() {
           class="justify-start gap-2"
           @click="openRegisterModal"
         >
-          <UserPlus class="h-4 w-4" />
+          <PhUserPlus class="h-4 w-4" />
           Registrácia
         </Button>
         <Button
@@ -96,7 +96,7 @@ function handleLogout() {
           class="justify-start gap-2"
           @click="openAccountModal"
         >
-          <User class="h-4 w-4" />
+          <PhUser class="h-4 w-4" />
           Účet
         </Button>
         <Button
@@ -105,11 +105,11 @@ function handleLogout() {
           class="justify-start gap-2"
           @click="handleLogout"
         >
-          <LogOut class="h-4 w-4" />
+          <PhSignOut class="h-4 w-4" />
           Odhlásiť
         </Button>
         <Button variant="outline" class="justify-start gap-2 opacity-70">
-          <Languages class="h-4 w-4" />
+          <PhTranslate class="h-4 w-4" />
           EN/SK
         </Button>
       </div>

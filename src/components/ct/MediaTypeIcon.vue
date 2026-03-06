@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaType } from '@/data/mockData'
-import { Play, FileText, Music, ImageIcon, GalleryThumbnails } from 'lucide-vue-next'
+import { PhPlay, PhFileText, PhMusicNotes, PhImage, PhSquaresFour } from '@phosphor-icons/vue'
 
 defineProps<{
   mediaType: MediaType
@@ -10,9 +10,9 @@ defineProps<{
 </script>
 
 <template>
-  <GalleryThumbnails v-if="mediaType === 'image' && hasTranscript" aria-label="Galéria obrázkov" />
-  <ImageIcon v-else-if="mediaType === 'image'" aria-label="Obrázok" />
-  <Play v-else-if="mediaType === 'video'" aria-label="Video" />
-  <Music v-else-if="mediaType === 'audio'" aria-label="Audio" />
-  <FileText v-else aria-label="Dokument" />
+  <PhSquaresFour v-if="mediaType === 'image' && hasTranscript" aria-label="Galéria obrázkov" />
+  <PhImage v-else-if="mediaType === 'image'" aria-label="Obrázok" />
+  <PhPlay v-else-if="mediaType === 'video'" aria-label="Video" />
+  <PhMusicNotes v-else-if="mediaType === 'audio'" aria-label="Audio" />
+  <PhFileText v-else aria-label="Dokument" />
 </template>

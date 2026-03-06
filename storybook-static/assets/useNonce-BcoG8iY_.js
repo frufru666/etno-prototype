@@ -1,0 +1,1 @@
+import{i as r}from"./ConfigProvider-CrTWlrV3.js";import{r as i,e as u}from"./iframe-Zdi-dMOP.js";function f(t){const o=r({nonce:i()});return u(()=>{var e;return(t==null?void 0:t.value)||((e=o.nonce)==null?void 0:e.value)})}export{f as u};

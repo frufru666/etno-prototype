@@ -1,6 +1,6 @@
 import { ref } from "vue"
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
-import { Bold } from "lucide-vue-next"
+import { PhTextB } from "@phosphor-icons/vue"
 import { Toggle } from "@/components/ui/toggle"
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>
 
 export const Playground: Story = {
   render: () => ({
-    components: { Toggle, Bold },
+    components: { Toggle, PhTextB },
     setup() {
       const pressed = ref(false)
       return { pressed }
@@ -22,7 +22,7 @@ export const Playground: Story = {
     template: `
       <div class="space-y-2">
         <Toggle v-model:pressed="pressed" aria-label="Toggle bold">
-          <Bold class="h-4 w-4" />
+          <PhTextB class="h-4 w-4" />
         </Toggle>
         <p class="text-label-small text-muted-foreground">Pressed: {{ pressed }}</p>
       </div>

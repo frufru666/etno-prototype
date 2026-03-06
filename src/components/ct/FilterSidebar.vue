@@ -3,7 +3,7 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
 import { FILTER_CATEGORIES } from '@/data/mockData'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowLeft, X, SlidersHorizontal, MapPin } from 'lucide-vue-next'
+import { PhArrowLeft, PhX, PhSlidersHorizontal, PhMapPin } from '@phosphor-icons/vue'
 import FilterCategoryList from '@/components/ct/FilterCategoryList.vue'
 import FilterOptionsPanel from '@/components/ct/FilterOptionsPanel.vue'
 
@@ -130,7 +130,7 @@ const totalActiveCount = computed(() =>
         <div class="w-[220px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:w-[240px] xl:w-[280px]">
           <div class="flex shrink-0 items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
-              <SlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
+              <PhSlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
               <span class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</span>
             </div>
             <button
@@ -169,7 +169,7 @@ const totalActiveCount = computed(() =>
                 aria-label="Späť"
                 @click="closeSubPanel"
               >
-                <ArrowLeft class="h-5 w-5" />
+                <PhArrowLeft class="h-5 w-5" />
               </Button>
               <span class="text-base font-semibold tracking-tight text-foreground">{{ getCategoryLabel(activePanelKey) }}</span>
             </div>
@@ -205,7 +205,7 @@ const totalActiveCount = computed(() =>
           class="gap-2 rounded-lg font-semibold"
           @click="emit('close')"
         >
-          <X class="h-5 w-5" aria-hidden />
+          <PhX class="h-5 w-5" aria-hidden />
           <span>Zavrieť filter</span>
         </Button>
       </header>
@@ -221,7 +221,7 @@ const totalActiveCount = computed(() =>
                 aria-label="Späť"
                 @click="closeSubPanel"
               >
-                <ArrowLeft class="h-5 w-5" />
+                <PhArrowLeft class="h-5 w-5" />
               </Button>
               <span class="text-base font-semibold tracking-tight text-foreground">{{ getCategoryLabel(activePanelKey) }}</span>
             </div>
@@ -238,7 +238,7 @@ const totalActiveCount = computed(() =>
           <div class="flex flex-col gap-2 border-t border-border p-3">
             <Button class="w-full gap-2" @click="emit('apply')">
               <span>Zobraziť {{ filteredCount }} výsledkov</span>
-              <MapPin class="h-4 w-4" />
+              <PhMapPin class="h-4 w-4" />
             </Button>
             <button
               v-if="totalActiveCount > 0"
@@ -265,7 +265,7 @@ const totalActiveCount = computed(() =>
         <div class="flex flex-col gap-2 border-t border-border p-3">
           <Button class="w-full gap-2" @click="emit('apply')">
             <span>Zobraziť {{ filteredCount }} výsledkov</span>
-            <MapPin class="h-4 w-4" />
+            <PhMapPin class="h-4 w-4" />
           </Button>
           <!-- Reset below CTA when a selection is made (wireframe) -->
           <button
