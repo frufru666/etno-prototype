@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
 import ObjectCard from '@/components/ct/ObjectCard.vue'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -8,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ChevronDown, ChevronUp } from 'lucide-vue-next'
 
 const props = withDefaults(
   defineProps<{
@@ -30,14 +32,18 @@ const sortOptions = [
   { value: 'title', label: 'Názov' },
   { value: 'studyPeriodStart', label: 'Čas aktivity' },
 ] as const
+
+function toggleSortOrder() {
+  emit('update:sortOrder', props.sortOrder === 'asc' ? 'desc' : 'asc')
+}
 </script>
 
 <template>
   <section class="px-4 py-4 md:px-6">
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <p class="text-sm font-medium text-muted-foreground">
-        {{ items.length }} položiek
-      </p>
+      <h2 class="text-lg font-semibold text-foreground md:text-xl">
+        {{ items.length }} objektov
+      </h2>
       <div class="flex items-center gap-2">
         <span class="text-sm text-muted-foreground">Zoradiť podľa:</span>
         <Select
@@ -57,6 +63,22 @@ const sortOptions = [
             </SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="icon"
+          class="h-9 w-9 shrink-0 rounded-lg border-border"
+          aria-label="Zmeniť smer zoradenia"
+          @click="toggleSortOrder"
+        >
+          <ChevronUp
+            v-if="sortOrder === 'asc'"
+            class="h-4 w-4"
+          />
+          <ChevronDown
+            v-else
+            class="h-4 w-4"
+          />
+        </Button>
       </div>
     </div>
     <div

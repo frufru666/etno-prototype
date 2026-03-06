@@ -22,6 +22,11 @@ const routes: RouteRecordRaw[] = [
     name: 'detail',
     component: () => import('@/views/DetailView.vue'),
   },
+  {
+    path: '/info',
+    name: 'info',
+    component: () => import('@/views/InfoView.vue'),
+  },
 ]
 
 const router = createRouter({

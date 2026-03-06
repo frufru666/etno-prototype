@@ -1,4 +1,4 @@
-import{e}from"./SearchResultsPanel.vue_vue_type_script_setup_true_lang-CgvfG-gN.js";/**
+import{k as e}from"./SearchResultsPanel.vue_vue_type_script_setup_true_lang-B_9PxFFj.js";/**
  * @license lucide-vue-next v0.300.0 - ISC
  *
  * This source code is licensed under the ISC license.

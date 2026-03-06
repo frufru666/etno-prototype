@@ -156,6 +156,13 @@ function onSearchSubmit(value: string) {
           />
         </div>
         <article class="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
+          <!-- Hero image above title (placeholder; replace with real asset when available) -->
+          <div
+            class="mb-6 flex min-h-[160px] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-primary-50 to-muted md:mb-8"
+            style="aspect-ratio: 21/9;"
+          >
+            <span class="text-sm font-medium text-muted-foreground">Kolekcia – obrázok</span>
+          </div>
           <h1 class="text-2xl font-semibold text-foreground md:text-3xl lg:text-4xl">
             {{ collection.title }}
           </h1>

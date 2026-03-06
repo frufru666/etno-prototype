@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter, RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -8,10 +8,13 @@ import {
   abstractDisplay,
   getCollectionsForItem,
   getDocumentsForItem,
+  getDocumentItems,
   type EtnoItem,
 } from '@/data/mockData'
 import { ExternalLink } from 'lucide-vue-next'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
+import CollectionCard from '@/components/ct/CollectionCard.vue'
+import DocumentCard from '@/components/ct/DocumentCard.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -183,42 +186,56 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </template>
       </div>
 
-      <!-- 5. Súčasť (collection / document membership) – always shown for testing -->
-      <div class="mb-7 space-y-2">
+      <!-- 5. Súčasť (collection / document membership) -->
+      <div class="mb-7 space-y-4">
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           SÚČASŤ
         </h4>
-        <div class="flex flex-col gap-1.5">
-          <div class="flex flex-wrap items-baseline gap-x-2">
-            <span class="text-sm text-muted-foreground">Je súčasťou kolekcie:</span>
-            <template v-if="collectionsForItem().length">
-              <RouterLink
+        <div class="space-y-4">
+          <div>
+            <p class="mb-2 text-sm text-muted-foreground">
+              Súčasť kolekcie
+            </p>
+            <div
+              v-if="collectionsForItem().length"
+              class="flex flex-col gap-3"
+            >
+              <CollectionCard
                 v-for="c in collectionsForItem()"
                 :key="c.id"
-                :to="{ name: 'collection-detail', params: { slug: c.slug } }"
-                class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-              >
-                {{ c.title }}
-                <ExternalLink class="h-3 w-3 shrink-0" />
-              </RouterLink>
-            </template>
-            <span v-else class="text-sm text-muted-foreground">—</span>
+                :collection="c"
+              />
+            </div>
+            <p
+              v-else
+              class="text-sm text-muted-foreground"
+            >
+              —
+            </p>
           </div>
-          <div class="flex flex-wrap items-baseline gap-x-2">
-            <span class="text-sm text-muted-foreground">Je súčasťou dokumentu:</span>
-            <template v-if="documentsForItem().length">
-              <button
+          <div>
+            <p class="mb-2 text-sm text-muted-foreground">
+              Súčasť dokumentu
+            </p>
+            <div
+              v-if="documentsForItem().length"
+              class="flex flex-col gap-2"
+            >
+              <DocumentCard
                 v-for="d in documentsForItem()"
                 :key="d.id"
-                type="button"
-                class="inline-flex w-fit items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                :document="d"
+                :subtitle="`${getDocumentItems(d).length} položiek`"
+                action-label="Zobraziť v Explore"
                 @click="openExploreWithFilter('document', d.slug)"
-              >
-                {{ d.name }}
-                <ExternalLink class="h-3 w-3 shrink-0" />
-              </button>
-            </template>
-            <span v-else class="text-sm text-muted-foreground">—</span>
+              />
+            </div>
+            <p
+              v-else
+              class="text-sm text-muted-foreground"
+            >
+              —
+            </p>
           </div>
         </div>
       </div>

@@ -1422,6 +1422,8 @@ export interface MapPin {
   lng: number;
   title: string;
   documentType: DocumentType;
+  /** For map tooltip (wireframe): author line */
+  authorDisplay?: string;
 }
 
 export function getMapPins(items: EtnoItem[]): MapPin[] {
@@ -1433,6 +1435,7 @@ export function getMapPins(items: EtnoItem[]): MapPin[] {
       lng: d.lng!,
       title: d.title,
       documentType: d.documentType,
+      authorDisplay: d.authors?.[0]?.name ?? undefined,
     }));
 }
 

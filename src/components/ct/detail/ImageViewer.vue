@@ -2,17 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import {
-  ZoomIn,
-  ZoomOut,
-  ChevronUp,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Maximize2,
-  X,
-  Menu,
-} from 'lucide-vue-next'
+import { ZoomIn, ZoomOut, ChevronLeft, X } from 'lucide-vue-next'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -129,7 +119,7 @@ function goBackToExplore() {
             >
               Image viewer {{ isMulti ? `(${currentIndex + 1} / ${imageCount})` : '' }}
             </div>
-            <!-- Left toolbar -->
+            <!-- Left toolbar: zoom only -->
             <div
               class="absolute left-2 top-1/2 flex -translate-y-1/2 flex-col gap-1"
               :class="{ 'top-[calc(50%+24px)]': fullscreen || isMulti || item.hasTranscript }"
@@ -138,7 +128,7 @@ function goBackToExplore() {
                 variant="secondary"
                 size="icon"
                 class="h-8 w-8 bg-white/90"
-                aria-label="Zoom in"
+                aria-label="Priblížiť"
               >
                 <ZoomIn class="h-4 w-4" />
               </Button>
@@ -146,67 +136,9 @@ function goBackToExplore() {
                 variant="secondary"
                 size="icon"
                 class="h-8 w-8 bg-white/90"
-                aria-label="Zoom out"
+                aria-label="Oddialiť"
               >
                 <ZoomOut class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Pan up"
-              >
-                <ChevronUp class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Pan down"
-              >
-                <ChevronDown class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Pan left"
-              >
-                <ChevronLeft class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Pan right"
-              >
-                <ChevronRight class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Fullscreen"
-              >
-                <Maximize2 class="h-4 w-4" />
-              </Button>
-              <Button
-                v-if="!fullscreen"
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Close"
-                @click="emit('close')"
-              >
-                <X class="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                class="h-8 w-8 bg-white/90"
-                aria-label="Menu"
-              >
-                <Menu class="h-4 w-4" />
               </Button>
             </div>
           </div>
