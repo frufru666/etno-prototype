@@ -1376,7 +1376,10 @@ export function getCollectionsForItem(itemId: string): EtnoCollection[] {
 const DEFAULT_ABSTRACT =
   "Krátky popis dokumentu pre potreby prototypu. Tento text slúži na vizualizáciu sekcie Abstrakt.";
 ITEMS.forEach((item) => {
-  item.hasTranscript = item.mediaType !== "pdf";
+  // For image items: keep explicit hasTranscript (true = multi-image/gallery, false = single image)
+  if (item.mediaType !== "image") {
+    item.hasTranscript = item.mediaType !== "pdf";
+  }
   if (!item.abstract && !item.note) item.abstract = DEFAULT_ABSTRACT;
 });
 

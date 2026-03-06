@@ -62,18 +62,24 @@ function participantLines(): { label: string; names: string }[] {
       </span>
     </CardHeader>
     <CardContent class="space-y-2 p-3 pt-2">
-      <!-- Thumbnail 4:3 -->
+      <!-- Thumbnail 4:3: single image = one icon, multi image = gallery icon + label -->
       <div
         class="relative aspect-[4/3] w-full overflow-hidden rounded-md bg-muted"
       >
         <div
-          class="absolute inset-0 flex items-center justify-center text-muted-foreground"
+          class="absolute inset-0 flex flex-col items-center justify-center gap-1 text-muted-foreground"
         >
           <MediaTypeIcon
             :media-type="mediaType"
             :has-transcript="item.hasTranscript"
             class="h-10 w-10"
           />
+          <span
+            v-if="isMultiImage"
+            class="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/90"
+          >
+            Galéria
+          </span>
         </div>
       </div>
       <h3 class="line-clamp-2 font-medium leading-tight">
@@ -93,20 +99,18 @@ function participantLines(): { label: string; names: string }[] {
           {{ item.documentType }}
         </Badge>
         <Badge
-          v-for="c in collections"
-          :key="'col-' + c.id"
+          v-if="collections.length"
           variant="outline"
           class="text-xs border-primary-200 text-primary-600"
         >
-          Kolekcia: {{ c.title }}
+          Kolekcia
         </Badge>
         <Badge
-          v-for="d in documents"
-          :key="'doc-' + d.id"
+          v-if="documents.length"
           variant="outline"
           class="text-xs border-muted-foreground/40 text-muted-foreground"
         >
-          Dokument: {{ d.name }}
+          Dokument
         </Badge>
       </div>
     </CardContent>

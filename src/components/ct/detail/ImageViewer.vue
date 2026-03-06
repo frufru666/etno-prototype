@@ -62,9 +62,25 @@ function goBackToExplore() {
           <div class="w-14" />
         </div>
         <ScrollArea class="flex-1 p-4">
-          <p class="whitespace-pre-wrap text-sm text-foreground">
-            {{ transcriptPreview(item) }}
-          </p>
+          <template v-if="isMulti">
+            <div
+              v-for="(_, idx) in thumbIndices"
+              :key="idx"
+              class="mb-6"
+            >
+              <h3 class="mb-2 text-sm font-semibold text-foreground">
+                Obrázok {{ idx + 1 }}/{{ imageCount }}
+              </h3>
+              <p class="whitespace-pre-wrap text-sm text-foreground">
+                {{ transcriptPreview(item) }}
+              </p>
+            </div>
+          </template>
+          <template v-else>
+            <p class="whitespace-pre-wrap text-sm text-foreground">
+              {{ transcriptPreview(item) }}
+            </p>
+          </template>
         </ScrollArea>
       </div>
     </template>
@@ -109,10 +125,11 @@ function goBackToExplore() {
         </Button>
       </div>
 
-      <!-- Desktop: image left, transcript panel right -->
-      <div class="flex flex-1 min-h-0 pt-12">
-        <div class="flex min-w-0 flex-1 flex-col">
-          <div class="relative flex flex-1 items-center justify-center p-4">
+      <!-- Desktop: column layout so thumbnail strip is never covered by transcript -->
+      <div class="flex flex-1 min-h-0 flex-col pt-12">
+        <!-- Row: image area + transcript panel (transcript does not extend into strip) -->
+        <div class="flex min-h-0 flex-1">
+          <div class="relative flex min-w-0 flex-1 items-center justify-center p-4">
             <div
               class="flex aspect-[4/3] w-full max-w-4xl items-center justify-center rounded bg-muted text-muted-foreground"
             >
@@ -141,45 +158,63 @@ function goBackToExplore() {
               </Button>
             </div>
           </div>
-          <!-- Bottom thumbnail strip (multi only) -->
+          <!-- Desktop: transcript panel to the right (stops above thumbnail strip) -->
           <div
-            v-if="isMulti"
-            class="border-t border-border bg-background/90 p-2"
+            v-if="!isMobile && item.hasTranscript && transcriptVisible"
+            class="flex w-80 shrink-0 flex-col border-l border-border bg-background/95"
           >
-            <p class="mb-2 text-xs font-medium text-muted-foreground">
-              OBRÁZKY ({{ imageCount }})
-            </p>
-            <div class="flex gap-2 overflow-x-auto pb-2">
-              <button
-                v-for="i in thumbIndices"
-                :key="i - 1"
-                type="button"
-                class="h-14 w-14 shrink-0 overflow-hidden rounded border-2 transition-colors"
-                :class="
-                  currentIndex === i - 1
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-transparent bg-muted hover:border-primary-200'
-                "
-                @click="currentIndex = i - 1"
-              >
-                <span class="flex h-full w-full items-center justify-center text-xs">
-                  {{ i }}
-                </span>
-              </button>
-            </div>
+            <ScrollArea class="min-h-0 flex-1 p-4">
+              <template v-if="isMulti">
+                <div
+                  v-for="(_, idx) in thumbIndices"
+                  :key="idx"
+                  class="mb-6"
+                >
+                  <h3 class="mb-2 text-sm font-semibold text-foreground">
+                    Obrázok {{ idx + 1 }}/{{ imageCount }}
+                  </h3>
+                  <p class="whitespace-pre-wrap text-sm text-muted-foreground">
+                    {{ transcriptPreview(item) }}
+                  </p>
+                </div>
+              </template>
+              <template v-else>
+                <h3 class="mb-2 text-sm font-semibold text-foreground">
+                  Transcript
+                </h3>
+                <p class="whitespace-pre-wrap text-sm text-muted-foreground">
+                  {{ transcriptPreview(item) }}
+                </p>
+              </template>
+            </ScrollArea>
           </div>
         </div>
-        <!-- Desktop: transcript panel to the right -->
+        <!-- Thumbnail strip in its own row so it is never covered -->
         <div
-          v-if="!isMobile && item.hasTranscript && transcriptVisible"
-          class="flex w-80 shrink-0 flex-col border-l border-border bg-background/95"
+          v-if="isMulti"
+          class="shrink-0 border-t border-border bg-background/90 p-2"
         >
-          <ScrollArea class="flex-1 p-4">
-            <h3 class="mb-2 text-sm font-semibold text-foreground">Transcript</h3>
-            <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-              {{ transcriptPreview(item) }}
-            </p>
-          </ScrollArea>
+          <p class="mb-2 text-xs font-medium text-muted-foreground">
+            OBRÁZKY ({{ imageCount }})
+          </p>
+          <div class="flex gap-2 overflow-x-auto pb-2">
+            <button
+              v-for="i in thumbIndices"
+              :key="i - 1"
+              type="button"
+              class="h-14 w-14 shrink-0 overflow-hidden rounded border-2 transition-colors"
+              :class="
+                currentIndex === i - 1
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-transparent bg-muted hover:border-primary-200'
+              "
+              @click="currentIndex = i - 1"
+            >
+              <span class="flex h-full w-full items-center justify-center text-xs">
+                {{ i }}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </template>

@@ -87,9 +87,10 @@ function toggleSortOrder() {
     >
       Pre hľadaný výraz „{{ searchQuery.trim() }}“ sa nenašli žiadne výsledky.
     </div>
+    <!-- ≤768: 1 col | ≥1024: 2 cols | ≥1280: 3 cols | ≥1920: 4 cols; cards fill grid -->
     <div
       v-else
-      class="grid grid-cols-1 gap-4 md:grid-cols-3"
+      class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 min-[1920px]:grid-cols-4"
     >
       <ObjectCard
         v-for="item in items"
