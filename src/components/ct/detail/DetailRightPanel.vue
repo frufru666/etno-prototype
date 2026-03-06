@@ -14,7 +14,6 @@ import {
 import { ExternalLink } from 'lucide-vue-next'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
-import DocumentCard from '@/components/ct/DocumentCard.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -207,6 +206,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                 v-for="c in collectionsForItem()"
                 :key="c.id"
                 :collection="c"
+                :show-thumbnail="false"
                 :show-perex="false"
                 :show-badges="false"
               />
@@ -226,7 +226,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
               v-if="documentsForItem().length"
               class="flex flex-col gap-2"
             >
-              <DocumentCard
+              <CollectionCard
                 v-for="d in documentsForItem()"
                 :key="d.id"
                 :document="d"
@@ -253,7 +253,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
-        <div class="relative aspect-square max-h-[160px] w-full max-w-[160px] overflow-hidden rounded-md border border-border bg-primary-50">
+        <div class="relative w-full max-h-[160px] overflow-hidden rounded-md border border-border bg-primary-50" style="aspect-ratio: 2/1;">
           <DetailMap
             :lat="item.lat"
             :lng="item.lng"
