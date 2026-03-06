@@ -11,12 +11,12 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import { useAuth } from '@/composables/useAuth'
-import { FolderOpen, Info, User, LogIn, KeyRound, LogOut } from 'lucide-vue-next'
+import { FolderOpen, Info, User, LogIn, UserPlus, LogOut } from 'lucide-vue-next'
 
 const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 const userMenuOpen = ref(false)
 const userDialogOpen = ref(false)
-const dialogInitialView = ref<'login' | 'reset'>('login')
+const dialogInitialView = ref<'login' | 'register'>('login')
 const { isLoggedIn, logout } = useAuth()
 
 function openLoginModal() {
@@ -25,8 +25,8 @@ function openLoginModal() {
   userDialogOpen.value = true
 }
 
-function openResetModal() {
-  dialogInitialView.value = 'reset'
+function openRegisterModal() {
+  dialogInitialView.value = 'register'
   userMenuOpen.value = false
   userDialogOpen.value = true
 }
@@ -76,10 +76,10 @@ function handleLogout() {
       <DropdownMenuItem
         v-if="!isLoggedIn"
         class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-        @select="openResetModal"
+        @select="openRegisterModal"
       >
-        <KeyRound class="h-4 w-4" />
-        Obnoviť heslo
+        <UserPlus class="h-4 w-4" />
+        Registrácia
       </DropdownMenuItem>
       <DropdownMenuItem
         v-if="isLoggedIn"

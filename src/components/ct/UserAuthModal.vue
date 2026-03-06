@@ -11,14 +11,17 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Info, X } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle2, X } from 'lucide-vue-next'
 
-type View = 'login' | 'reset'
+type View = 'login' | 'reset' | 'register'
+
+const DEMO_EMAIL = 'demo@etno.sk'
+const DEMO_PASSWORD = 'password'
 
 const props = withDefaults(
   defineProps<{
     /** Initial view when modal opens (from dropdown choice) */
-    initialView?: View
+    initialView?: 'login' | 'register'
   }>(),
   { initialView: 'login' }
 )
@@ -27,35 +30,74 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const { isLoggedIn, userEmail, login, logout } = useAuth()
+const { isLoggedIn, userEmail, login, register, logout } = useAuth()
 
 const view = ref<View>(props.initialView)
-const email = ref('')
-const password = ref('')
+const email = ref(DEMO_EMAIL)
+const password = ref(DEMO_PASSWORD)
+const registerEmail = ref('')
+const registerPassword = ref('')
 const resetEmail = ref('')
 const error = ref('')
 const resetSent = ref(false)
+const loginSuccess = ref(false)
+const registerSuccess = ref(false)
 
-const showLoginForm = computed(() => !isLoggedIn.value && view.value === 'login')
+/** Logged-in block only when opened already logged in (not after just succeeding login/register) */
+const showLoggedInBlock = computed(
+  () => isLoggedIn.value && !loginSuccess.value && !registerSuccess.value
+)
+const showLoginForm = computed(
+  () => view.value === 'login' && (!isLoggedIn.value || loginSuccess.value)
+)
 const showResetForm = computed(() => !isLoggedIn.value && view.value === 'reset')
+const showRegisterForm = computed(
+  () => view.value === 'register' && (!isLoggedIn.value || registerSuccess.value)
+)
 
 function handleLogin() {
   error.value = ''
+  loginSuccess.value = false
   const result = login(email.value, password.value)
-  if (result.success) emit('close')
-  else error.value = result.error ?? 'Prihlásenie zlyhalo.'
+  if (result.success) {
+    loginSuccess.value = true
+  } else {
+    error.value = result.error ?? 'Prihlásenie zlyhalo.'
+  }
 }
 
 function goToReset() {
   view.value = 'reset'
   error.value = ''
   resetSent.value = false
+  loginSuccess.value = false
 }
 
 function goToLogin() {
   view.value = 'login'
+  email.value = DEMO_EMAIL
+  password.value = DEMO_PASSWORD
   error.value = ''
   resetSent.value = false
+  loginSuccess.value = false
+  registerSuccess.value = false
+}
+
+function goToRegister() {
+  view.value = 'register'
+  error.value = ''
+  registerSuccess.value = false
+}
+
+function handleRegister() {
+  error.value = ''
+  registerSuccess.value = false
+  const result = register(registerEmail.value, registerPassword.value)
+  if (result.success) {
+    registerSuccess.value = true
+  } else {
+    error.value = result.error ?? 'Registrácia zlyhala.'
+  }
 }
 
 function handleResetSubmit() {
@@ -79,7 +121,13 @@ function handleLogout() {
 
 watch(
   () => props.initialView,
-  (v) => { view.value = v },
+  (v) => {
+    view.value = v
+    if (v === 'login') {
+      email.value = DEMO_EMAIL
+      password.value = DEMO_PASSWORD
+    }
+  },
   { immediate: true }
 )
 </script>
@@ -95,18 +143,21 @@ watch(
       </DialogClose>
       <DialogHeader class="text-left">
         <DialogTitle>
-          {{ isLoggedIn ? 'Účet' : view === 'reset' ? 'Obnoviť heslo' : 'Prihlásenie' }}
+          {{ showLoggedInBlock ? 'Účet' : view === 'reset' ? 'Obnoviť heslo' : view === 'register' ? 'Registrácia' : 'Prihlásenie' }}
         </DialogTitle>
-        <DialogDescription v-if="!isLoggedIn && view === 'login'">
-          Prihláste sa do svojho účtu. (Demo: heslo „password“)
+        <DialogDescription v-if="showLoginForm && !loginSuccess && view === 'login'">
+          Prihláste sa (demo: údaje sú predvyplnené).
         </DialogDescription>
-        <DialogDescription v-else-if="!isLoggedIn && view === 'reset'">
+        <DialogDescription v-else-if="view === 'reset'">
           Zadajte e-mail a my vám pošleme odkaz na obnovenie hesla.
+        </DialogDescription>
+        <DialogDescription v-else-if="showRegisterForm && !registerSuccess && view === 'register'">
+          Vytvorte si účet (demo – bez skutočnej registrácie).
         </DialogDescription>
       </DialogHeader>
 
-      <!-- Logged in -->
-      <div v-if="isLoggedIn" class="space-y-4 py-4">
+      <!-- Logged in: only when opening modal already logged in (not after success in this modal) -->
+      <div v-if="showLoggedInBlock" class="space-y-4 py-4">
         <p class="text-sm text-muted-foreground">
           Prihlásený ako <strong class="text-foreground">{{ userEmail }}</strong>
         </p>
@@ -148,18 +199,29 @@ watch(
             autocomplete="current-password"
           />
         </div>
-        <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          <Info class="h-4 w-4 shrink-0" />
+        <div v-if="loginSuccess" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
+          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
+          Úspešne ste sa prihlásili.
+        </div>
+        <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+          <AlertCircle class="h-4 w-4 shrink-0" />
           {{ error }}
         </div>
-        <Button type="button" variant="link" class="h-auto p-0 text-sm text-primary-500" @click="goToReset">
-          Zabudnuté heslo?
-        </Button>
+        <div v-if="!loginSuccess" class="flex flex-wrap gap-x-4 gap-y-1">
+          <Button type="button" variant="link" class="h-auto p-0 text-sm text-primary-500" @click="goToReset">
+            Zabudnuté heslo?
+          </Button>
+          <Button type="button" variant="link" class="h-auto p-0 text-sm text-primary-500" @click="goToRegister">
+            Nemáte účet? Registrácia
+          </Button>
+        </div>
         <DialogFooter>
           <DialogClose as-child>
-            <Button type="button" variant="outline">Zrušiť</Button>
+            <Button type="button" variant="outline">{{ loginSuccess ? 'Zavrieť' : 'Zrušiť' }}</Button>
           </DialogClose>
-          <Button type="submit">Prihlásiť sa</Button>
+          <Button v-if="!loginSuccess" type="submit">
+            Prihlásiť sa
+          </Button>
         </DialogFooter>
       </form>
 
@@ -180,11 +242,12 @@ watch(
             autocomplete="email"
           />
         </div>
-        <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          <Info class="h-4 w-4 shrink-0" />
+        <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+          <AlertCircle class="h-4 w-4 shrink-0" />
           {{ error }}
         </div>
-        <div v-if="resetSent" class="rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm text-foreground">
+        <div v-if="resetSent" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
+          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
           Odkaz na obnovenie hesla bol odoslaný na váš e-mail. (Demo – žiadny e-mail sa neodosiela.)
         </div>
         <DialogFooter class="flex-row flex-wrap gap-2 sm:gap-2">
@@ -195,6 +258,55 @@ watch(
             <Button>Zavrieť</Button>
           </DialogClose>
           <Button v-else type="submit">Odoslať</Button>
+        </DialogFooter>
+      </form>
+
+      <!-- Register form -->
+      <form
+        v-else-if="showRegisterForm"
+        class="space-y-4 py-4"
+        @submit.prevent="handleRegister"
+      >
+        <div class="space-y-2">
+          <label for="reg-email" class="text-sm font-medium text-foreground">E-mail</label>
+          <Input
+            id="reg-email"
+            v-model="registerEmail"
+            type="email"
+            placeholder="vas@email.sk"
+            class="w-full"
+            autocomplete="email"
+          />
+        </div>
+        <div class="space-y-2">
+          <label for="reg-password" class="text-sm font-medium text-foreground">Heslo</label>
+          <Input
+            id="reg-password"
+            v-model="registerPassword"
+            type="password"
+            placeholder="••••••••"
+            class="w-full"
+            autocomplete="new-password"
+          />
+        </div>
+        <div v-if="registerSuccess" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
+          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
+          Účet bol vytvorený. Ste prihlásený.
+        </div>
+        <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+          <AlertCircle class="h-4 w-4 shrink-0" />
+          {{ error }}
+        </div>
+        <DialogFooter>
+          <Button v-if="!registerSuccess" type="button" variant="link" class="h-auto p-0 text-sm" @click="goToLogin">
+            Už mám účet – prihlásiť sa
+          </Button>
+          <DialogClose as-child>
+            <Button type="button" variant="outline">{{ registerSuccess ? 'Zavrieť' : 'Zrušiť' }}</Button>
+          </DialogClose>
+          <Button v-if="!registerSuccess" type="submit">
+            Registrovať sa
+          </Button>
         </DialogFooter>
       </form>
     </div>
