@@ -17,9 +17,20 @@ npx shadcn-vue@latest add button input checkbox card scroll-area select badge se
 
 # Run dev server
 npm run dev
+
+# Run Storybook design system
+npm run storybook
 ```
 
 Open http://localhost:5173
+Open Storybook at http://localhost:6006
+
+## Design System / UI Audit
+
+- `Audit/Component Inventory` story auto-discovers Vue components in `src/components` and marks story coverage.
+- `UI/Primitives Gallery` gives a one-screen reference for core primitives.
+- `Foundation/Design Tokens` keeps palette + typography visible while polishing.
+- Add one story per component in `src/stories` to move missing coverage to zero.
 
 ## Project Structure
 
