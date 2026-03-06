@@ -6,20 +6,18 @@ import DetailRightPanel from '@/components/ct/detail/DetailRightPanel.vue'
 import DetailMediaViewer from '@/components/ct/detail/DetailMediaViewer.vue'
 import DetailMobileHero from '@/components/ct/detail/DetailMobileHero.vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
-import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
+import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import { Button } from '@/components/ui/button'
-import { getItemById, ITEMS, matchesSearch } from '@/data/mockData'
+import { getItemById } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { useSearchOverlay } from '@/composables/useSearchOverlay'
+import { pushExploreSearch } from '@/lib/navigation'
 
 const route = useRoute()
 const router = useRouter()
 const isMobile = useIsMobile()
 const searchQuery = ref('')
-
-const searchFilteredItems = computed(() =>
-  ITEMS.filter((it) => matchesSearch(it, searchQuery.value))
-)
-const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
+const { searchFilteredItems } = useSearchOverlay(searchQuery)
 
 const id = computed(() => route.params.id as string)
 const item = computed(() => getItemById(id.value))
@@ -29,6 +27,10 @@ const leftPanelView = ref<'media' | 'map'>('media')
 const mobileViewerFullscreen = ref(false)
 const mobileMapFullscreen = ref(false)
 const transcriptVisible = ref(false)
+
+function onSearchSubmit(value: string) {
+  pushExploreSearch(router, value)
+}
 
 function openMapFullscreen() {
   if (isMobile.value) mobileMapFullscreen.value = true
@@ -82,7 +84,7 @@ watch(item, (it) => {
       :mobile-context-id="item?.id"
       @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
       @update:search-query="searchQuery = $event"
-      @search-submit="(v: string) => { router.push({ name: 'explore', query: v.trim() ? { q: v.trim() } : {} }) }"
+      @search-submit="onSearchSubmit"
     />
 
     <template v-if="!item">
@@ -97,16 +99,11 @@ watch(item, (it) => {
     </template>
 
     <template v-else>
-      <div
-        v-if="isSearchActive"
-        class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
-      >
-        <SearchResultsPanel
-          :items="searchFilteredItems"
-          :query="searchQuery"
-          :mobile="isMobile"
-        />
-      </div>
+      <SearchOverlayPanel
+        :items="searchFilteredItems"
+        :query="searchQuery"
+        :mobile="isMobile"
+      />
       <div
         class="pt-[96px] md:flex md:flex-1 md:pt-[57px] md:overflow-hidden"
       >

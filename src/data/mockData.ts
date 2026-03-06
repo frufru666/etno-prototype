@@ -174,6 +174,13 @@ export const FILTER_CATEGORIES: Record<string, FilterCategory> = {
   },
 };
 
+export function getFilterQueryKeys(): string[] {
+  const keys = Object.values(FILTER_CATEGORIES).flatMap((category) =>
+    category.filters.map((filter) => filter.key)
+  )
+  return [...new Set([...keys, "document"])];
+}
+
 // ─── Helper: Get filterable value from item ─────────────────────────────────
 
 export function getFilterableValue(item: EtnoItem, key: string): string[] {

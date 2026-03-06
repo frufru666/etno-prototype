@@ -6,7 +6,7 @@ import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
-import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
+import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
@@ -14,11 +14,12 @@ import {
   getCollectionBySlug,
   getCollectionItems,
   getItemById,
-  ITEMS,
-  matchesSearch,
   type CollectionBodyBlock,
 } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { useSearchOverlay } from '@/composables/useSearchOverlay'
+import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
+import { pushExploreSearch } from '@/lib/navigation'
 import { ChevronLeft } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -27,35 +28,18 @@ const isMobile = useIsMobile()
 const slug = computed(() => route.params.slug as string)
 const collection = computed(() => getCollectionBySlug(slug.value))
 
-const sortKey = ref('id')
+const sortKey = ref<ItemSortKey>('id')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const searchQuery = ref('')
 
 const items = computed(() => {
   const col = collection.value
   if (!col) return []
-  let list = getCollectionItems(col)
-  const key = sortKey.value
-  const order = sortOrder.value
-  return [...list].sort((a, b) => {
-    let aVal: string | undefined
-    let bVal: string | undefined
-    if (key === 'id') {
-      aVal = a.id
-      bVal = b.id
-    } else if (key === 'title') {
-      aVal = a.title
-      bVal = b.title
-    } else if (key === 'studyPeriodStart') {
-      aVal = a.studyPeriodStart ?? ''
-      bVal = b.studyPeriodStart ?? ''
-    } else {
-      aVal = a.id
-      bVal = b.id
-    }
-    const cmp = (aVal ?? '').localeCompare(bVal ?? '', undefined, { numeric: true })
-    return order === 'asc' ? cmp : -cmp
-  })
+  return sortEtnoItems(
+    getCollectionItems(col),
+    sortKey.value,
+    sortOrder.value
+  )
 })
 
 function getItemForBlock(block: CollectionBodyBlock) {
@@ -63,13 +47,10 @@ function getItemForBlock(block: CollectionBodyBlock) {
   return getItemById(block.documentId)
 }
 
-const searchFilteredItems = computed(() =>
-  ITEMS.filter((item) => matchesSearch(item, searchQuery.value))
-)
-const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
+const { searchFilteredItems } = useSearchOverlay(searchQuery)
 
 function onSearchSubmit(value: string) {
-  router.push({ name: 'explore', query: value.trim() ? { q: value.trim() } : {} })
+  pushExploreSearch(router, value)
 }
 </script>
 
@@ -146,16 +127,11 @@ function onSearchSubmit(value: string) {
 
     <template v-if="collection">
       <div class="flex-1 flex flex-col pt-[96px] md:pt-[57px]">
-        <div
-          v-if="isSearchActive"
-          class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
-        >
-          <SearchResultsPanel
-            :items="searchFilteredItems"
-            :query="searchQuery"
-            :mobile="isMobile"
-          />
-        </div>
+        <SearchOverlayPanel
+          :items="searchFilteredItems"
+          :query="searchQuery"
+          :mobile="isMobile"
+        />
         <article class="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
           <!-- Hero image above title (placeholder; replace with real asset when available) -->
           <div
@@ -230,6 +206,24 @@ function onSearchSubmit(value: string) {
         />
         <Footer />
       </div>
+    </template>
+    <template v-else>
+      <main class="flex-1 px-4 pt-[96px] md:px-6 md:pt-[57px]">
+        <div class="mx-auto max-w-3xl py-8">
+          <h1 class="text-2xl font-semibold text-foreground">Kolekcia nebola nájdená</h1>
+          <p class="mt-2 text-muted-foreground">
+            Požadovaná kolekcia neexistuje alebo bola odstránená.
+          </p>
+          <Button
+            variant="link"
+            class="mt-4 p-0 text-primary-600"
+            @click="router.push({ name: 'collections' })"
+          >
+            ← Späť do Kolekcií
+          </Button>
+        </div>
+      </main>
+      <Footer />
     </template>
   </div>
 </template>

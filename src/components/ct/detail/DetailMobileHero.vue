@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
+import { participantLines } from '@/lib/itemPresentation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -7,17 +8,6 @@ defineProps<{
   item: EtnoItem
   ctaLabel: string
 }>()
-
-function participantLines(item: EtnoItem): { label: string; names: string }[] {
-  const out: { label: string; names: string }[] = []
-  if (item.authors?.length)
-    out.push({ label: 'Autor:', names: item.authors.map((a) => a.name).join(', ') })
-  if (item.researchers?.length)
-    out.push({ label: 'Výskumník:', names: item.researchers.map((a) => a.name).join(', ') })
-  if (item.originators?.length)
-    out.push({ label: 'Pôvodca:', names: item.originators.map((a) => a.name).join(', ') })
-  return out
-}
 
 const emit = defineEmits<{
   (e: 'open-viewer'): void
