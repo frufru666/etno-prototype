@@ -61,7 +61,7 @@ const mobileCtaLabel = computed(() => {
   const it = item.value
   if (!it) return 'Zobraziť'
   if (it.mediaType === 'image') return imageCount.value > 1 ? 'Zobraziť galériu' : 'Zobraziť obrázok'
-  if (it.mediaType === 'pdf') return 'Zobraziť dokument'
+  if (it.mediaType === 'pdf') return 'Zobraziť PDF'
   if (it.mediaType === 'audio') return 'Zobraziť nahrávku'
   if (it.mediaType === 'video') return 'Zobraziť video'
   return 'Zobraziť'
@@ -123,10 +123,12 @@ watch(item, (it) => {
               <div v-if="leftPanelView === 'map'" class="absolute inset-0 z-30 flex flex-col bg-background">
                 <template v-if="item.lat != null && item.lng != null">
                   <DetailMap :lat="item.lat" :lng="item.lng" />
-                  <div class="absolute right-2 top-2 z-10 flex gap-2">
+                  <div class="absolute left-2 right-2 top-2 z-10 flex items-center justify-between">
                     <Button variant="secondary" size="sm" @click="closeMapFullscreen">Zavrieť</Button>
-                    <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
-                    <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
+                    <div class="flex gap-2">
+                      <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
+                      <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
+                    </div>
                   </div>
                 </template>
                 <div v-else class="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
@@ -177,20 +179,20 @@ watch(item, (it) => {
         </div>
       </div>
 
-      <!-- Mobile: fullscreen map overlay -->
+      <!-- Mobile: fullscreen map overlay (floating buttons, no bar) -->
       <div
         v-if="isMobile && mobileMapFullscreen && item.lat != null && item.lng != null"
         class="fixed inset-0 z-[60] flex flex-col bg-background"
       >
-        <div class="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-2">
-          <Button variant="ghost" size="sm" class="gap-1" @click="closeMapFullscreen">× Zavrieť</Button>
-        </div>
         <div class="relative flex-1 min-h-0">
           <DetailMap :lat="item.lat" :lng="item.lng" />
-        </div>
-        <div class="flex flex-shrink-0 justify-end gap-2 border-t border-border p-4">
-          <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
-          <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
+          <div class="absolute left-4 right-4 top-2 z-10 flex items-center justify-between">
+            <Button variant="secondary" size="sm" @click="closeMapFullscreen">Zavrieť</Button>
+            <div class="flex gap-2">
+              <Button variant="outline" size="sm" @click="openInMaps">Otvoriť v Maps</Button>
+              <Button variant="outline" size="sm" @click="copyGps">Kopírovať GPS</Button>
+            </div>
+          </div>
         </div>
       </div>
     </template>

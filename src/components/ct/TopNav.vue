@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
@@ -20,6 +21,10 @@ const emit = defineEmits<{
 }>()
 
 const isMobile = useIsMobile()
+const route = useRoute()
+const showFilter = computed(
+  () => route.name !== 'collections' && route.name !== 'collection-detail'
+)
 </script>
 
 <template>
@@ -36,19 +41,24 @@ const isMobile = useIsMobile()
       >
         Etno Explorer SAV
       </RouterLink>
-      <div class="relative">
+      <div
+        v-if="showFilter"
+        class="relative"
+      >
         <Button
           type="button"
           :variant="filterOpen ? 'default' : 'outline'"
-          size="icon"
+          size="sm"
           :class="[
-            'h-9 w-9 rounded-lg',
+            'h-9 gap-1.5 rounded-lg text-sm font-semibold',
+            !filterOpen && 'border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600',
             filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
           ]"
-          aria-label="Toggle filters"
+          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
           <SlidersHorizontal class="h-4 w-4" />
+          <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
         </Button>
         <span
           v-if="activeFilterCount > 0"
@@ -90,20 +100,24 @@ const isMobile = useIsMobile()
       <MobileMenu />
     </div>
     <div class="flex items-center gap-2 px-4 pb-2.5">
-      <div class="relative shrink-0">
+      <div
+        v-if="showFilter"
+        class="relative shrink-0"
+      >
         <Button
           type="button"
           :variant="filterOpen ? 'default' : 'outline'"
           size="sm"
           :class="[
             'gap-1.5 rounded-lg text-sm font-semibold',
+            !filterOpen && 'border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600',
             filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
           ]"
-          aria-label="Toggle filters"
+          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
           <SlidersHorizontal class="h-4 w-4" />
-          <span>Filter</span>
+          <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
         </Button>
         <span
           v-if="activeFilterCount > 0"

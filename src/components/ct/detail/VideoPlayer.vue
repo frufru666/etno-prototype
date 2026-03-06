@@ -67,9 +67,8 @@ function goBackToExplore() {
       <div v-else class="flex-1" />
       <Button
         v-if="item.hasTranscript"
-        variant="ghost"
+        variant="secondary"
         size="sm"
-        class="bg-transparent text-primary-100 hover:bg-white/10 hover:text-primary-50"
         @click="emit('show-transcript')"
       >
         {{ transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript' }}

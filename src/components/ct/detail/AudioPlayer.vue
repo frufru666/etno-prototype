@@ -55,9 +55,8 @@ function goBackToExplore() {
       class="absolute right-4 top-4 z-10"
     >
       <Button
-        variant="ghost"
+        variant="secondary"
         size="sm"
-        class="bg-transparent text-primary-600 hover:text-primary-700"
         @click="emit('show-transcript')"
       >
         {{ transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript' }}

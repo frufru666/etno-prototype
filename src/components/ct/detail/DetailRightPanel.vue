@@ -186,8 +186,11 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </template>
       </div>
 
-      <!-- 5. Súčasť (collection / document membership) -->
-      <div class="mb-7 space-y-4">
+      <!-- 5. Súčasť (collection / document membership) – only when item has any -->
+      <div
+        v-if="collectionsForItem().length > 0 || documentsForItem().length > 0"
+        class="mb-7 space-y-4"
+      >
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           SÚČASŤ
         </h4>
@@ -204,6 +207,8 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                 v-for="c in collectionsForItem()"
                 :key="c.id"
                 :collection="c"
+                :show-perex="false"
+                :show-badges="false"
               />
             </div>
             <p
@@ -248,7 +253,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
           LOKALITA
         </h4>
-        <div class="relative aspect-square max-w-full overflow-hidden rounded-md border border-border bg-primary-50">
+        <div class="relative aspect-square max-h-[160px] w-full max-w-[160px] overflow-hidden rounded-md border border-border bg-primary-50">
           <DetailMap
             :lat="item.lat"
             :lng="item.lng"
@@ -261,9 +266,9 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
             {{ formatCoords(item) }}
           </div>
           <Button
-            variant="link"
+            variant="secondary"
             size="sm"
-            class="absolute bottom-2 right-2 z-10 text-primary-500 hover:text-primary-600"
+            class="absolute bottom-2 right-2 z-10"
             @click="emit('open-map-fullscreen')"
           >
             Fullscreen →

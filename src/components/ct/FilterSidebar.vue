@@ -127,8 +127,8 @@ const totalActiveCount = computed(() =>
     <template v-if="!mobile">
       <div class="flex items-start gap-3 min-w-0">
         <!-- Panel 1: category list — standalone floating card 280px -->
-        <div class="w-[280px] shrink-0 flex flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-          <div class="flex items-center justify-between p-4 pb-0 mb-3">
+        <div class="w-[280px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+          <div class="flex shrink-0 items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
               <SlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
               <span class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</span>
@@ -142,21 +142,23 @@ const totalActiveCount = computed(() =>
               Reset all
             </button>
           </div>
-          <ScrollArea class="flex-1">
-            <div class="px-4 pb-4">
-              <FilterCategoryList
-                :active-filters="activeFilters"
-                :active-key="activePanelKey"
-                @select="toggleCategory"
-              />
-            </div>
-          </ScrollArea>
+          <div class="min-h-0 flex-1 overflow-hidden">
+            <ScrollArea class="h-full">
+              <div class="px-4 pb-4">
+                <FilterCategoryList
+                  :active-filters="activeFilters"
+                  :active-key="activePanelKey"
+                  @select="toggleCategory"
+                />
+              </div>
+            </ScrollArea>
+          </div>
         </div>
         <!-- Panel 2: sub-panel — standalone floating card 320px (closes on click outside) -->
         <div
           v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="w-[320px] shrink-0 flex flex-col h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+          class="w-[320px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">
@@ -180,7 +182,7 @@ const totalActiveCount = computed(() =>
               Reset
             </button>
           </div>
-          <div class="flex flex-1 flex-col min-h-0 pb-4">
+          <div class="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
             <FilterOptionsPanel
               :filter-key="activePanelKey"
               :active-filters="activeFilters"
@@ -197,18 +199,19 @@ const totalActiveCount = computed(() =>
     <template v-else>
       <header class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
         <h2 class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</h2>
-        <button
-          type="button"
-          class="flex cursor-pointer items-center gap-2 rounded-lg bg-muted px-3 py-2 text-base font-semibold text-foreground transition-colors hover:bg-accent"
+        <Button
+          variant="secondary"
+          size="sm"
+          class="gap-2 rounded-lg font-semibold"
           @click="emit('close')"
         >
           <X class="h-5 w-5" aria-hidden />
           <span>Zavrieť filter</span>
-        </button>
+        </Button>
       </header>
       <!-- Mobile step 2: sub-panel -->
       <template v-if="activePanelKey">
-        <div class="flex h-0 grow flex-col overflow-hidden">
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
           <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
             <div class="flex items-center gap-2">
               <Button
@@ -223,7 +226,7 @@ const totalActiveCount = computed(() =>
               <span class="text-base font-semibold tracking-tight text-foreground">{{ getCategoryLabel(activePanelKey) }}</span>
             </div>
           </div>
-          <div class="flex h-0 grow flex-col pb-4">
+          <div class="flex min-h-0 flex-1 flex-col pb-4">
             <FilterOptionsPanel
               :filter-key="activePanelKey"
               :active-filters="activeFilters"
@@ -251,7 +254,7 @@ const totalActiveCount = computed(() =>
 
       <!-- Mobile step 1: category list (title is in top bar) -->
       <template v-else>
-        <ScrollArea class="flex-1">
+        <ScrollArea class="flex-1 min-h-0">
           <div class="px-4 pt-4 pb-4">
             <FilterCategoryList
               :active-filters="activeFilters"
