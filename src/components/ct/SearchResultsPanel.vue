@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
 import { getMediaType } from '@/data/mockData'
+import { searchResultCountLabel } from '@/lib/itemPresentation'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 import { useRouter } from 'vue-router'
@@ -24,23 +25,18 @@ function getItemMediaType(item: EtnoItem) {
   return getMediaType(item.documentType)
 }
 
-function resultCountLabel(count: number): string {
-  if (count === 1) return '1 výsledok vyhľadávania'
-  if (count >= 2 && count <= 4) return `${count} výsledky vyhľadávania`
-  return `${count} výsledkov vyhľadávania`
-}
 </script>
 
 <template>
   <div
     class="flex flex-col overflow-hidden bg-background"
     :class="mobile
-      ? 'w-full min-h-[50vh]'
+      ? 'w-full max-h-[calc(100dvh-112px)] rounded-xl border border-border shadow-lg'
       : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-border shadow-lg'"
   >
     <div class="shrink-0 px-4 pb-2 pt-4">
       <h2 class="text-base font-bold tracking-tight text-foreground">
-        {{ resultCountLabel(items.length) }}
+        {{ searchResultCountLabel(items.length) }}
       </h2>
     </div>
     <ScrollArea class="flex-1 min-h-0">

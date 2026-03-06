@@ -22,9 +22,7 @@ const emit = defineEmits<{
 
 const isMobile = useIsMobile()
 const route = useRoute()
-const showFilter = computed(
-  () => route.name !== 'collections' && route.name !== 'collection-detail'
-)
+const showFilter = computed(() => route.name === 'explore')
 </script>
 
 <template>

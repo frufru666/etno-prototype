@@ -1,28 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import TopNav from '@/components/ct/TopNav.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { INFO_CONTENT, type InfoSection } from '@/data/infoContent'
-import { ITEMS, matchesSearch } from '@/data/mockData'
-import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
+import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { useSearchOverlay } from '@/composables/useSearchOverlay'
+import { pushExploreSearch } from '@/lib/navigation'
 import { ExternalLink } from 'lucide-vue-next'
 
 const router = useRouter()
 const isMobile = useIsMobile()
 const filterOpen = ref(false)
 const searchQuery = ref('')
-
-const searchFilteredItems = computed(() =>
-  ITEMS.filter((item) => matchesSearch(item, searchQuery.value))
-)
-const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
+const { searchFilteredItems } = useSearchOverlay(searchQuery)
 
 function onSearchSubmit(value: string) {
-  router.push({ name: 'explore', query: value.trim() ? { q: value.trim() } : {} })
+  pushExploreSearch(router, value)
 }
 
 function sectionTag(level: InfoSection['level']) {
@@ -31,7 +28,7 @@ function sectionTag(level: InfoSection['level']) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="min-h-dvh bg-background flex flex-col">
     <TopNav
       :filter-open="filterOpen"
       :active-filter-count="0"
@@ -40,18 +37,13 @@ function sectionTag(level: InfoSection['level']) {
       @update:search-query="searchQuery = $event"
       @search-submit="onSearchSubmit"
     />
-    <div class="pt-[96px] md:pt-[57px]">
-      <div
-        v-if="isSearchActive"
-        class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
-      >
-        <SearchResultsPanel
-          :items="searchFilteredItems"
-          :query="searchQuery"
-          :mobile="isMobile"
-        />
-      </div>
-      <main class="mx-auto max-w-3xl px-4 py-8 md:px-6 md:py-10">
+    <div class="flex-1 flex flex-col pt-[96px] md:pt-[57px]">
+      <SearchOverlayPanel
+        :items="searchFilteredItems"
+        :query="searchQuery"
+        :mobile="isMobile"
+      />
+      <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:px-6 md:py-10">
         <h1 class="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
           {{ INFO_CONTENT.title }}
         </h1>

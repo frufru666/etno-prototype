@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
+import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import {
   Sheet,
   SheetContent,
@@ -9,11 +11,41 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Menu, FolderOpen, Info, User, Languages } from 'lucide-vue-next'
+import { useAuth } from '@/composables/useAuth'
+import { Menu, FolderOpen, Info, User, Languages, LogIn, UserPlus, LogOut } from 'lucide-vue-next'
 
 const open = ref(false)
+const userDialogOpen = ref(false)
+const dialogInitialView = ref<'login' | 'register'>('login')
+const { isLoggedIn, logout } = useAuth()
 
 const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+
+async function openLoginModal() {
+  dialogInitialView.value = 'login'
+  open.value = false
+  await nextTick()
+  userDialogOpen.value = true
+}
+
+async function openRegisterModal() {
+  dialogInitialView.value = 'register'
+  open.value = false
+  await nextTick()
+  userDialogOpen.value = true
+}
+
+async function openAccountModal() {
+  dialogInitialView.value = 'login'
+  open.value = false
+  await nextTick()
+  userDialogOpen.value = true
+}
+
+function handleLogout() {
+  logout()
+  open.value = false
+}
 </script>
 
 <template>
@@ -34,19 +66,60 @@ const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus
             Collections
           </RouterLink>
         </Button>
-        <Button variant="outline" class="justify-start gap-2" @click="open = false">
-          <Info class="h-4 w-4" />
-          Info
+        <Button variant="outline" class="justify-start gap-2" as-child>
+          <RouterLink to="/info" class="flex items-center gap-2" @click="open = false">
+            <Info class="h-4 w-4" />
+            Info
+          </RouterLink>
         </Button>
-        <Button variant="outline" class="justify-start gap-2" @click="open = false">
+        <Button
+          v-if="!isLoggedIn"
+          variant="outline"
+          class="justify-start gap-2"
+          @click="openLoginModal"
+        >
+          <LogIn class="h-4 w-4" />
+          Prihlásiť sa
+        </Button>
+        <Button
+          v-if="!isLoggedIn"
+          variant="outline"
+          class="justify-start gap-2"
+          @click="openRegisterModal"
+        >
+          <UserPlus class="h-4 w-4" />
+          Registrácia
+        </Button>
+        <Button
+          v-if="isLoggedIn"
+          variant="outline"
+          class="justify-start gap-2"
+          @click="openAccountModal"
+        >
           <User class="h-4 w-4" />
-          User
+          Účet
         </Button>
-        <Button variant="outline" class="justify-start gap-2" @click="open = false">
+        <Button
+          v-if="isLoggedIn"
+          variant="outline"
+          class="justify-start gap-2"
+          @click="handleLogout"
+        >
+          <LogOut class="h-4 w-4" />
+          Odhlásiť
+        </Button>
+        <Button variant="outline" class="justify-start gap-2 opacity-70">
           <Languages class="h-4 w-4" />
           EN/SK
         </Button>
       </div>
     </SheetContent>
   </Sheet>
+  <Dialog v-model:open="userDialogOpen">
+    <UserAuthModal
+      v-if="userDialogOpen"
+      :initial-view="dialogInitialView"
+      @close="userDialogOpen = false"
+    />
+  </Dialog>
 </template>

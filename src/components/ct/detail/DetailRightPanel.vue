@@ -11,6 +11,7 @@ import {
   getDocumentItems,
   type EtnoItem,
 } from '@/data/mockData'
+import { participantLines } from '@/lib/itemPresentation'
 import { ExternalLink } from 'lucide-vue-next'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
@@ -34,17 +35,6 @@ const router = useRouter()
 
 const collectionsForItem = () => getCollectionsForItem(props.item.id)
 const documentsForItem = () => getDocumentsForItem(props.item.id)
-
-function participantLines(item: EtnoItem): { label: string; names: string }[] {
-  const out: { label: string; names: string }[] = []
-  if (item.authors?.length)
-    out.push({ label: 'Autor:', names: item.authors.map((a) => a.name).join(', ') })
-  if (item.researchers?.length)
-    out.push({ label: 'Výskumník:', names: item.researchers.map((a) => a.name).join(', ') })
-  if (item.originators?.length)
-    out.push({ label: 'Pôvodca:', names: item.originators.map((a) => a.name).join(', ') })
-  return out
-}
 
 function openExploreWithFilter(filterKey: string, value: string) {
   router.push({ name: 'explore', query: { [filterKey]: value } })

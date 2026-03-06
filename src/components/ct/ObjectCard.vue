@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
 import { getCollectionsForItem, getDocumentsForItem, getMediaType } from '@/data/mockData'
+import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
@@ -20,26 +21,6 @@ const mediaType = getMediaType(props.item.documentType)
 const isMultiImage = mediaType === 'image' && props.item.hasTranscript
 const collections = getCollectionsForItem(props.item.id)
 const documents = getDocumentsForItem(props.item.id)
-
-function participantLines(): { label: string; names: string }[] {
-  const out: { label: string; names: string }[] = []
-  if (props.item.authors?.length)
-    out.push({
-      label: 'Autor:',
-      names: props.item.authors.map((a) => a.name).join(', '),
-    })
-  if (props.item.researchers?.length)
-    out.push({
-      label: 'Výskumník:',
-      names: props.item.researchers.map((a) => a.name).join(', '),
-    })
-  if (props.item.originators?.length)
-    out.push({
-      label: 'Pôvodca:',
-      names: props.item.originators.map((a) => a.name).join(', '),
-    })
-  return out
-}
 </script>
 
 <template>
@@ -87,7 +68,7 @@ function participantLines(): { label: string; names: string }[] {
       </h3>
       <div class="space-y-0.5 text-xs text-muted-foreground">
         <p
-          v-for="line in participantLines()"
+          v-for="line in participantLines(item)"
           :key="line.label"
           class="line-clamp-1"
         >

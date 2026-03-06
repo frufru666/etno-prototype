@@ -5,18 +5,19 @@ import TopNav from '@/components/ct/TopNav.vue'
 import FilterSidebar from '@/components/ct/FilterSidebar.vue'
 import FilterChips from '@/components/ct/FilterChips.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
-import SearchResultsPanel from '@/components/ct/SearchResultsPanel.vue'
+import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
-  ITEMS,
   getMapPins,
+  getFilterQueryKeys,
   matchesFilters,
   matchesSearch,
-  type EtnoItem,
+  ITEMS,
 } from '@/data/mockData'
 import MapView from '@/components/ct/MapView.vue'
 import { useIsMobile } from '@/composables/useIsMobile'
+import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
 
 const route = useRoute()
 const router = useRouter()
@@ -24,15 +25,12 @@ const isMobile = useIsMobile()
 const filterOpen = ref(false)
 const openSubPanelKey = ref<string | null>(null)
 const activeFilters = ref<Record<string, string[]>>({})
-const sortKey = ref('id')
+const sortKey = ref<ItemSortKey>('id')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const searchQuery = ref('')
 
 // Build activeFilters from route.query (e.g. from Detail filter links)
-const filterKeys = [
-  'keywords', 'researchCollection', 'author', 'obec', 'okres', 'kraj', 'stat',
-  'documentType', 'studyPeriod', 'collectionMethod', 'language', 'document',
-]
+const filterKeys = getFilterQueryKeys()
 
 let syncingFromQuery = false
 function syncFiltersFromQuery() {
@@ -51,18 +49,16 @@ function syncFiltersFromQuery() {
   })
 }
 
-const isSearchActive = computed(() => searchQuery.value.trim().length > 0)
-
 onMounted(() => {
   filterOpen.value = !isMobile.value
   syncFiltersFromQuery()
   const q = route.query.q ?? route.query.query
-  if (typeof q === 'string') searchQuery.value = q
+  searchQuery.value = typeof q === 'string' ? q : ''
 })
 watch(() => route.query, (query) => {
   syncFiltersFromQuery()
   const q = query.q ?? query.query
-  if (typeof q === 'string') searchQuery.value = q
+  searchQuery.value = typeof q === 'string' ? q : ''
 }, { deep: true })
 
 watch(activeFilters, (filters) => {
@@ -90,27 +86,7 @@ const filteredItems = computed(() => {
     matchesFilters(item, activeFilters.value)
   )
   list = list.filter((item) => matchesSearch(item, searchQuery.value))
-  const key = sortKey.value
-  const order = sortOrder.value
-  return [...list].sort((a, b) => {
-    let aVal: string | undefined
-    let bVal: string | undefined
-    if (key === 'id') {
-      aVal = a.id
-      bVal = b.id
-    } else if (key === 'title') {
-      aVal = a.title
-      bVal = b.title
-    } else if (key === 'studyPeriodStart') {
-      aVal = a.studyPeriodStart ?? ''
-      bVal = b.studyPeriodStart ?? ''
-    } else {
-      aVal = a.id
-      bVal = b.id
-    }
-    const cmp = (aVal ?? '').localeCompare(bVal ?? '', undefined, { numeric: true })
-    return order === 'asc' ? cmp : -cmp
-  })
+  return sortEtnoItems(list, sortKey.value, sortOrder.value)
 })
 
 const activeFilterCount = computed(() => {
@@ -158,7 +134,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="min-h-dvh bg-background flex flex-col">
     <TopNav
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"
@@ -167,7 +143,7 @@ onUnmounted(() => {
       @update:search-query="onSearchQueryChange"
     />
     <!-- Mobile nav is 2 rows (~96px), desktop is 57px -->
-    <div class="relative pt-[96px] md:pt-[57px]">
+    <div class="relative flex-1 pt-[96px] md:pt-[57px]">
       <!-- Desktop: floating filter container over map (no layout shift) -->
       <div
         v-if="filterOpen && !isMobile"
@@ -182,16 +158,11 @@ onUnmounted(() => {
         />
       </div>
 
-      <div
-        v-if="isSearchActive"
-        class="fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
-      >
-        <SearchResultsPanel
-          :items="filteredItems"
-          :query="searchQuery"
-          :mobile="isMobile"
-        />
-      </div>
+      <SearchOverlayPanel
+        :items="filteredItems"
+        :query="searchQuery"
+        :mobile="isMobile"
+      />
 
       <div
         class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
@@ -202,7 +173,7 @@ onUnmounted(() => {
       <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
       <div
         class="transition-[margin] duration-200"
-        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[628px]' : 'md:ml-[296px]') : ''"
+        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]' : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]') : ''"
       >
         <FilterChips
           :active-filters="activeFilters"
