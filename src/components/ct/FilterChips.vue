@@ -36,21 +36,21 @@ function getPillLabel(pill: { label: string; value: string }) {
     v-if="pills.length > 0"
     class="flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3 md:px-6"
   >
-    <span class="text-sm text-muted-foreground">Aplikované filtre:</span>
+    <span class="text-label-small text-muted-foreground">Aplikované filtre:</span>
     <template v-for="pill in pills" :key="`${pill.key}-${pill.value}`">
       <span
-        class="inline-flex items-center gap-1 rounded-full bg-primary-100 px-3 py-1 text-sm text-primary-800"
+        class="inline-flex h-6 items-center gap-1 rounded-full bg-primary-100 px-2 text-[12px] font-medium leading-4 text-primary-600"
       >
         {{ getPillLabel(pill) }}
         <Button
           type="button"
           variant="ghost"
-          size="icon"
-          class="h-5 w-5 rounded-full hover:bg-primary-200"
+          size="icon-sm"
+          class="h-4 w-4 rounded-full p-0 text-primary-600 hover:bg-primary-200 hover:text-primary-600"
           aria-label="Odstrániť filter"
           @click.stop="emit('remove', pill.key, pill.value)"
         >
-          <X class="h-3 w-3" />
+          <X class="h-4 w-4" />
         </Button>
       </span>
     </template>

@@ -7,13 +7,13 @@ module.exports = {
   		colors: {
   			primary: {
   				'50': '#E5F0FF',
-  				'100': '#CCE0FF',
-  				'200': '#99C2FF',
+  				'100': '#CDE0FF',
+  				'200': '#A0C3FF',
   				'300': '#66A3FF',
   				'400': '#3385FF',
   				'500': '#1A62FF',
-  				'600': '#0047CC',
-  				'700': '#003399',
+  				'600': '#034AE8',
+  				'700': '#043CB9',
   				'800': '#002266',
   				'900': '#05205D',
   				DEFAULT: 'hsl(var(--primary))',
@@ -32,6 +32,18 @@ module.exports = {
   			error: '#EF4444',
   			warning: '#F59E0B',
   			success: '#22C55E',
+  			ct: {
+  				neutral: {
+  					'0': '#FFFFFF',
+  					'50': '#FAFAFA',
+  					'200': '#E5E5E5',
+  					'300': '#D4D4D4',
+  					'400': '#A3A3A3',
+  					'500': '#737373',
+  					'700': '#404040',
+  					'900': '#171717'
+  				}
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -84,11 +96,12 @@ module.exports = {
   			'4.5': '18px'
   		},
   		borderRadius: {
-  			sm: 'calc(var(--radius) - 4px)',
-  			md: 'calc(var(--radius) - 2px)',
-  			lg: 'var(--radius)',
-  			xl: '16px',
-  			'2xl': '24px'
+  			sm: 'var(--radius-sm)',
+  			md: 'var(--radius-md)',
+  			lg: 'var(--radius-lg)',
+  			xl: 'var(--radius-xl)',
+  			'2xl': 'var(--radius-2xl)',
+  			full: 'var(--radius-full)'
   		},
   		fontSize: {
   			'heading-1': [
@@ -161,6 +174,22 @@ module.exports = {
   					lineHeight: '18px',
   					letterSpacing: '0',
   					fontWeight: '500'
+  				}
+  			],
+  			button: [
+  				'16px',
+  				{
+  					lineHeight: '24px',
+  					letterSpacing: '-0.01em',
+  					fontWeight: '600'
+  				}
+  			],
+  			'button-small': [
+  				'14px',
+  				{
+  					lineHeight: '16px',
+  					letterSpacing: '-0.01em',
+  					fontWeight: '600'
   				}
   			],
   			data: [
