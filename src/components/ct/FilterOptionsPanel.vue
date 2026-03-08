@@ -47,17 +47,23 @@ const filteredOptions = computed(() => {
           v-for="opt in filteredOptions"
           :key="opt.value"
           type="button"
-          class="flex cursor-pointer items-center justify-between border-b border-border py-2.5 px-4 text-left transition-colors hover:bg-accent"
+          class="flex cursor-pointer items-center justify-between border-b border-[#E5E5E5] py-2.5 px-4 text-left transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[#1A62FF]"
+          :class="[
+            isSelected(opt.value)
+              ? 'bg-[#CDE0FF] border-[#1A62FF]'
+              : 'bg-transparent hover:bg-[#CDE0FF]',
+          ]"
           @click="emit('toggle', opt.value, !isSelected(opt.value))"
         >
           <div class="flex items-center gap-3">
             <Checkbox
               :model-value="isSelected(opt.value)"
               class="h-5 w-5 rounded border-2 shadow-none pointer-events-none"
+              :class="isSelected(opt.value) ? 'border-[#034AE8] bg-[#034AE8] text-white' : ''"
             />
-            <span class="text-sm font-medium text-foreground">{{ opt.value }}</span>
+            <span class="text-label text-[#171717]">{{ opt.value }}</span>
           </div>
-          <span class="ml-2 shrink-0 text-sm font-medium text-primary-500">{{ opt.count }}</span>
+          <span class="ml-2 shrink-0 text-label text-[#1A62FF]">{{ opt.count }}</span>
         </button>
       </div>
     </ScrollArea>

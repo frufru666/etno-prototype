@@ -39,40 +39,42 @@ function getSelectedCount(key: string): number {
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-1 pr-1">
             <component :is="getSectionIcon(FILTER_CATEGORIES[catKey].icon)" class="h-4 w-4 text-muted-foreground" />
-            <span class="text-xs font-medium text-muted-foreground">{{ FILTER_CATEGORIES[catKey].label }}</span>
+            <span class="text-label-small text-muted-foreground">{{ FILTER_CATEGORIES[catKey].label }}</span>
           </div>
           <div class="flex flex-col gap-2">
             <button
               v-for="filter in FILTER_CATEGORIES[catKey].filters"
               :key="filter.key"
               type="button"
-              class="flex h-9 w-full cursor-pointer items-center justify-between rounded-lg border px-3 transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              class="flex h-10 w-full cursor-pointer items-center justify-between rounded-md px-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A62FF]"
               :class="[
                 activeKey === filter.key
-                  ? 'border-2 border-primary-600 bg-background'
+                  ? 'border-2 border-[#034AE8] bg-[#CDE0FF] text-[#034AE8]'
                   : getSelectedCount(filter.key) > 0
-                    ? 'border border-primary-200 bg-primary-50'
-                    : 'border border-border bg-background',
+                    ? 'border border-[#E5E5E5] bg-[#CDE0FF] text-[#034AE8] border-2 border-[#034AE8]'
+                    : 'border border-[#E5E5E5] bg-white hover:bg-[#CDE0FF]',
               ]"
               @click.stop="emit('select', filter.key)"
             >
               <div class="flex items-center gap-2 min-w-0">
                 <span
-                  class="truncate text-sm font-medium tracking-tight"
-                  :class="activeKey === filter.key ? 'text-primary-600' : 'text-foreground'"
+                  class="truncate text-label"
+                  :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-[#034AE8]' : 'text-[#171717]'"
                 >
                   {{ filter.label }}
                 </span>
+                <!-- Filter chip: pill with count -->
                 <span
                   v-if="getSelectedCount(filter.key) > 0"
-                  class="flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full bg-primary-500 px-1.5 text-xs font-semibold text-primary-foreground"
+                  class="inline-flex h-6 shrink-0 items-center gap-1 rounded-full bg-[#CDE0FF] px-2 text-xs font-medium text-[#034AE8]"
+                  style="line-height: 16px"
                 >
                   {{ getSelectedCount(filter.key) }}
                 </span>
               </div>
               <ChevronRight
                 class="h-4 w-4 shrink-0"
-                :class="activeKey === filter.key ? 'text-primary-600' : 'text-foreground'"
+                :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-[#034AE8]' : 'text-[#171717]'"
               />
             </button>
           </div>

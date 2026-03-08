@@ -25,11 +25,11 @@ function onKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="relative">
-    <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+    <Search class="absolute left-3 top-1/2 h-6 w-6 -translate-y-1/2 text-[#A3A3A3]" aria-hidden />
     <Input
       :model-value="modelValue"
       type="search"
-      class="h-9 rounded-lg pl-9 pr-8 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:border-primary-500 [&::-webkit-search-cancel-button]:hidden"
+      class="h-10 rounded-md pl-11 pr-9"
       :class="inputClass"
       :placeholder="placeholder"
       aria-label="Search"
@@ -39,7 +39,7 @@ function onKeydown(e: KeyboardEvent) {
     <button
       v-if="modelValue.length > 0"
       type="button"
-      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A3A3A3] hover:text-[#171717]"
       aria-label="Clear search"
       @click="$emit('update:modelValue', '')"
     >
