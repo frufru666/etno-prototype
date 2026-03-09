@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
-import { ChevronLeft } from 'lucide-vue-next'
+import { PhCaretLeft } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const props = defineProps<{
@@ -73,7 +73,7 @@ function goBackToExplore() {
         aria-label="Späť do Explore"
         @click="goBackToExplore"
       >
-        <ChevronLeft class="h-4 w-4" />
+        <PhCaretLeft class="h-4 w-4" />
         <span>Späť do Explore</span>
       </Button>
     </div>

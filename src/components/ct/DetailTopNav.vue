@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
-import { ChevronLeft, PanelRightClose, PanelRightOpen } from 'lucide-vue-next'
+import { PhCaretLeft, PhSidebarSimple, PhSidebar } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
@@ -66,8 +66,8 @@ function onSearchSubmit(value: string) {
         aria-label="Toggle right panel"
         @click="emit('toggle-right-panel')"
       >
-        <PanelRightOpen v-if="!rightPanelOpen" class="h-4 w-4" />
-        <PanelRightClose v-else class="h-4 w-4" />
+        <PhSidebar v-if="!rightPanelOpen" class="h-4 w-4" />
+        <PhSidebarSimple v-else class="h-4 w-4" />
         <span class="hidden sm:inline">
           {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
         </span>
@@ -103,7 +103,7 @@ function onSearchSubmit(value: string) {
         aria-label="Späť do Explore"
         @click="goBackToExplore"
       >
-        <ChevronLeft class="h-4 w-4" />
+        <PhCaretLeft class="h-4 w-4" />
         <span>Späť do Explore</span>
       </Button>
       <SearchInput

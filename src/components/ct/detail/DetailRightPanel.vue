@@ -12,7 +12,7 @@ import {
   type EtnoItem,
 } from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
-import { ExternalLink } from 'lucide-vue-next'
+import { PhArrowSquareOut } from '@phosphor-icons/vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
 
@@ -150,7 +150,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                     "
                   >
                     {{ field.getValue(item) }}
-                    <ExternalLink class="h-3 w-3 shrink-0" />
+                    <PhArrowSquareOut class="h-3 w-3 shrink-0" />
                   </button>
                 </template>
                 <a
@@ -161,7 +161,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                   class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                 >
                   {{ field.getValue(item) }}
-                  <ExternalLink class="h-3 w-3 shrink-0" />
+                  <PhArrowSquareOut class="h-3 w-3 shrink-0" />
                 </a>
                 <span
                   v-else

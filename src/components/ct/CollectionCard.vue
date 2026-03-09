@@ -5,7 +5,7 @@ import { getCollectionItems } from '@/data/mockData'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'vue-router'
-import { FolderArchive, FileText } from 'lucide-vue-next'
+import { PhArchive, PhFileText } from '@phosphor-icons/vue'
 
 const props = withDefaults(
   defineProps<{
@@ -69,7 +69,7 @@ function handleClick() {
     <CardContent class="p-3">
       <div class="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted">
         <div class="absolute inset-0 flex items-center justify-center text-muted-foreground">
-          <FolderArchive class="h-12 w-12" />
+          <PhArchive class="h-12 w-12" />
         </div>
       </div>
       <h3 class="mt-3 line-clamp-1 text-lg font-semibold leading-tight text-foreground">
@@ -116,7 +116,7 @@ function handleClick() {
         class="h-[200px] w-full shrink-0 overflow-hidden rounded-t-xl bg-muted"
       >
         <div class="flex h-full w-full items-center justify-center text-muted-foreground">
-          <FolderArchive class="h-12 w-12" />
+          <PhArchive class="h-12 w-12" />
         </div>
       </div>
       <!-- Same content row for both collection and document -->

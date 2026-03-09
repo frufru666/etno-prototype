@@ -20,7 +20,7 @@ import { useIsMobile } from '@/composables/useIsMobile'
 import { useSearchOverlay } from '@/composables/useSearchOverlay'
 import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
 import { pushExploreSearch } from '@/lib/navigation'
-import { ChevronLeft } from 'lucide-vue-next'
+import { PhCaretLeft } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -78,7 +78,7 @@ function onSearchSubmit(value: string) {
           aria-label="Späť do Kolekcií"
           @click="router.push({ name: 'collections' })"
         >
-          <ChevronLeft class="h-4 w-4" />
+          <PhCaretLeft class="h-4 w-4" />
           <span class="hidden lg:inline">Späť do Kolekcií</span>
         </Button>
         <SearchInput
@@ -115,7 +115,7 @@ function onSearchSubmit(value: string) {
           aria-label="Späť do Kolekcií"
           @click="router.push({ name: 'collections' })"
         >
-          <ChevronLeft class="h-4 w-4" />
+          <PhCaretLeft class="h-4 w-4" />
         </Button>
         <SearchInput
           v-model="searchQuery"

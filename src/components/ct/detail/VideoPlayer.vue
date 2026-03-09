@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ChevronLeft, X } from 'lucide-vue-next'
+import { PhCaretLeft, PhX } from '@phosphor-icons/vue'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -50,7 +50,7 @@ function goBackToExplore() {
         aria-label="Späť do Explore"
         @click="goBackToExplore"
       >
-        <ChevronLeft class="h-4 w-4" />
+        <PhCaretLeft class="h-4 w-4" />
         <span>Späť do Explore</span>
       </Button>
       <Button
@@ -61,7 +61,7 @@ function goBackToExplore() {
         aria-label="Zavrieť"
         @click="emit('close')"
       >
-        <X class="h-4 w-4" />
+        <PhX class="h-4 w-4" />
         Zavrieť
       </Button>
       <div v-else class="flex-1" />

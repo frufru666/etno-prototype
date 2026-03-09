@@ -10,7 +10,7 @@
 
 ```
 Vue 3 (Composition API + <script setup>), vue-router 4,
-Tailwind CSS v4, shadcn-vue (radix-vue primitives), lucide-vue-next icons,
+Tailwind CSS v4, shadcn-vue (radix-vue primitives), @phosphor-icons/vue icons,
 leaflet (maps), vue-sonner (toasts)
 ```
 

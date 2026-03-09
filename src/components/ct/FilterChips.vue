@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
-import { X } from 'lucide-vue-next'
+import { PhX } from '@phosphor-icons/vue'
 import { FILTER_CATEGORIES } from '@/data/mockData'
 
 const props = defineProps<{
@@ -50,7 +50,7 @@ function getPillLabel(pill: { label: string; value: string }) {
           aria-label="Odstrániť filter"
           @click.stop="emit('remove', pill.key, pill.value)"
         >
-          <X class="h-4 w-4" />
+          <PhX class="h-4 w-4" />
         </Button>
       </span>
     </template>

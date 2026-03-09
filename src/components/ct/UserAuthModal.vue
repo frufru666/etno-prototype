@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { AlertCircle, CheckCircle2, X } from 'lucide-vue-next'
+import { PhWarningCircle, PhCheckCircle, PhX } from '@phosphor-icons/vue'
 
 type View = 'login' | 'reset' | 'register'
 
@@ -139,7 +139,7 @@ watch(
         class="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         aria-label="Zavrieť"
       >
-        <X class="h-4 w-4" />
+        <PhX class="h-4 w-4" />
       </DialogClose>
       <DialogHeader class="text-left">
         <DialogTitle>
@@ -200,11 +200,11 @@ watch(
           />
         </div>
         <div v-if="loginSuccess" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
-          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
+          <PhCheckCircle class="h-4 w-4 shrink-0 text-green-600" />
           Úspešne ste sa prihlásili.
         </div>
         <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <PhWarningCircle class="h-4 w-4 shrink-0" />
           {{ error }}
         </div>
         <div v-if="!loginSuccess" class="flex flex-wrap gap-x-4 gap-y-1">
@@ -243,11 +243,11 @@ watch(
           />
         </div>
         <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <PhWarningCircle class="h-4 w-4 shrink-0" />
           {{ error }}
         </div>
         <div v-if="resetSent" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
-          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
+          <PhCheckCircle class="h-4 w-4 shrink-0 text-green-600" />
           Odkaz na obnovenie hesla bol odoslaný na váš e-mail. (Demo – žiadny e-mail sa neodosiela.)
         </div>
         <DialogFooter class="flex-row flex-wrap gap-2 sm:gap-2">
@@ -290,11 +290,11 @@ watch(
           />
         </div>
         <div v-if="registerSuccess" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800" role="status" aria-live="polite">
-          <CheckCircle2 class="h-4 w-4 shrink-0 text-green-600" />
+          <PhCheckCircle class="h-4 w-4 shrink-0 text-green-600" />
           Účet bol vytvorený. Ste prihlásený.
         </div>
         <div v-if="error" class="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <PhWarningCircle class="h-4 w-4 shrink-0" />
           {{ error }}
         </div>
         <DialogFooter>

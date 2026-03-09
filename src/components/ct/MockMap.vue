@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ZoomIn, ZoomOut, Locate, ChevronRight, LayoutGrid } from 'lucide-vue-next'
+import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCrosshair, PhCaretRight, PhSquaresFour } from '@phosphor-icons/vue'
 import type { MapPin } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 
@@ -247,7 +247,7 @@ watch(
         <!-- Image placeholder (compact for short map views) -->
         <div class="h-16 w-full shrink-0 bg-muted">
           <div class="flex h-full w-full items-center justify-center text-muted-foreground">
-            <LayoutGrid class="h-6 w-6" />
+            <PhSquaresFour class="h-6 w-6" />
           </div>
         </div>
         <div class="p-2.5">
@@ -255,7 +255,7 @@ watch(
             {{ tooltipPin.title }}
           </h3>
           <div class="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <LayoutGrid class="h-3 w-3 shrink-0" />
+            <PhSquaresFour class="h-3 w-3 shrink-0" />
             <span class="truncate">{{ tooltipPin.authorDisplay ?? '—' }}</span>
           </div>
           <Badge variant="secondary" class="mb-2 rounded-full text-xs">
@@ -267,7 +267,7 @@ watch(
             @click="goToPin(tooltipPin); hideTooltip()"
           >
             Zobrazit polozku
-            <ChevronRight class="h-4 w-4" />
+            <PhCaretRight class="h-4 w-4" />
           </Button>
         </div>
         <!-- Downward triangle pointer (matches card background) -->
@@ -298,7 +298,7 @@ watch(
         aria-label="Priblížiť"
         @click="zoomIn"
       >
-        <ZoomIn class="h-4 w-4" />
+        <PhMagnifyingGlassPlus class="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
@@ -307,7 +307,7 @@ watch(
         aria-label="Oddialiť"
         @click="zoomOut"
       >
-        <ZoomOut class="h-4 w-4" />
+        <PhMagnifyingGlassMinus class="h-4 w-4" />
       </Button>
       <Button
         variant="ghost"
@@ -316,7 +316,7 @@ watch(
         aria-label="Zobraziť všetky body"
         @click="fitBounds"
       >
-        <Locate class="h-4 w-4" />
+        <PhCrosshair class="h-4 w-4" />
       </Button>
     </div>
   </div>

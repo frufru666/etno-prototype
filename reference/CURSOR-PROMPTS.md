@@ -16,7 +16,7 @@
 npm install
 npx shadcn-vue@latest init
 npx shadcn-vue@latest add button input checkbox card scroll-area select badge separator tabs collapsible toggle sheet aspect-ratio tooltip
-npm install lucide-vue-next
+npm install @phosphor-icons/vue
 npm install vue-router@4
 npm install vue-sonner
 npm run dev
@@ -54,7 +54,7 @@ TopNav specs:
 
 Props: filterOpen (boolean), activeFilterCount (number), onFilterToggle (emit)
 
-Use shadcn-vue Button, Sheet. Use lucide-vue-next for icons (SlidersHorizontal, Search, Menu, X).
+Use shadcn-vue Button, Sheet. Use @phosphor-icons/vue for icons (PhSlidersHorizontal, PhMagnifyingGlass, PhList, PhX).
 Follow CT design tokens from tailwind.config.js.
 
 Reference the Archeo TopNav.tsx for the interaction pattern (filter toggle, mobile sheet) but adapt the content for Etno (search bar instead of just branding, additional nav items).

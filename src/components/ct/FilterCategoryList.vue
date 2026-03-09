@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Tag, MapPin, FileText, ChevronRight } from 'lucide-vue-next'
+import { PhTag, PhMapPin, PhFileText, PhCaretRight } from '@phosphor-icons/vue'
 import { FILTER_CATEGORIES } from '@/data/mockData'
 
 const props = withDefaults(
@@ -17,13 +17,13 @@ const emit = defineEmits<{
 const categoryOrder = ['thematic', 'geographic', 'formal'] as const
 
 const iconMap = {
-  Tag,
-  MapPin,
-  FileText,
+  Tag: PhTag,
+  MapPin: PhMapPin,
+  FileText: PhFileText,
 }
 
 function getSectionIcon(iconName: keyof typeof iconMap) {
-  return iconMap[iconName] ?? FileText
+  return iconMap[iconName] ?? PhFileText
 }
 
 function getSelectedCount(key: string): number {
@@ -74,7 +74,7 @@ function getSelectedCount(key: string): number {
                   {{ getSelectedCount(filter.key) }}
                 </span>
               </div>
-              <ChevronRight
+              <PhCaretRight
                 class="h-4 w-4 shrink-0"
                 :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-[#171717]'"
               />

@@ -4,7 +4,7 @@
 - Vue 3 + TypeScript + Vite
 - Tailwind CSS with CT design tokens
 - shadcn-vue components
-- Lucide Vue icons
+- Phosphor Vue icons
 
 ## CRITICAL:
 This is a Vue 3 project. NEVER generate React/JSX. Always use .vue SFC with <script setup lang="ts"> and <template>
@@ -44,7 +44,9 @@ Prefer Tailwind built-in classes over custom CSS. Use CT design tokens in tailwi
 - Comment complex logic
 
 ## Icons
-Use Lucide Vue: import { IconName } from lucide-vue-next. Size with Tailwind: class="h-4 w-4"
+- **ONLY** use **@phosphor-icons/vue**. Do NOT use lucide-vue-next or any other icon library.
+- Import: `import { PhX, PhCheck, PhCaretLeft, ... } from "@phosphor-icons/vue"`
+- Icons are named with `Ph` prefix (e.g. PhMagnifyingGlass, PhSlidersHorizontal). Size with Tailwind: `class="h-4 w-4"`
 
 ## Responsive
 Mobile-first approach. Test at 1366px width (researcher hardware). Breakpoints: sm (640), md (768), lg (1024), xl (1280)
