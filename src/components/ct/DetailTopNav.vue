@@ -60,15 +60,15 @@ function onSearchSubmit(value: string) {
     <div class="flex flex-shrink-0 items-center gap-2">
       <NavActions />
       <Button
-        variant="outline"
-        size="sm"
-        class="gap-1.5 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        variant="secondary"
+        size="lg"
+        class="gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Toggle right panel"
         @click="emit('toggle-right-panel')"
       >
-        <PhSidebar v-if="!rightPanelOpen" class="h-4 w-4" />
-        <PhSidebarSimple v-else class="h-4 w-4" />
-        <span class="hidden sm:inline">
+        <PhSidebar v-if="!rightPanelOpen" class="size-6 text-primary-500" />
+        <PhSidebarSimple v-else class="size-6 text-primary-500" />
+        <span class="hidden sm:inline text-primary-500">
           {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
         </span>
       </Button>
@@ -97,14 +97,14 @@ function onSearchSubmit(value: string) {
     </div>
     <div class="flex items-center gap-2 px-4 pb-2.5">
       <Button
-        variant="default"
+        variant="primary"
         size="sm"
-        class="gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Späť do Explore"
         @click="goBackToExplore"
       >
-        <PhCaretLeft class="h-4 w-4" />
-        <span>Späť do Explore</span>
+        <PhCaretLeft class="size-4" />
+        Späť do Explore
       </Button>
       <SearchInput
         :model-value="searchQuery ?? ''"

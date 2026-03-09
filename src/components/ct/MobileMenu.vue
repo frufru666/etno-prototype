@@ -19,7 +19,7 @@ const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
 const { isLoggedIn, logout } = useAuth()
 
-const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 
 async function openLoginModal() {
   dialogInitialView.value = 'login'
@@ -51,8 +51,8 @@ function handleLogout() {
 <template>
   <Sheet v-model:open="open">
     <SheetTrigger as-child>
-      <Button variant="outline" size="icon" :class="['h-9 w-9', btnClass]" aria-label="Open menu">
-        <PhList class="h-5 w-5" />
+      <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Open menu">
+        <PhList class="size-6" />
       </Button>
     </SheetTrigger>
     <SheetContent side="right" class="w-[280px] sm:max-w-[320px]">

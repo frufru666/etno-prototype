@@ -13,7 +13,7 @@ import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { PhFolderOpen, PhInfo, PhUser, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
 
-const btnClass = 'rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 const userMenuOpen = ref(false)
 const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
@@ -38,27 +38,27 @@ function handleLogout() {
 </script>
 
 <template>
-  <Button variant="outline" size="sm" :class="['gap-1.5', btnClass]" aria-label="Collections" as-child>
-    <RouterLink to="/collections" class="flex items-center gap-1.5">
-      <PhFolderOpen class="h-4 w-4" />
-      <span class="hidden sm:inline text-sm font-semibold">Collections</span>
+  <Button variant="secondary" size="lg" :class="['gap-2', btnClass]" aria-label="Collections" as-child>
+    <RouterLink to="/collections" class="flex items-center gap-2">
+      <PhFolderOpen class="size-6 text-primary-500" />
+      <span class="hidden sm:inline text-primary-500">Collections</span>
     </RouterLink>
   </Button>
-  <Button variant="outline" size="icon" :class="['h-9 w-9', btnClass]" aria-label="Info" as-child>
+  <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Info" as-child>
     <RouterLink to="/info" class="flex items-center justify-center">
-      <PhInfo class="h-4 w-4" />
+      <PhInfo class="size-6" />
     </RouterLink>
   </Button>
 
   <DropdownMenuRoot v-model:open="userMenuOpen">
     <DropdownMenuTrigger as-child>
       <Button
-        variant="outline"
-        size="icon"
-        :class="['h-9 w-9', btnClass]"
+        variant="secondary"
+        size="icon-lg"
+        :class="btnClass"
         aria-label="Používateľ – možnosti"
       >
-        <PhUser class="h-4 w-4" />
+        <PhUser class="size-6" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent
@@ -100,7 +100,7 @@ function handleLogout() {
     />
   </Dialog>
 
-  <Button variant="outline" size="sm" :class="[btnClass, 'text-sm font-semibold']" aria-label="Language EN/SK">
+  <Button variant="secondary" size="lg" :class="btnClass" aria-label="Language EN/SK">
     EN/SK
   </Button>
 </template>

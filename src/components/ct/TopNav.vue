@@ -45,23 +45,19 @@ const showFilter = computed(() => route.name === 'explore')
       >
         <Button
           type="button"
-          :variant="filterOpen ? 'default' : 'outline'"
-          size="sm"
-          :class="[
-            'h-9 gap-1.5 rounded-lg text-sm font-semibold',
-            !filterOpen && 'border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600',
-            filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
-          ]"
+          variant="primary"
+          size="lg"
+          class="gap-2 rounded-md text-white font-semibold"
           :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
-          <PhSlidersHorizontal class="h-4 w-4" />
-          <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
+          <PhSlidersHorizontal class="size-6" />
+          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
         </Button>
         <span
           v-if="activeFilterCount > 0"
           class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
-          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-primary-foreground'"
+          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-white'"
         >
           {{ activeFilterCount }}
         </span>
@@ -104,23 +100,19 @@ const showFilter = computed(() => route.name === 'explore')
       >
         <Button
           type="button"
-          :variant="filterOpen ? 'default' : 'outline'"
-          size="sm"
-          :class="[
-            'gap-1.5 rounded-lg text-sm font-semibold',
-            !filterOpen && 'border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600',
-            filterOpen && 'bg-primary-500 text-primary-foreground hover:bg-primary-600',
-          ]"
+          variant="primary"
+          size="lg"
+          class="gap-2 rounded-md text-white font-semibold"
           :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="emit('toggle-filter')"
         >
-          <PhSlidersHorizontal class="h-4 w-4" />
-          <span>{{ filterOpen ? 'Zavrieť filter' : 'Filter' }}</span>
+          <PhSlidersHorizontal class="size-6" />
+          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
         </Button>
         <span
           v-if="activeFilterCount > 0"
           class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
-          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-primary-foreground'"
+          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-white'"
         >
           {{ activeFilterCount }}
         </span>

@@ -134,6 +134,11 @@
   }
 }
 
+/* Nav outline/secondary buttons: force primary text (overrides inherited text-foreground) */
+nav button.border-primary-500 {
+  color: var(--ct-primary-500);
+}
+
 /* Map markers and popup button use primary token */
 .mapboxgl-marker {
   background-color: hsl(var(--primary)) !important;

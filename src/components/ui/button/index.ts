@@ -13,13 +13,13 @@ export const buttonVariants = cva(
         primary:
           "bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500",
         secondary:
-          "bg-white text-primary-500 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
         outline:
-          "border-2 border-primary-500 bg-white text-primary-500 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
         outlined:
-          "border-2 border-primary-500 bg-white text-primary-500 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
         toggle:
-          "bg-white text-primary-500 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
         ghost:
           "bg-transparent text-neutral-900 hover:bg-neutral-900/10 active:bg-neutral-900/20 focus-visible:ring-2 focus-visible:ring-neutral-900",
         destructive:

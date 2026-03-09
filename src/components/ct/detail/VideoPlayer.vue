@@ -44,14 +44,14 @@ function goBackToExplore() {
     <div class="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
       <Button
         v-if="!isMobile"
-        variant="default"
+        variant="primary"
         size="sm"
-        class="gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
+        class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
         aria-label="Späť do Explore"
         @click="goBackToExplore"
       >
-        <PhCaretLeft class="h-4 w-4" />
-        <span>Späť do Explore</span>
+        <PhCaretLeft class="size-4" />
+        Späť do Explore
       </Button>
       <Button
         v-if="fullscreen"
