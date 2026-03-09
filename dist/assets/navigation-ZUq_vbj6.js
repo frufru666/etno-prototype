@@ -1,0 +1,1 @@
+import{I as o,A as c}from"./SearchOverlayPanel.vue_vue_type_script_setup_true_lang-CleC4TcW.js";import{a}from"./index-D6gw6Tsl.js";function i(e){const t=a(()=>o.filter(s=>c(s,e.value))),r=a(()=>e.value.trim().length>0);return{searchFilteredItems:t,isSearchActive:r}}function m(e,t){const r=t.trim();return e.push({name:"explore",query:r?{q:r}:{}})}export{m as p,i as u};

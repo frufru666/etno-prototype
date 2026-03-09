@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MediaType } from '@/data/mockData'
-import { Play, FileText, Music, ImageIcon, GalleryThumbnails } from 'lucide-vue-next'
+import { Play, FileText, Music, ImageIcon, Images } from 'lucide-vue-next'
 
 defineProps<{
   mediaType: MediaType
@@ -10,7 +10,7 @@ defineProps<{
 </script>
 
 <template>
-  <GalleryThumbnails v-if="mediaType === 'image' && hasTranscript" aria-label="Galéria obrázkov" />
+  <Images v-if="mediaType === 'image' && hasTranscript" aria-label="Galéria obrázkov" />
   <ImageIcon v-else-if="mediaType === 'image'" aria-label="Obrázok" />
   <Play v-else-if="mediaType === 'video'" aria-label="Video" />
   <Music v-else-if="mediaType === 'audio'" aria-label="Audio" />
