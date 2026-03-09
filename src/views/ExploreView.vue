@@ -16,8 +16,11 @@ import {
   ITEMS,
 } from '@/data/mockData'
 import MapView from '@/components/ct/MapView.vue'
+import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
+import { pushExploreSearch } from '@/lib/navigation'
+import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -142,13 +145,50 @@ onUnmounted(() => {
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
     />
-    <!-- Mobile nav is 2 rows (~96px), desktop is 57px -->
-    <div class="relative flex-1 pt-[96px] md:pt-[57px]">
+    <!-- Fixed over map: Filter / Close filter button (not part of nav) -->
+    <div
+      class="fixed left-4 z-40 flex items-center gap-2"
+      :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
+    >
+      <Button
+        v-if="filterOpen"
+        type="button"
+        variant="outline"
+        size="lg"
+        class="gap-2 rounded-md shadow-sm"
+        aria-label="Zavrieť filter"
+        @click="filterOpen = false"
+      >
+        <PhX class="size-6" />
+        Zavrieť filter
+      </Button>
+      <Button
+        v-else
+        type="button"
+        variant="primary"
+        size="lg"
+        class="gap-2 rounded-md font-semibold shadow-sm"
+        aria-label="Filter"
+        @click="filterOpen = true"
+      >
+        <PhSlidersHorizontal class="size-6" />
+        Filter
+        <span
+          v-if="activeFilterCount > 0"
+          class="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-semibold"
+        >
+          {{ activeFilterCount }}
+        </span>
+      </Button>
+    </div>
+
+    <div class="relative flex-1 pt-[49px] md:pt-[61px]">
       <!-- Desktop: floating filter container over map (no layout shift) -->
       <div
         v-if="filterOpen && !isMobile"
         ref="filterAsideRef"
-        class="fixed left-4 top-20 z-40 overflow-visible"
+        class="fixed left-4 z-40 overflow-visible"
+        style="top: 5rem;"
         aria-label="Filter panel"
       >
         <FilterSidebar
@@ -165,7 +205,7 @@ onUnmounted(() => {
       />
 
       <div
-        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
+        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]"
       >
         <MapView :pins="mapPins" />
       </div>

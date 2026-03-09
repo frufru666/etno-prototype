@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { ref, computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import {
   DropdownMenuRoot,
   DropdownMenuTrigger,
@@ -11,9 +11,11 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import { useAuth } from '@/composables/useAuth'
-import { PhFolderOpen, PhInfo, PhUser, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
+import { PhInfo, PhUser, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
 
-const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const route = useRoute()
+const isInfoActive = computed(() => route.name === 'info')
+const btnClass = 'gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 const userMenuOpen = ref(false)
 const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
@@ -38,22 +40,17 @@ function handleLogout() {
 </script>
 
 <template>
-  <Button variant="secondary" size="lg" :class="['gap-2', btnClass]" aria-label="Collections" as-child>
-    <RouterLink to="/collections" class="flex items-center gap-2">
-      <PhFolderOpen class="size-6 text-primary-500" />
-      <span class="hidden sm:inline text-primary-500">Collections</span>
-    </RouterLink>
-  </Button>
-  <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Info" as-child>
-    <RouterLink to="/info" class="flex items-center justify-center">
+  <Button :variant="isInfoActive ? 'primary' : 'toggle'" size="lg" :class="btnClass" aria-label="Info" as-child>
+    <RouterLink to="/info" class="flex items-center gap-2">
       <PhInfo class="size-6" />
+      <span class="hidden sm:inline">Info</span>
     </RouterLink>
   </Button>
 
   <DropdownMenuRoot v-model:open="userMenuOpen">
     <DropdownMenuTrigger as-child>
       <Button
-        variant="secondary"
+        variant="toggle"
         size="icon-lg"
         :class="btnClass"
         aria-label="Používateľ – možnosti"
@@ -100,7 +97,7 @@ function handleLogout() {
     />
   </Dialog>
 
-  <Button variant="secondary" size="lg" :class="btnClass" aria-label="Language EN/SK">
+  <Button variant="toggle" size="lg" :class="btnClass" aria-label="Language EN/SK">
     EN/SK
   </Button>
 </template>

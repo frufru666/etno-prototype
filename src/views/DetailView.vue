@@ -7,7 +7,9 @@ import DetailMediaViewer from '@/components/ct/detail/DetailMediaViewer.vue'
 import DetailMobileHero from '@/components/ct/detail/DetailMobileHero.vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
+import SearchInput from '@/components/ct/SearchInput.vue'
 import { Button } from '@/components/ui/button'
+import { PhCaretLeft, PhSidebar, PhSidebarSimple } from '@phosphor-icons/vue'
 import { getItemById } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { useSearchOverlay } from '@/composables/useSearchOverlay'
@@ -30,6 +32,10 @@ const transcriptVisible = ref(false)
 
 function onSearchSubmit(value: string) {
   pushExploreSearch(router, value)
+}
+
+function updateSearchQuery(value: string) {
+  searchQuery.value = value
 }
 
 function openMapFullscreen() {
@@ -87,8 +93,43 @@ watch(item, (it) => {
       @search-submit="onSearchSubmit"
     />
 
+    <!-- Fixed over content: Back to Explore + panel toggle (not part of nav) -->
+    <div
+      class="fixed left-4 z-40 flex items-center gap-2"
+      :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
+    >
+      <Button
+        variant="primary"
+        size="sm"
+        class="gap-1.5 rounded-md text-sm font-semibold shadow-sm"
+        aria-label="Späť do Explore"
+        @click="router.push({ name: 'explore' })"
+      >
+        <PhCaretLeft class="size-4" />
+        Späť do Explore
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        class="gap-1.5 rounded-md text-sm font-semibold shadow-sm"
+        aria-label="Toggle right panel"
+        @click="rightPanelOpen = !rightPanelOpen"
+      >
+        <PhSidebar v-if="!rightPanelOpen" class="size-4" />
+        <PhSidebarSimple v-else class="size-4" />
+        {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
+      </Button>
+      <SearchInput
+        v-if="isMobile"
+        class="w-40 shrink-0"
+        :model-value="searchQuery"
+        @update:model-value="updateSearchQuery"
+        @submit="onSearchSubmit"
+      />
+    </div>
+
     <template v-if="!item">
-      <main class="p-6 pt-[96px] md:pt-[57px]">
+      <main class="p-6 pt-[49px] md:pt-[61px]">
         <p class="text-muted-foreground">
           Položka s ID <strong>{{ id }}</strong> nebola nájdená.
         </p>
@@ -105,12 +146,12 @@ watch(item, (it) => {
         :mobile="isMobile"
       />
       <div
-        class="pt-[96px] md:flex md:flex-1 md:pt-[57px] md:overflow-hidden"
+        class="pt-[49px] md:flex md:flex-1 md:pt-[61px] md:overflow-hidden"
       >
         <div class="min-w-0 md:flex-1 flex flex-col">
           <!-- Desktop: layered media + map -->
           <template v-if="!isMobile">
-            <div class="flex-1 relative overflow-hidden h-[calc(100vh-57px)]">
+            <div class="flex-1 relative overflow-hidden h-[calc(100vh-61px)]">
               <div class="absolute inset-0" :class="{ invisible: leftPanelView !== 'media' }">
                 <DetailMediaViewer
                   :item="item"
@@ -158,7 +199,7 @@ watch(item, (it) => {
 
         <aside
           v-if="!isMobile && rightPanelOpen"
-          class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
+          class="flex h-[calc(100vh-61px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
         >
           <DetailRightPanel :item="item" @open-map-fullscreen="openMapFullscreen" />
         </aside>

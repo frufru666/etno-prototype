@@ -22,6 +22,10 @@ function onSearchSubmit(value: string) {
   pushExploreSearch(router, value)
 }
 
+function updateSearchQuery(value: string) {
+  searchQuery.value = value
+}
+
 function sectionTag(level: InfoSection['level']) {
   return `h${level}`
 }
@@ -34,10 +38,10 @@ function sectionTag(level: InfoSection['level']) {
       :active-filter-count="0"
       :search-query="searchQuery"
       @toggle-filter="filterOpen = !filterOpen"
-      @update:search-query="searchQuery = $event"
+      @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
-    <div class="flex-1 flex flex-col pt-[96px] md:pt-[57px]">
+    <div class="flex-1 flex flex-col pt-[49px] md:pt-[61px]">
       <SearchOverlayPanel
         :items="searchFilteredItems"
         :query="searchQuery"

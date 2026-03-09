@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
-import { PhSlidersHorizontal } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
@@ -22,14 +21,15 @@ const emit = defineEmits<{
 
 const isMobile = useIsMobile()
 const route = useRoute()
-const showFilter = computed(() => route.name === 'explore')
+const isExploreActive = computed(() => route.name === 'explore')
+const isCollectionsActive = computed(() => route.name === 'collections')
 </script>
 
 <template>
-  <!-- Desktop nav: single row -->
+  <!-- Single row nav only; Filter / Back buttons live in views, fixed over content -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6 focus-within:outline-none"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[61px] items-center border-b border-border bg-background px-4 md:px-6 focus-within:outline-none"
     aria-label="Main navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-2">
@@ -39,31 +39,27 @@ const showFilter = computed(() => route.name === 'explore')
       >
         Etno Explorer SAV
       </RouterLink>
-      <div
-        v-if="showFilter"
-        class="relative"
+      <Button
+        :variant="isExploreActive ? 'primary' : 'toggle'"
+        size="lg"
+        class="gap-2 rounded-md"
+        as-child
       >
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          class="gap-2 rounded-md text-white font-semibold"
-          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
-          @click="emit('toggle-filter')"
-        >
-          <PhSlidersHorizontal class="size-6" />
-          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
-        </Button>
-        <span
-          v-if="activeFilterCount > 0"
-          class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
-          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-white'"
-        >
-          {{ activeFilterCount }}
-        </span>
-      </div>
+        <RouterLink to="/" class="flex items-center gap-2">
+          Explore
+        </RouterLink>
+      </Button>
+      <Button
+        :variant="isCollectionsActive ? 'primary' : 'toggle'"
+        size="lg"
+        class="gap-2 rounded-md"
+        as-child
+      >
+        <RouterLink to="/collections" class="flex items-center gap-2">
+          Collections
+        </RouterLink>
+      </Button>
     </div>
-
     <div class="flex flex-1 justify-center px-4">
       <SearchInput
         class="w-full max-w-lg"
@@ -72,57 +68,27 @@ const showFilter = computed(() => route.name === 'explore')
         @submit="emit('searchSubmit', $event)"
       />
     </div>
-
     <div class="flex flex-shrink-0 items-center gap-2">
       <NavActions />
     </div>
   </nav>
-
-  <!-- Mobile nav: two rows -->
   <nav
     v-else
-    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[49px] items-center gap-2 border-b border-border bg-background px-4"
     aria-label="Main navigation"
   >
-    <div class="flex h-[49px] items-center justify-between px-4">
-      <RouterLink
-        to="/"
-        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-      >
-        Etno Explorer SAV
-      </RouterLink>
-      <MobileMenu />
-    </div>
-    <div class="flex items-center gap-2 px-4 pb-2.5">
-      <div
-        v-if="showFilter"
-        class="relative shrink-0"
-      >
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          class="gap-2 rounded-md text-white font-semibold"
-          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
-          @click="emit('toggle-filter')"
-        >
-          <PhSlidersHorizontal class="size-6" />
-          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
-        </Button>
-        <span
-          v-if="activeFilterCount > 0"
-          class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold"
-          :class="filterOpen ? 'bg-primary-foreground text-primary-500' : 'bg-primary-500 text-white'"
-        >
-          {{ activeFilterCount }}
-        </span>
-      </div>
-      <SearchInput
-        class="flex-1 min-w-0"
-        :model-value="searchQuery ?? ''"
-        @update:model-value="emit('update:searchQuery', $event)"
-        @submit="emit('searchSubmit', $event)"
-      />
-    </div>
+    <RouterLink
+      to="/"
+      class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600 shrink-0"
+    >
+      Etno Explorer SAV
+    </RouterLink>
+    <SearchInput
+      class="min-w-0 flex-1"
+      :model-value="searchQuery ?? ''"
+      @update:model-value="emit('update:searchQuery', $event)"
+      @submit="emit('searchSubmit', $event)"
+    />
+    <MobileMenu />
   </nav>
 </template>

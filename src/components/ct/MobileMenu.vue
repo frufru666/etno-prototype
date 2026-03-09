@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { nextTick, ref, computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import UserAuthModal from '@/components/ct/UserAuthModal.vue'
@@ -14,10 +14,15 @@ import {
 import { useAuth } from '@/composables/useAuth'
 import { PhList, PhFolderOpen, PhInfo, PhUser, PhTranslate, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
 
+const route = useRoute()
 const open = ref(false)
 const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
 const { isLoggedIn, logout } = useAuth()
+
+const isExploreActive = computed(() => route.name === 'explore')
+const isCollectionsActive = computed(() => route.name === 'collections' || route.name === 'collection-detail')
+const isInfoActive = computed(() => route.name === 'info')
 
 const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 
@@ -51,7 +56,7 @@ function handleLogout() {
 <template>
   <Sheet v-model:open="open">
     <SheetTrigger as-child>
-      <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Open menu">
+      <Button variant="toggle" size="icon-lg" :class="btnClass" aria-label="Open menu">
         <PhList class="size-6" />
       </Button>
     </SheetTrigger>
@@ -60,13 +65,18 @@ function handleLogout() {
         <SheetTitle>Menu</SheetTitle>
       </SheetHeader>
       <div class="mt-6 flex flex-col gap-2">
-        <Button variant="outline" class="justify-start gap-2" as-child>
+        <Button :variant="isExploreActive ? 'primary' : 'toggle'" class="justify-start gap-2" as-child>
+          <RouterLink to="/" class="flex items-center gap-2" @click="open = false">
+            Explore
+          </RouterLink>
+        </Button>
+        <Button :variant="isCollectionsActive ? 'primary' : 'toggle'" class="justify-start gap-2" as-child>
           <RouterLink to="/collections" class="flex items-center gap-2" @click="open = false">
             <PhFolderOpen class="h-4 w-4" />
             Collections
           </RouterLink>
         </Button>
-        <Button variant="outline" class="justify-start gap-2" as-child>
+        <Button :variant="isInfoActive ? 'primary' : 'toggle'" class="justify-start gap-2" as-child>
           <RouterLink to="/info" class="flex items-center gap-2" @click="open = false">
             <PhInfo class="h-4 w-4" />
             Info
@@ -74,7 +84,7 @@ function handleLogout() {
         </Button>
         <Button
           v-if="!isLoggedIn"
-          variant="outline"
+          variant="toggle"
           class="justify-start gap-2"
           @click="openLoginModal"
         >
@@ -83,7 +93,7 @@ function handleLogout() {
         </Button>
         <Button
           v-if="!isLoggedIn"
-          variant="outline"
+          variant="toggle"
           class="justify-start gap-2"
           @click="openRegisterModal"
         >
@@ -92,7 +102,7 @@ function handleLogout() {
         </Button>
         <Button
           v-if="isLoggedIn"
-          variant="outline"
+          variant="toggle"
           class="justify-start gap-2"
           @click="openAccountModal"
         >
@@ -101,14 +111,14 @@ function handleLogout() {
         </Button>
         <Button
           v-if="isLoggedIn"
-          variant="outline"
+          variant="toggle"
           class="justify-start gap-2"
           @click="handleLogout"
         >
           <PhSignOut class="h-4 w-4" />
           Odhlásiť
         </Button>
-        <Button variant="outline" class="justify-start gap-2 opacity-70">
+        <Button variant="toggle" class="justify-start gap-2 opacity-70">
           <PhTranslate class="h-4 w-4" />
           EN/SK
         </Button>

@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { RouterLink } from 'vue-router'
-import NavActions from '@/components/ct/NavActions.vue'
-import MobileMenu from '@/components/ct/MobileMenu.vue'
-import SearchInput from '@/components/ct/SearchInput.vue'
+import TopNav from '@/components/ct/TopNav.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
+import { Button } from '@/components/ui/button'
+import { PhCaretLeft } from '@phosphor-icons/vue'
 import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
 import {
   getCollectionBySlug,
   getCollectionItems,
@@ -20,7 +18,6 @@ import { useIsMobile } from '@/composables/useIsMobile'
 import { useSearchOverlay } from '@/composables/useSearchOverlay'
 import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
 import { pushExploreSearch } from '@/lib/navigation'
-import { PhCaretLeft } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -52,81 +49,41 @@ const { searchFilteredItems } = useSearchOverlay(searchQuery)
 function onSearchSubmit(value: string) {
   pushExploreSearch(router, value)
 }
+
+function updateSearchQuery(value: string) {
+  searchQuery.value = value
+}
 </script>
 
 <template>
   <div class="min-h-dvh bg-background flex flex-col">
-    <!-- Desktop nav: single row -->
-    <nav
-      v-if="!isMobile"
-      class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
-      aria-label="Collection navigation"
-    >
-      <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
-        <RouterLink
-          to="/"
-          class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-        >
-          Etno Explorer SAV
-        </RouterLink>
-      </div>
-      <div class="flex flex-1 justify-center px-4">
-        <Button
-          variant="outline"
-          size="sm"
-          class="mr-2 gap-1.5 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-          aria-label="Späť do Kolekcií"
-          @click="router.push({ name: 'collections' })"
-        >
-          <PhCaretLeft class="h-4 w-4" />
-          <span class="hidden lg:inline">Späť do Kolekcií</span>
-        </Button>
-        <SearchInput
-          v-model="searchQuery"
-          class="w-full max-w-md"
-          @submit="onSearchSubmit"
-        />
-      </div>
-      <div class="flex flex-shrink-0 items-center gap-2">
-        <NavActions />
-      </div>
-    </nav>
+    <TopNav
+      :filter-open="false"
+      :active-filter-count="0"
+      :search-query="searchQuery"
+      @update:search-query="updateSearchQuery"
+      @search-submit="onSearchSubmit"
+    />
 
-    <!-- Mobile nav: two rows (title + menu, then back button + search) -->
-    <nav
-      v-else
-      class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
-      aria-label="Collection navigation"
+    <!-- Fixed over content: Back to Collections (not part of nav) -->
+    <div
+      class="fixed left-4 z-40"
+      :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
     >
-      <div class="flex h-[49px] items-center justify-between px-4">
-        <RouterLink
-          to="/"
-          class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-        >
-          Etno Explorer SAV
-        </RouterLink>
-        <MobileMenu />
-      </div>
-      <div class="flex items-center gap-2 px-4 pb-2.5">
-        <Button
-          variant="outline"
-          size="icon"
-          class="h-9 w-9 rounded-lg border-border text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-          aria-label="Späť do Kolekcií"
-          @click="router.push({ name: 'collections' })"
-        >
-          <PhCaretLeft class="h-4 w-4" />
-        </Button>
-        <SearchInput
-          v-model="searchQuery"
-          class="flex-1 min-w-0"
-          @submit="onSearchSubmit"
-        />
-      </div>
-    </nav>
+      <Button
+        variant="primary"
+        size="sm"
+        class="gap-1.5 rounded-md text-sm font-semibold shadow-sm"
+        aria-label="Späť do Kolekcií"
+        @click="router.push({ name: 'collections' })"
+      >
+        <PhCaretLeft class="size-4" />
+        Späť do Kolekcií
+      </Button>
+    </div>
 
     <template v-if="collection">
-      <div class="flex-1 flex flex-col pt-[96px] md:pt-[57px]">
+      <div class="flex-1 flex flex-col pt-[49px] md:pt-[61px]">
         <SearchOverlayPanel
           :items="searchFilteredItems"
           :query="searchQuery"
@@ -208,7 +165,7 @@ function onSearchSubmit(value: string) {
       </div>
     </template>
     <template v-else>
-      <main class="flex-1 px-4 pt-[96px] md:px-6 md:pt-[57px]">
+      <main class="flex-1 px-4 pt-[49px] md:px-6 md:pt-[61px]">
         <div class="mx-auto max-w-3xl py-8">
           <h1 class="text-2xl font-semibold text-foreground">Kolekcia nebola nájdená</h1>
           <p class="mt-2 text-muted-foreground">

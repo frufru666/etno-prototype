@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
@@ -21,7 +22,10 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const route = useRoute()
 const isMobile = useIsMobile()
+const isExploreActive = computed(() => route.name === 'explore')
+const isCollectionsActive = computed(() => route.name === 'collections')
 
 function goBackToExplore() {
   router.push({ name: 'explore' })
@@ -33,21 +37,40 @@ function onSearchSubmit(value: string) {
 </script>
 
 <template>
-  <!-- Desktop nav: single row -->
+  <!-- Single row nav only; Back to Explore + panel toggle live in DetailView, fixed over content -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[61px] items-center border-b border-border bg-background px-4 md:px-6"
     aria-label="Detail navigation"
   >
-    <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
+    <div class="flex min-w-0 flex-shrink-0 items-center gap-2">
       <RouterLink
         to="/"
         class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
       >
         Etno Explorer SAV
       </RouterLink>
+      <Button
+        :variant="isExploreActive ? 'primary' : 'toggle'"
+        size="lg"
+        class="gap-2 rounded-md"
+        as-child
+      >
+        <RouterLink to="/" class="flex items-center gap-2">
+          Explore
+        </RouterLink>
+      </Button>
+      <Button
+        :variant="isCollectionsActive ? 'primary' : 'toggle'"
+        size="lg"
+        class="gap-2 rounded-md"
+        as-child
+      >
+        <RouterLink to="/collections" class="flex items-center gap-2">
+          Collections
+        </RouterLink>
+      </Button>
     </div>
-
     <div class="flex flex-1 items-center justify-center px-4">
       <SearchInput
         :model-value="searchQuery ?? ''"
@@ -56,62 +79,26 @@ function onSearchSubmit(value: string) {
         @submit="onSearchSubmit"
       />
     </div>
-
     <div class="flex flex-shrink-0 items-center gap-2">
       <NavActions />
-      <Button
-        variant="secondary"
-        size="lg"
-        class="gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-        aria-label="Toggle right panel"
-        @click="emit('toggle-right-panel')"
-      >
-        <PhSidebar v-if="!rightPanelOpen" class="size-6 text-primary-500" />
-        <PhSidebarSimple v-else class="size-6 text-primary-500" />
-        <span class="hidden sm:inline text-primary-500">
-          {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
-        </span>
-      </Button>
     </div>
   </nav>
-
-  <!-- Mobile nav: two rows (title + menu, then back button + search) -->
   <nav
     v-else
-    class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[49px] items-center justify-between gap-2 border-b border-border bg-background px-4"
     aria-label="Detail navigation"
   >
-    <div class="flex h-[49px] items-center justify-between px-4">
-      <div class="flex min-w-0 items-center gap-2">
-        <span class="rounded bg-primary-50 px-2 py-0.5 text-label-small font-semibold uppercase tracking-wide text-primary-600">
-          {{ mobileContextLabel ?? 'Detail' }}
-        </span>
-        <span
-          v-if="mobileContextId"
-          class="truncate font-mono text-xs text-muted-foreground"
-        >
-          {{ mobileContextId }}
-        </span>
-      </div>
-      <MobileMenu />
-    </div>
-    <div class="flex items-center gap-2 px-4 pb-2.5">
-      <Button
-        variant="primary"
-        size="sm"
-        class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-        aria-label="Späť do Explore"
-        @click="goBackToExplore"
+    <div class="flex min-w-0 items-center gap-2">
+      <span class="rounded bg-primary-50 px-2 py-0.5 text-label-small font-semibold uppercase tracking-wide text-primary-600">
+        {{ mobileContextLabel ?? 'Detail' }}
+      </span>
+      <span
+        v-if="mobileContextId"
+        class="truncate font-mono text-xs text-muted-foreground"
       >
-        <PhCaretLeft class="size-4" />
-        Späť do Explore
-      </Button>
-      <SearchInput
-        :model-value="searchQuery ?? ''"
-        class="flex-1 min-w-0"
-        @update:model-value="emit('update:searchQuery', $event)"
-        @submit="onSearchSubmit"
-      />
+        {{ mobileContextId }}
+      </span>
     </div>
+    <MobileMenu />
   </nav>
 </template>
