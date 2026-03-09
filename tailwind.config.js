@@ -104,25 +104,33 @@ module.exports = {
   			full: 'var(--radius-full)'
   		},
   		fontSize: {
-  			// Tailwind default scale (14px base, all even)
-  			xs: ['10px', { lineHeight: '14px' }],
-  			sm: ['12px', { lineHeight: '18px' }],
-  			base: ['14px', { lineHeight: '22px' }],
-  			lg: ['16px', { lineHeight: '24px' }],
-  			xl: ['18px', { lineHeight: '26px' }],
-  			'2xl': ['20px', { lineHeight: '28px' }],
-  			'3xl': ['24px', { lineHeight: '32px' }],
-  			'4xl': ['28px', { lineHeight: '36px' }],
+  			// Tailwind default scale (min 12px, all even)
+  			xs: ['12px', { lineHeight: '16px' }],
+  			sm: ['14px', { lineHeight: '20px' }],
+  			base: ['16px', { lineHeight: '24px' }],
+  			lg: ['18px', { lineHeight: '26px' }],
+  			xl: ['20px', { lineHeight: '28px' }],
+  			'2xl': ['22px', { lineHeight: '30px' }],
+  			'3xl': ['26px', { lineHeight: '34px' }],
+  			'4xl': ['30px', { lineHeight: '38px' }],
   			// Custom tokens
   			'heading-1': [
-  				'24px',
+  				'26px',
   				{
-  					lineHeight: '32px',
+  					lineHeight: '34px',
   					letterSpacing: '-0.01em',
   					fontWeight: '600'
   				}
   			],
   			'heading-2': [
+  				'22px',
+  				{
+  					lineHeight: '30px',
+  					letterSpacing: '0',
+  					fontWeight: '600'
+  				}
+  			],
+  			'heading-3': [
   				'20px',
   				{
   					lineHeight: '28px',
@@ -130,7 +138,7 @@ module.exports = {
   					fontWeight: '600'
   				}
   			],
-  			'heading-3': [
+  			'heading-4': [
   				'18px',
   				{
   					lineHeight: '26px',
@@ -138,26 +146,18 @@ module.exports = {
   					fontWeight: '600'
   				}
   			],
-  			'heading-4': [
-  				'16px',
-  				{
-  					lineHeight: '22px',
-  					letterSpacing: '0',
-  					fontWeight: '600'
-  				}
-  			],
   			'body-large': [
-  				'16px',
+  				'18px',
   				{
-  					lineHeight: '24px',
+  					lineHeight: '26px',
   					letterSpacing: '-0.01em',
   					fontWeight: '500'
   				}
   			],
   			body: [
-  				'14px',
+  				'16px',
   				{
-  					lineHeight: '22px',
+  					lineHeight: '24px',
   					letterSpacing: '0',
   					fontWeight: '400'
   				}
@@ -171,9 +171,9 @@ module.exports = {
   				}
   			],
   			label: [
-  				'14px',
+  				'16px',
   				{
-  					lineHeight: '20px',
+  					lineHeight: '22px',
   					letterSpacing: '-0.01em',
   					fontWeight: '500'
   				}
@@ -187,9 +187,9 @@ module.exports = {
   				}
   			],
   			button: [
-  				'14px',
+  				'16px',
   				{
-  					lineHeight: '20px',
+  					lineHeight: '22px',
   					letterSpacing: '-0.01em',
   					fontWeight: '600'
   				}

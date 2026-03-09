@@ -56,11 +56,6 @@ function getSelectedCount(key: string): number {
               @click.stop="emit('select', filter.key)"
             >
               <div class="flex min-w-0 items-center gap-2">
-                <component
-                  :is="getSectionIcon(FILTER_CATEGORIES[catKey].icon)"
-                  class="h-6 w-6 shrink-0"
-                  :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-foreground'"
-                />
                 <span
                   class="truncate text-sm font-medium tracking-[-0.01em]"
                   :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-[#171717]'"

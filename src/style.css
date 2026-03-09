@@ -102,34 +102,34 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-size: 14px;
-    line-height: 22px;
+    font-size: 16px;
+    line-height: 24px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1 {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 26px;
+    line-height: 34px;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
   h2 {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 600;
+  }
+
+  h3 {
     font-size: 20px;
     line-height: 28px;
     font-weight: 600;
   }
 
-  h3 {
+  h4 {
     font-size: 18px;
     line-height: 26px;
-    font-weight: 600;
-  }
-
-  h4 {
-    font-size: 16px;
-    line-height: 22px;
     font-weight: 600;
   }
 }
