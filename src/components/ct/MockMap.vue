@@ -251,7 +251,7 @@ watch(
           </div>
         </div>
         <div class="p-2.5">
-          <h3 class="mb-1 line-clamp-3 text-sm font-bold leading-tight text-foreground">
+          <h3 class="mb-1 line-clamp-3 text-sm font-semibold leading-tight text-foreground">
             {{ tooltipPin.title }}
           </h3>
           <div class="mb-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -263,7 +263,7 @@ watch(
           </Badge>
           <Button
             size="sm"
-            class="w-full gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600"
+            class="w-full gap-1.5 rounded-lg bg-primary-500 text-primary-foreground hover:bg-primary-600 text-sm font-semibold"
             @click="goToPin(tooltipPin); hideTooltip()"
           >
             Zobrazit polozku

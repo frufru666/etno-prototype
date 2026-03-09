@@ -41,7 +41,7 @@ function handleLogout() {
   <Button variant="outline" size="sm" :class="['gap-1.5', btnClass]" aria-label="Collections" as-child>
     <RouterLink to="/collections" class="flex items-center gap-1.5">
       <PhFolderOpen class="h-4 w-4" />
-      <span class="hidden sm:inline">Collections</span>
+      <span class="hidden sm:inline text-sm font-semibold">Collections</span>
     </RouterLink>
   </Button>
   <Button variant="outline" size="icon" :class="['h-9 w-9', btnClass]" aria-label="Info" as-child>
@@ -100,7 +100,7 @@ function handleLogout() {
     />
   </Dialog>
 
-  <Button variant="outline" size="sm" :class="btnClass" aria-label="Language EN/SK">
+  <Button variant="outline" size="sm" :class="[btnClass, 'text-sm font-semibold']" aria-label="Language EN/SK">
     EN/SK
   </Button>
 </template>

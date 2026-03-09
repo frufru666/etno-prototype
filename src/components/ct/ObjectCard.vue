@@ -63,14 +63,14 @@ const documents = getDocumentsForItem(props.item.id)
           </span>
         </div>
       </div>
-      <h3 class="line-clamp-2 font-medium leading-tight">
+      <h3 class="line-clamp-2 text-base font-semibold leading-tight text-foreground">
         {{ item.title }}
       </h3>
-      <div class="space-y-0.5 text-xs text-muted-foreground">
+      <div class="space-y-0.5 text-sm text-muted-foreground">
         <p
           v-for="line in participantLines(item)"
           :key="line.label"
-          class="line-clamp-1"
+          class="line-clamp-1 text-sm"
         >
           {{ line.label }} {{ line.names }}
         </p>
