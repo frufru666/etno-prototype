@@ -69,7 +69,7 @@ function getSelectedCount(key: string): number {
                 </span>
                 <span
                   v-if="getSelectedCount(filter.key) > 0"
-                  class="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-primary-100 px-2 text-[12px] font-medium leading-4 text-primary-600"
+                  class="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-primary-100 px-2 text-label-small font-medium leading-4 text-primary-600"
                 >
                   {{ getSelectedCount(filter.key) }}
                 </span>

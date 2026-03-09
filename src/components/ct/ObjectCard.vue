@@ -57,7 +57,7 @@ const documents = getDocumentsForItem(props.item.id)
           />
           <span
             v-if="isMultiImage"
-            class="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/90"
+            class="text-xs font-medium uppercase tracking-wider text-muted-foreground/90"
           >
             Galéria
           </span>

@@ -39,7 +39,7 @@ function getPillLabel(pill: { label: string; value: string }) {
     <span class="text-label-small text-muted-foreground">Aplikované filtre:</span>
     <template v-for="pill in pills" :key="`${pill.key}-${pill.value}`">
       <span
-        class="inline-flex h-6 items-center gap-1 rounded-full bg-primary-100 px-2 text-[12px] font-medium leading-4 text-primary-600"
+        class="inline-flex h-6 items-center gap-1 rounded-full bg-primary-100 px-2 text-label-small font-medium leading-4 text-primary-600"
       >
         {{ getPillLabel(pill) }}
         <Button

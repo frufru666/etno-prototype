@@ -104,31 +104,33 @@ module.exports = {
   			full: 'var(--radius-full)'
   		},
   		fontSize: {
+  			// Tailwind default scale (14px base, all even)
+  			xs: ['10px', { lineHeight: '14px' }],
+  			sm: ['12px', { lineHeight: '18px' }],
+  			base: ['14px', { lineHeight: '22px' }],
+  			lg: ['16px', { lineHeight: '24px' }],
+  			xl: ['18px', { lineHeight: '26px' }],
+  			'2xl': ['20px', { lineHeight: '28px' }],
+  			'3xl': ['24px', { lineHeight: '32px' }],
+  			'4xl': ['28px', { lineHeight: '36px' }],
+  			// Custom tokens
   			'heading-1': [
-  				'36px',
+  				'24px',
   				{
-  					lineHeight: '44px',
+  					lineHeight: '32px',
   					letterSpacing: '-0.01em',
   					fontWeight: '600'
   				}
   			],
   			'heading-2': [
-  				'30px',
+  				'20px',
   				{
-  					lineHeight: '38px',
+  					lineHeight: '28px',
   					letterSpacing: '0',
   					fontWeight: '600'
   				}
   			],
   			'heading-3': [
-  				'24px',
-  				{
-  					lineHeight: '32px',
-  					letterSpacing: '0',
-  					fontWeight: '600'
-  				}
-  			],
-  			'heading-4': [
   				'18px',
   				{
   					lineHeight: '26px',
@@ -136,23 +138,23 @@ module.exports = {
   					fontWeight: '600'
   				}
   			],
-  			'body-large': [
-  				'20px',
+  			'heading-4': [
+  				'16px',
   				{
-  					lineHeight: '28px',
+  					lineHeight: '22px',
+  					letterSpacing: '0',
+  					fontWeight: '600'
+  				}
+  			],
+  			'body-large': [
+  				'16px',
+  				{
+  					lineHeight: '24px',
   					letterSpacing: '-0.01em',
   					fontWeight: '500'
   				}
   			],
   			body: [
-  				'18px',
-  				{
-  					lineHeight: '24px',
-  					letterSpacing: '0',
-  					fontWeight: '400'
-  				}
-  			],
-  			'body-small': [
   				'14px',
   				{
   					lineHeight: '22px',
@@ -160,32 +162,40 @@ module.exports = {
   					fontWeight: '400'
   				}
   			],
+  			'body-small': [
+  				'12px',
+  				{
+  					lineHeight: '18px',
+  					letterSpacing: '0',
+  					fontWeight: '400'
+  				}
+  			],
   			label: [
   				'14px',
   				{
-  					lineHeight: '24px',
+  					lineHeight: '20px',
   					letterSpacing: '-0.01em',
   					fontWeight: '500'
   				}
   			],
   			'label-small': [
-  				'13px',
+  				'12px',
   				{
-  					lineHeight: '18px',
+  					lineHeight: '16px',
   					letterSpacing: '0',
   					fontWeight: '500'
   				}
   			],
   			button: [
-  				'16px',
+  				'14px',
   				{
-  					lineHeight: '24px',
+  					lineHeight: '20px',
   					letterSpacing: '-0.01em',
   					fontWeight: '600'
   				}
   			],
   			'button-small': [
-  				'14px',
+  				'12px',
   				{
   					lineHeight: '16px',
   					letterSpacing: '-0.01em',
@@ -193,9 +203,9 @@ module.exports = {
   				}
   			],
   			data: [
-  				'14px',
+  				'12px',
   				{
-  					lineHeight: '18px',
+  					lineHeight: '16px',
   					letterSpacing: '0',
   					fontWeight: '400'
   				}

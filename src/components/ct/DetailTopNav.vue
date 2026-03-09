@@ -83,7 +83,7 @@ function onSearchSubmit(value: string) {
   >
     <div class="flex h-[49px] items-center justify-between px-4">
       <div class="flex min-w-0 items-center gap-2">
-        <span class="rounded bg-primary-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-primary-600">
+        <span class="rounded bg-primary-50 px-2 py-0.5 text-label-small font-semibold uppercase tracking-wide text-primary-600">
           {{ mobileContextLabel ?? 'Detail' }}
         </span>
         <span
