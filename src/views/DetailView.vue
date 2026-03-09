@@ -7,7 +7,6 @@ import DetailMediaViewer from '@/components/ct/detail/DetailMediaViewer.vue'
 import DetailMobileHero from '@/components/ct/detail/DetailMobileHero.vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
-import SearchInput from '@/components/ct/SearchInput.vue'
 import { Button } from '@/components/ui/button'
 import { PhCaretLeft, PhSidebar, PhSidebarSimple } from '@phosphor-icons/vue'
 import { getItemById } from '@/data/mockData'
@@ -32,10 +31,6 @@ const transcriptVisible = ref(false)
 
 function onSearchSubmit(value: string) {
   pushExploreSearch(router, value)
-}
-
-function updateSearchQuery(value: string) {
-  searchQuery.value = value
 }
 
 function openMapFullscreen() {
@@ -88,15 +83,18 @@ watch(item, (it) => {
       :search-query="searchQuery"
       mobile-context-label="Detail"
       :mobile-context-id="item?.id"
+      :show-mobile-up="isMobile"
+      mobile-up-aria-label="Späť do Explore"
+      @mobile-up="router.push({ name: 'explore' })"
       @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
       @update:search-query="searchQuery = $event"
       @search-submit="onSearchSubmit"
     />
 
-    <!-- Fixed over content: Back to Explore + panel toggle (not part of nav) -->
+    <!-- Desktop only: second-row controls float over content below navbar -->
     <div
-      class="fixed left-4 z-40 flex items-center gap-2"
-      :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
+      v-if="!isMobile"
+      class="fixed left-4 top-[65px] z-40 flex items-center gap-2"
     >
       <Button
         variant="primary"
@@ -109,23 +107,17 @@ watch(item, (it) => {
         Späť do Explore
       </Button>
       <Button
-        variant="outline"
+        :variant="rightPanelOpen ? 'primary' : 'toggle'"
         size="sm"
         class="gap-1.5 rounded-md text-sm font-semibold shadow-sm"
         aria-label="Toggle right panel"
+        :aria-pressed="rightPanelOpen"
         @click="rightPanelOpen = !rightPanelOpen"
       >
         <PhSidebar v-if="!rightPanelOpen" class="size-4" />
         <PhSidebarSimple v-else class="size-4" />
         {{ rightPanelOpen ? 'Skryť panel' : 'Zobraziť panel' }}
       </Button>
-      <SearchInput
-        v-if="isMobile"
-        class="w-40 shrink-0"
-        :model-value="searchQuery"
-        @update:model-value="updateSearchQuery"
-        @submit="onSearchSubmit"
-      />
     </div>
 
     <template v-if="!item">

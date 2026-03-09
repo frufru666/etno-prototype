@@ -5,18 +5,22 @@ import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
+import { PhCaretLeft } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
   filterOpen: boolean
   activeFilterCount: number
   searchQuery?: string
+  showMobileUp?: boolean
+  mobileUpAriaLabel?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle-filter'): void
   (e: 'update:searchQuery', value: string): void
   (e: 'searchSubmit', value: string): void
+  (e: 'mobile-up'): void
 }>()
 
 const isMobile = useIsMobile()
@@ -45,7 +49,12 @@ const isCollectionsActive = computed(() => route.name === 'collections')
         class="gap-2 rounded-md"
         as-child
       >
-        <RouterLink to="/" class="flex items-center gap-2">
+        <RouterLink
+          to="/"
+          class="flex items-center gap-2"
+          :aria-current="isExploreActive ? 'page' : undefined"
+          :aria-pressed="isExploreActive"
+        >
           Explore
         </RouterLink>
       </Button>
@@ -55,7 +64,12 @@ const isCollectionsActive = computed(() => route.name === 'collections')
         class="gap-2 rounded-md"
         as-child
       >
-        <RouterLink to="/collections" class="flex items-center gap-2">
+        <RouterLink
+          to="/collections"
+          class="flex items-center gap-2"
+          :aria-current="isCollectionsActive ? 'page' : undefined"
+          :aria-pressed="isCollectionsActive"
+        >
           Collections
         </RouterLink>
       </Button>
@@ -77,6 +91,16 @@ const isCollectionsActive = computed(() => route.name === 'collections')
     class="fixed top-0 left-0 right-0 z-50 flex h-[49px] items-center gap-2 border-b border-border bg-background px-4"
     aria-label="Main navigation"
   >
+    <Button
+      v-if="showMobileUp"
+      variant="primary"
+      size="icon-sm"
+      class="shrink-0 rounded-md"
+      :aria-label="mobileUpAriaLabel ?? 'O úroveň vyššie'"
+      @click="emit('mobile-up')"
+    >
+      <PhCaretLeft class="size-4" />
+    </Button>
     <RouterLink
       to="/"
       class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600 shrink-0"

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
-import { PhCaretLeft, PhSidebarSimple, PhSidebar } from '@phosphor-icons/vue'
+import { PhCaretLeft } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
@@ -13,23 +13,21 @@ defineProps<{
   searchQuery?: string
   mobileContextLabel?: string
   mobileContextId?: string
+  showMobileUp?: boolean
+  mobileUpAriaLabel?: string
 }>()
 
 const emit = defineEmits<{
   (e: 'toggle-right-panel'): void
   (e: 'update:searchQuery', value: string): void
   (e: 'searchSubmit', value: string): void
+  (e: 'mobile-up'): void
 }>()
 
-const router = useRouter()
 const route = useRoute()
 const isMobile = useIsMobile()
 const isExploreActive = computed(() => route.name === 'explore')
 const isCollectionsActive = computed(() => route.name === 'collections')
-
-function goBackToExplore() {
-  router.push({ name: 'explore' })
-}
 
 function onSearchSubmit(value: string) {
   emit('searchSubmit', value)
@@ -56,7 +54,12 @@ function onSearchSubmit(value: string) {
         class="gap-2 rounded-md"
         as-child
       >
-        <RouterLink to="/" class="flex items-center gap-2">
+        <RouterLink
+          to="/"
+          class="flex items-center gap-2"
+          :aria-current="isExploreActive ? 'page' : undefined"
+          :aria-pressed="isExploreActive"
+        >
           Explore
         </RouterLink>
       </Button>
@@ -66,7 +69,12 @@ function onSearchSubmit(value: string) {
         class="gap-2 rounded-md"
         as-child
       >
-        <RouterLink to="/collections" class="flex items-center gap-2">
+        <RouterLink
+          to="/collections"
+          class="flex items-center gap-2"
+          :aria-current="isCollectionsActive ? 'page' : undefined"
+          :aria-pressed="isCollectionsActive"
+        >
           Collections
         </RouterLink>
       </Button>
@@ -89,6 +97,16 @@ function onSearchSubmit(value: string) {
     aria-label="Detail navigation"
   >
     <div class="flex min-w-0 items-center gap-2">
+      <Button
+        v-if="showMobileUp"
+        variant="primary"
+        size="icon-sm"
+        class="shrink-0 rounded-md"
+        :aria-label="mobileUpAriaLabel ?? 'O úroveň vyššie'"
+        @click="emit('mobile-up')"
+      >
+        <PhCaretLeft class="size-4" />
+      </Button>
       <span class="rounded bg-primary-50 px-2 py-0.5 text-label-small font-semibold uppercase tracking-wide text-primary-600">
         {{ mobileContextLabel ?? 'Detail' }}
       </span>

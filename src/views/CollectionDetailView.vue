@@ -61,15 +61,15 @@ function updateSearchQuery(value: string) {
       :filter-open="false"
       :active-filter-count="0"
       :search-query="searchQuery"
+      :show-mobile-up="isMobile"
+      mobile-up-aria-label="Späť do Kolekcií"
+      @mobile-up="router.push({ name: 'collections' })"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
 
-    <!-- Fixed over content: Back to Collections (not part of nav) -->
-    <div
-      class="fixed left-4 z-40"
-      :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
-    >
+    <!-- Desktop only: second-row controls float over content below navbar -->
+    <div v-if="!isMobile" class="fixed left-4 top-[65px] z-40">
       <Button
         variant="primary"
         size="sm"

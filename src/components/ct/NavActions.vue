@@ -41,7 +41,12 @@ function handleLogout() {
 
 <template>
   <Button :variant="isInfoActive ? 'primary' : 'toggle'" size="lg" :class="btnClass" aria-label="Info" as-child>
-    <RouterLink to="/info" class="flex items-center gap-2">
+    <RouterLink
+      to="/info"
+      class="flex items-center gap-2"
+      :aria-current="isInfoActive ? 'page' : undefined"
+      :aria-pressed="isInfoActive"
+    >
       <PhInfo class="size-6" />
       <span class="hidden sm:inline">Info</span>
     </RouterLink>
@@ -50,10 +55,12 @@ function handleLogout() {
   <DropdownMenuRoot v-model:open="userMenuOpen">
     <DropdownMenuTrigger as-child>
       <Button
-        variant="toggle"
+        :variant="userMenuOpen ? 'primary' : 'toggle'"
         size="icon-lg"
         :class="btnClass"
         aria-label="Používateľ – možnosti"
+        :aria-expanded="userMenuOpen"
+        :aria-pressed="userMenuOpen"
       >
         <PhUser class="size-6" />
       </Button>
@@ -97,7 +104,7 @@ function handleLogout() {
     />
   </Dialog>
 
-  <Button variant="toggle" size="lg" :class="btnClass" aria-label="Language EN/SK">
+  <Button variant="toggle" size="lg" :class="btnClass" aria-label="Language EN/SK" :aria-pressed="false">
     EN/SK
   </Button>
 </template>

@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
 import { pushExploreSearch } from '@/lib/navigation'
-import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
+import { PhSlidersHorizontal } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -151,25 +151,13 @@ onUnmounted(() => {
       :class="isMobile ? 'top-[53px]' : 'top-[65px]'"
     >
       <Button
-        v-if="filterOpen"
         type="button"
-        variant="outline"
-        size="lg"
-        class="gap-2 rounded-md shadow-sm"
-        aria-label="Zavrieť filter"
-        @click="filterOpen = false"
-      >
-        <PhX class="size-6" />
-        Zavrieť filter
-      </Button>
-      <Button
-        v-else
-        type="button"
-        variant="primary"
+        :variant="filterOpen ? 'primary' : 'toggle'"
         size="lg"
         class="gap-2 rounded-md font-semibold shadow-sm"
-        aria-label="Filter"
-        @click="filterOpen = true"
+        :aria-label="filterOpen ? 'Zavrieť filter' : 'Otvoriť filter'"
+        :aria-pressed="filterOpen"
+        @click="filterOpen = !filterOpen"
       >
         <PhSlidersHorizontal class="size-6" />
         Filter
