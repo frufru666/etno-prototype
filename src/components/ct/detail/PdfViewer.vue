@@ -40,13 +40,13 @@ const currentPage = ref(1)
     <template v-if="isMobile && fullscreen">
       <MediaViewerMobileHeader @close="emit('close')" />
       <div
-        class="flex h-11 shrink-0 items-center gap-2 border-b border-border bg-background px-4"
+        class="flex h-10 shrink-0 items-center gap-2 border-b border-border bg-background px-4"
       >
         <div class="flex flex-1 items-center justify-center gap-1">
-          <Button variant="outline" size="icon" class="h-8 w-8" aria-label="Zoom out">
+          <Button variant="outline" size="icon" class="h-10 w-10" aria-label="Zoom out">
             <PhMagnifyingGlassMinus class="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" class="h-8 w-8" aria-label="Zoom in">
+          <Button variant="outline" size="icon" class="h-10 w-10" aria-label="Zoom in">
             <PhMagnifyingGlassPlus class="h-4 w-4" />
           </Button>
         </div>
@@ -54,7 +54,7 @@ const currentPage = ref(1)
           <Button
             variant="outline"
             size="icon"
-            class="h-8 w-8"
+            class="h-10 w-10"
             :disabled="currentPage <= 1"
             aria-label="Previous page"
             @click="currentPage = Math.max(1, currentPage - 1)"
@@ -67,7 +67,7 @@ const currentPage = ref(1)
           <Button
             variant="outline"
             size="icon"
-            class="h-8 w-8"
+            class="h-10 w-10"
             :disabled="currentPage >= pageCount"
             aria-label="Next page"
             @click="currentPage = Math.min(pageCount, currentPage + 1)"

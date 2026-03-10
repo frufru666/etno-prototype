@@ -5,17 +5,25 @@ import { Button } from '@/components/ui/button'
 import NavActions from '@/components/ct/NavActions.vue'
 import MobileMenu from '@/components/ct/MobileMenu.vue'
 import SearchInput from '@/components/ct/SearchInput.vue'
+import { PhSlidersHorizontal } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
 const props = withDefaults(
   defineProps<{
-    filterOpen: boolean
-    activeFilterCount: number
+    filterOpen?: boolean
+    activeFilterCount?: number
     searchQuery?: string
     mobileTitle?: string
     mobileShowSearch?: boolean
+    /** When true (Explore), show Filter + Search row below the title row. */
+    mobileShowFilterRow?: boolean
   }>(),
-  { mobileShowSearch: true }
+  {
+    mobileShowSearch: true,
+    mobileShowFilterRow: false,
+    filterOpen: false,
+    activeFilterCount: 0,
+  }
 )
 
 const emit = defineEmits<{
@@ -103,19 +111,48 @@ const mobileHeaderTitle = computed(() => {
     </div>
   </nav>
 
-  <!-- Mobile nav: brand + search + menu -->
+  <!-- Mobile nav: Figma – row 1 title + menu; row 2 Filter + Search (Explore) or Search only -->
   <nav
     v-else
     class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Main navigation"
   >
-    <div class="flex h-[49px] items-center justify-between gap-2 px-4">
-      <span class="truncate text-lg font-bold tracking-tight text-foreground">
-        {{ props.mobileTitle ?? mobileHeaderTitle }}
-      </span>
-      <MobileMenu />
+    <div class="flex h-14 shrink-0 items-center justify-center pl-2 pr-3 py-1">
+      <div class="flex h-10 w-full items-center justify-between gap-2">
+        <span class="truncate text-lg font-bold tracking-tight text-foreground">
+          {{ props.mobileTitle ?? mobileHeaderTitle }}
+        </span>
+        <MobileMenu />
+      </div>
     </div>
-    <div v-if="props.mobileShowSearch" class="flex items-center gap-2 px-2 pb-2">
+    <!-- Explore: Filter + Search row (Figma) -->
+    <div
+      v-if="props.mobileShowFilterRow"
+      class="flex shrink-0 items-center gap-3 px-2 pb-2 pt-1"
+    >
+      <Button
+        type="button"
+        variant="primary"
+        class="h-10 gap-2 rounded-md font-semibold"
+        :aria-label="props.filterOpen ? 'Zavrieť filter' : 'Filter'"
+        @click="emit('toggle-filter')"
+      >
+        <PhSlidersHorizontal class="size-5" />
+        Filter
+      </Button>
+      <SearchInput
+        class="flex-1 min-w-0"
+        placeholder="Search database"
+        :model-value="props.searchQuery ?? ''"
+        @update:model-value="emit('update:searchQuery', $event)"
+        @submit="emit('searchSubmit', $event)"
+      />
+    </div>
+    <!-- Collections / Info: search-only row when not using Filter row -->
+    <div
+      v-else-if="props.mobileShowSearch"
+      class="flex items-center gap-2 px-2 pb-2"
+    >
       <SearchInput
         class="flex-1 min-w-0"
         :model-value="props.searchQuery ?? ''"

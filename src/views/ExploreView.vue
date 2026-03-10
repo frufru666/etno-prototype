@@ -26,7 +26,7 @@ import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
 const route = useRoute()
 const router = useRouter()
 const isMobile = useIsMobile()
-const filterOpen = ref(true)
+const filterOpen = ref(false)
 const openSubPanelKey = ref<string | null>(null)
 const activeFilters = ref<Record<string, string[]>>({})
 const sortKey = ref<ItemSortKey>('id')
@@ -54,7 +54,7 @@ function syncFiltersFromQuery() {
 }
 
 onMounted(() => {
-  filterOpen.value = true
+  if (!isMobile.value) filterOpen.value = true
   syncFiltersFromQuery()
   const q = route.query.q ?? route.query.query
   searchQuery.value = typeof q === 'string' ? q : ''
@@ -143,36 +143,11 @@ onUnmounted(() => {
       :active-filter-count="activeFilterCount"
       :search-query="searchQuery"
       :mobile-show-search="false"
+      :mobile-show-filter-row="isMobile"
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
       @search-submit="onSearchSubmit"
     />
-    <!-- Mobile: search row with filter button -->
-    <div
-      v-if="isMobile"
-      class="ct-fixed-toolbar fixed left-0 right-0 top-[49px] z-40 px-2 pb-2"
-    >
-      <div class="flex items-center gap-2">
-        <Button
-          type="button"
-          :variant="filterOpen ? 'outline' : 'primary'"
-          size="sm"
-          class="gap-2 rounded-md shadow-sm"
-          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
-          @click="filterOpen = !filterOpen"
-        >
-          <PhX v-if="filterOpen" class="size-4" />
-          <PhSlidersHorizontal v-else class="size-4" />
-          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
-        </Button>
-        <SearchInput
-          class="flex-1 min-w-0"
-          :model-value="searchQuery"
-          @update:model-value="onSearchQueryChange"
-          @submit="onSearchSubmit"
-        />
-      </div>
-    </div>
 
     <!-- Desktop: filter button + sidebar -->
     <div
@@ -226,7 +201,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="relative flex-1 pt-[96px] md:pt-[61px]">
+    <div class="relative flex-1 pt-[108px] md:pt-[61px]">
 
       <SearchOverlayPanel
         :items="filteredItems"

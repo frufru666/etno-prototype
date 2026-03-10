@@ -20,8 +20,7 @@ const emit = defineEmits<{
   >
     <Button
       variant="ghost"
-      size="sm"
-      class="gap-2 text-base font-semibold text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+      class="h-10 gap-2 text-base font-semibold text-primary-500 hover:bg-primary-50 hover:text-primary-600"
       aria-label="Zavrieť"
       @click="emit('close')"
     >
@@ -31,8 +30,7 @@ const emit = defineEmits<{
     <div v-if="rightLabel" class="flex shrink-0 items-center">
       <Button
         variant="ghost"
-        size="sm"
-        class="gap-2 text-base font-semibold text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+        class="h-10 gap-2 text-base font-semibold text-primary-500 hover:bg-primary-50 hover:text-primary-600"
         @click="emit('action')"
       >
         {{ rightLabel }}

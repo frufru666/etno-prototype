@@ -14,6 +14,7 @@ import {
 import { useAuth } from '@/composables/useAuth'
 import {
   PhList,
+  PhCompass,
   PhFolderOpen,
   PhInfo,
   PhUser,
@@ -69,6 +70,12 @@ function handleLogout() {
         <SheetTitle>Menu</SheetTitle>
       </SheetHeader>
       <div class="mt-6 flex flex-col gap-2">
+        <Button variant="outline" class="justify-start gap-2" as-child>
+          <RouterLink to="/" class="flex items-center gap-2" @click="open = false">
+            <PhCompass class="h-4 w-4" />
+            Explore
+          </RouterLink>
+        </Button>
         <Button variant="outline" class="justify-start gap-2" as-child>
           <RouterLink to="/collections" class="flex items-center gap-2" @click="open = false">
             <PhFolderOpen class="h-4 w-4" />

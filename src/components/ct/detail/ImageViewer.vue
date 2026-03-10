@@ -127,7 +127,7 @@ const activeTranscript = computed(
               <Button
                 variant="secondary"
                 size="icon"
-                class="h-8 w-8 border-2 border-primary-500 bg-background"
+                class="h-10 w-10 border-2 border-primary-500 bg-background"
                 aria-label="Priblížiť"
               >
                 <PhMagnifyingGlassPlus class="h-4 w-4" />
@@ -135,7 +135,7 @@ const activeTranscript = computed(
               <Button
                 variant="secondary"
                 size="icon"
-                class="h-8 w-8 border-2 border-primary-500 bg-background"
+                class="h-10 w-10 border-2 border-primary-500 bg-background"
                 aria-label="Oddialiť"
               >
                 <PhMagnifyingGlassMinus class="h-4 w-4" />

@@ -119,34 +119,36 @@ function onSearchSubmit(value: string) {
     </div>
   </nav>
 
-  <!-- Mobile nav: first row with back arrow + context, second row search only -->
+  <!-- Mobile nav: Figma – back (icon only) + title ± ID badge + menu -->
   <nav
     v-else
     class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Detail navigation"
   >
-    <div class="flex h-[49px] items-center justify-between gap-2 px-4">
-      <div class="flex min-w-0 items-center gap-2">
+    <div class="flex h-14 shrink-0 items-center justify-center pl-2 pr-3 py-1">
+      <div class="flex h-10 w-full items-center justify-between gap-2">
         <Button
           variant="primary"
-          size="icon-sm"
-          class="h-8 w-8 rounded-md"
+          size="icon"
+          class="h-10 w-10 shrink-0 rounded-md p-2 [&_svg]:size-6"
           :aria-label="props.mobileBackAriaLabel ?? 'Späť do Explore'"
           @click="goBackToExplore"
         >
-          <PhCaretLeft class="size-4" />
+          <PhCaretLeft class="size-6" />
         </Button>
-        <span class="truncate text-lg font-bold tracking-tight text-foreground">
-          {{ props.mobileContextLabel ?? 'Detail' }}
-        </span>
-        <span
-          v-if="props.mobileContextId"
-          class="shrink-0 rounded-md border border-primary-300 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
-        >
-          ID {{ props.mobileContextId }}
-        </span>
+        <div class="flex min-w-0 flex-1 items-center justify-start gap-3">
+          <span class="truncate text-lg font-bold tracking-tight text-foreground">
+            {{ props.mobileContextLabel ?? 'Detail' }}
+          </span>
+          <span
+            v-if="props.mobileContextId"
+            class="shrink-0 rounded-md border border-primary-300 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
+          >
+            ID {{ props.mobileContextId }}
+          </span>
+        </div>
+        <MobileMenu />
       </div>
-      <MobileMenu />
     </div>
     <div
       v-if="props.mobileShowSearch"

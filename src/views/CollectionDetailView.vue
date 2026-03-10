@@ -84,6 +84,7 @@ function goBackFromCollectionDetail() {
       mobile-context-label="Collection Detail"
       mobile-back-to-name="collections"
       :mobile-back-aria-label="`Späť do ${collectionBackLabel}`"
+      :mobile-show-search="false"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
