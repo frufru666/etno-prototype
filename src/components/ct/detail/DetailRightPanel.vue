@@ -12,7 +12,7 @@ import {
   type EtnoItem,
 } from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
-import { PhArrowSquareOut } from '@phosphor-icons/vue'
+import { PhArrowSquareOut, PhCaretRight } from '@phosphor-icons/vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
 
@@ -22,13 +22,16 @@ const props = withDefaults(
     mobile?: boolean
     /** When true, hide ID/title/author (e.g. when shown in mobile hero block above) */
     hideHeader?: boolean
+    /** When true, show desktop panel controls in the header row. */
+    showPanelHeader?: boolean
   }>(),
-  { hideHeader: false }
+  { hideHeader: false, showPanelHeader: false }
 )
 
 const emit = defineEmits<{
   (e: 'open-map-fullscreen'): void
   (e: 'show-transcript'): void
+  (e: 'hide-panel'): void
 }>()
 
 const router = useRouter()
@@ -54,14 +57,39 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
   <component :is="mobile ? 'div' : ScrollArea" :class="mobile ? '' : 'h-full'">
     <div
       class="flex flex-col"
-      :class="mobile ? 'px-4 py-5' : 'p-6'"
+      :class="mobile ? 'px-4 py-5' : showPanelHeader ? 'p-4' : 'p-6'"
     >
+      <div
+        v-if="showPanelHeader && !mobile"
+        class="mb-4 flex items-center justify-between gap-2"
+      >
+        <div class="flex min-w-0 items-center gap-2">
+          <h3 class="truncate text-lg font-bold text-foreground">Detail</h3>
+          <span
+            class="shrink-0 rounded-full bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
+          >
+            {{ item.id }}
+          </span>
+        </div>
+        <Button
+          variant="nav"
+          size="sm"
+          class="gap-1.5 rounded-md text-sm font-semibold"
+          aria-label="Skryť panel"
+          @click="emit('hide-panel')"
+        >
+          Skryť
+          <PhCaretRight class="h-4 w-4" />
+        </Button>
+      </div>
+
       <!-- 1. Header (hidden on mobile when shown in hero block above) -->
       <div
         v-if="!hideHeader"
         class="mb-5 space-y-1"
       >
         <span
+          v-if="!showPanelHeader"
           class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
         >
           {{ item.id }}
@@ -144,8 +172,8 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
                     class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                     @click="
                       openExploreWithFilter(
-                        field.filterKey!,
-                        field.getValue(item)!
+                        field.filterKey,
+                        field.getValue(item)
                       )
                     "
                   >

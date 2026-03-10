@@ -89,12 +89,12 @@ function goBackFromCollectionDetail() {
     />
     <div
       v-if="!isMobile"
-      class="ct-fixed-toolbar fixed left-0 right-0 top-[73px] z-40 flex items-center gap-2 px-4"
+      class="ct-fixed-toolbar fixed left-0 right-0 top-[73px] z-40 flex items-start justify-between gap-2 px-4"
     >
       <Button
         variant="primary"
         size="sm"
-        class="gap-1.5 rounded-md text-sm font-semibold text-white"
+        class="gap-1.5 shrink-0 rounded-md text-sm font-semibold text-white shadow-sm"
         :aria-label="`Back to ${collectionBackLabel}`"
         @click="goBackFromCollectionDetail"
       >

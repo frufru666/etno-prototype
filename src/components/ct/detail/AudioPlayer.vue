@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
+import { useIsMobile } from '@/composables/useIsMobile'
 
 defineProps<{
   item: EtnoItem
@@ -17,6 +18,7 @@ const emit = defineEmits<{
   (e: 'show-transcript'): void
 }>()
 
+const isMobile = useIsMobile()
 const isPlaying = ref(false)
 const currentTime = ref(15)
 const duration = ref(93)
@@ -57,7 +59,7 @@ function seek(seconds: number) {
 
     <!-- Transcript above player: own scroll so transcript scrolls without player moving -->
     <div
-      v-if="item.hasTranscript && transcriptVisible"
+      v-if="item.hasTranscript && transcriptVisible && (isMobile || fullscreen)"
       class="flex min-h-0 flex-1 flex-col border-b border-border bg-background/60"
     >
       <ScrollArea class="flex-1 p-4">

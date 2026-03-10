@@ -61,7 +61,7 @@ function seek(seconds: number) {
       class="h-12 shrink-0"
     />
 
-    <!-- Desktop: media left, transcript panel right -->
+    <!-- Desktop: media only (transcript column is managed in page layout) -->
     <template v-if="!isMobile">
       <div class="flex flex-1 min-h-0">
         <div class="flex min-w-0 flex-1 flex-col">
@@ -75,16 +75,6 @@ function seek(seconds: number) {
             @seek="seek"
             @toggle-play="isPlaying = !isPlaying"
           />
-        </div>
-        <div
-          v-if="item.hasTranscript && transcriptVisible"
-          class="flex w-80 shrink-0 flex-col border-l border-white/20 bg-black/40"
-        >
-          <ScrollArea class="flex-1 p-4">
-            <p class="whitespace-pre-wrap text-sm text-neutral-200">
-              {{ transcriptPreview(item) }}
-            </p>
-          </ScrollArea>
         </div>
       </div>
     </template>

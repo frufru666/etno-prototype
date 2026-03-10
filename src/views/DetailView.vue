@@ -3,12 +3,13 @@ import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import DetailTopNav from "@/components/ct/DetailTopNav.vue";
 import DetailRightPanel from "@/components/ct/detail/DetailRightPanel.vue";
+import DetailTranscriptPanel from "@/components/ct/detail/DetailTranscriptPanel.vue";
 import DetailMediaViewer from "@/components/ct/detail/DetailMediaViewer.vue";
 import DetailMobileHero from "@/components/ct/detail/DetailMobileHero.vue";
 import DetailMap from "@/components/ct/detail/DetailMap.vue";
 import SearchOverlayPanel from "@/components/ct/SearchOverlayPanel.vue";
 import { Button } from "@/components/ui/button";
-import { PhCaretLeft, PhSidebar, PhSidebarSimple } from "@phosphor-icons/vue";
+import { PhCaretLeft } from "@phosphor-icons/vue";
 import { getItemById } from "@/data/mockData";
 import { useIsMobile } from "@/composables/useIsMobile";
 import { useSearchOverlay } from "@/composables/useSearchOverlay";
@@ -26,7 +27,8 @@ const fromCollectionSlug = computed(
   () => route.query.fromCollection as string | undefined,
 );
 
-const rightPanelOpen = ref(true);
+const metadataPanelOpen = ref(true);
+const transcriptPanelOpen = ref(true);
 const leftPanelView = ref<"media" | "map">("media");
 const mobileViewerFullscreen = ref(false);
 const mobileMapFullscreen = ref(false);
@@ -100,9 +102,27 @@ async function copyGps() {
   }
 }
 
-function toggleRightPanel() {
-  rightPanelOpen.value = !rightPanelOpen.value;
+function toggleMetadataPanel() {
+  metadataPanelOpen.value = !metadataPanelOpen.value;
   // Keep viewer content visible and full-width when panel is hidden.
+  leftPanelView.value = "media";
+}
+
+function showTranscriptPanel() {
+  transcriptPanelOpen.value = true;
+}
+
+function hideTranscriptPanel() {
+  transcriptPanelOpen.value = false;
+}
+
+function showMetadataPanel() {
+  metadataPanelOpen.value = true;
+  leftPanelView.value = "media";
+}
+
+function hideMetadataPanel() {
+  metadataPanelOpen.value = false;
   leftPanelView.value = "media";
 }
 
@@ -143,7 +163,12 @@ watch(
   (it) => {
     if (it == null && route.name === "detail")
       router.replace({ name: "explore" });
-    else transcriptVisible.value = it?.mediaType === "audio";
+    else {
+      transcriptVisible.value = it?.mediaType === "audio";
+      transcriptPanelOpen.value = !!it?.hasTranscript;
+      metadataPanelOpen.value = true;
+      leftPanelView.value = "media";
+    }
   },
   { immediate: true },
 );
@@ -152,61 +177,17 @@ watch(
 <template>
   <div class="min-h-screen bg-background">
     <DetailTopNav
-      :right-panel-open="rightPanelOpen"
+      :right-panel-open="metadataPanelOpen"
       :search-query="searchQuery"
       :mobile-context-label="mobileContextLabel"
       :mobile-context-id="fromCollectionSlug ? undefined : item?.id"
       :mobile-back-to-name="mobileBackTargetName"
       :mobile-back-to-params="mobileBackTargetParams"
       :mobile-back-aria-label="`Späť do ${detailBackLabel}`"
-      @toggle-right-panel="toggleRightPanel"
+      @toggle-right-panel="toggleMetadataPanel"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
-
-    <!-- Desktop-only fixed toolbar row for detail actions -->
-    <div
-      v-if="item && !isMobile"
-      class="ct-fixed-toolbar fixed left-0 right-0 top-[73px] z-40 flex items-start justify-between gap-2 px-4"
-    >
-      <div class="flex items-center gap-2 min-w-0">
-        <Button
-          variant="primary"
-          size="sm"
-          class="gap-1.5 shrink-0 rounded-md text-sm font-semibold text-white shadow-sm"
-          :aria-label="`Back to ${detailBackLabel}`"
-          @click="goBackFromDetail"
-        >
-          <PhCaretLeft class="size-4" />
-          {{ `Back to ${detailBackLabel}` }}
-        </Button>
-      </div>
-      <div class="ml-auto flex items-center gap-2">
-        <Button
-          v-if="item.hasTranscript"
-          variant="outline"
-          size="sm"
-          class="gap-1.5 shrink-0 rounded-md text-sm font-semibold shadow-sm"
-          :aria-label="transcriptVisible ? 'Hide Transcript' : 'Show Transcript'"
-          @click="transcriptVisible = !transcriptVisible"
-        >
-          {{ transcriptVisible ? "Hide Transcript" : "Show Transcript" }}
-        </Button>
-        <div class="flex items-center border-y border-l border-border bg-muted/30 px-2 py-1">
-          <Button
-            variant="outline"
-            size="sm"
-            class="gap-1.5 shrink-0 rounded-md text-sm font-semibold shadow-sm"
-            :aria-label="rightPanelOpen ? 'Hide right panel' : 'Show right panel'"
-            @click="toggleRightPanel"
-          >
-            <PhSidebar v-if="!rightPanelOpen" class="size-4" />
-            <PhSidebarSimple v-else class="size-4" />
-            {{ rightPanelOpen ? "Hide right panel" : "Show right panel" }}
-          </Button>
-        </div>
-      </div>
-    </div>
 
     <template v-if="!item">
       <main class="p-6 pt-[96px] md:pt-[57px]">
@@ -234,9 +215,47 @@ watch(
         :class="isMobile && item ? 'pt-[96px]' : 'pt-[96px] md:pt-[57px]'"
       >
         <div
-          class="min-w-0 md:flex-1 flex flex-col"
-          :class="{ 'md:w-full': !rightPanelOpen }"
+          class="relative min-w-0 md:flex-1 flex flex-col"
+          :class="{ 'md:w-full': !metadataPanelOpen && !transcriptPanelOpen }"
         >
+          <div
+            v-if="!isMobile"
+            class="pointer-events-none absolute left-4 right-4 top-4 z-40 flex items-start justify-between gap-2"
+          >
+            <Button
+              variant="primary"
+              size="sm"
+              class="pointer-events-auto gap-1.5 shrink-0 rounded-md text-sm font-semibold text-white shadow-sm"
+              :aria-label="`Back to ${detailBackLabel}`"
+              @click="goBackFromDetail"
+            >
+              <PhCaretLeft class="size-4" />
+              {{ `Back to ${detailBackLabel}` }}
+            </Button>
+            <div class="pointer-events-auto ml-auto flex items-center gap-2">
+              <Button
+                v-if="item.hasTranscript && !transcriptPanelOpen"
+                variant="nav"
+                size="sm"
+                class="gap-1.5 shrink-0 rounded-md text-sm font-semibold"
+                aria-label="Zobraziť Transcript"
+                @click="showTranscriptPanel"
+              >
+                Zobraziť Transcript
+              </Button>
+              <Button
+                v-if="!metadataPanelOpen"
+                variant="nav"
+                size="sm"
+                class="gap-1.5 shrink-0 rounded-md text-sm font-semibold"
+                aria-label="Zobraziť Panel"
+                @click="showMetadataPanel"
+              >
+                Zobraziť Panel
+              </Button>
+            </div>
+          </div>
+
           <!-- Desktop: layered media + map -->
           <template v-if="!isMobile">
             <div class="flex-1 overflow-hidden h-[calc(100vh-57px)]">
@@ -244,7 +263,10 @@ watch(
                 <DetailMediaViewer
                   :item="item"
                   :image-count="imageCount"
-                  :transcript-visible="transcriptVisible"
+                  desktop-transcript-in-layout
+                  :transcript-visible="
+                    isMobile || mobileViewerFullscreen ? transcriptVisible : false
+                  "
                   @toggle-transcript="transcriptVisible = !transcriptVisible"
                 />
               </div>
@@ -304,12 +326,21 @@ watch(
           </template>
         </div>
 
+        <DetailTranscriptPanel
+          v-if="!isMobile && item.hasTranscript && transcriptPanelOpen"
+          :item="item"
+          class="h-[calc(100vh-57px)] w-[345px] shrink-0 border-l border-border bg-background"
+          @hide="hideTranscriptPanel"
+        />
+
         <aside
-          v-if="!isMobile && rightPanelOpen"
-          class="flex h-[calc(100vh-57px)] w-[420px] shrink-0 flex-col border-l border-border bg-background"
+          v-if="!isMobile && metadataPanelOpen"
+          class="flex h-[calc(100vh-57px)] w-[393px] shrink-0 flex-col border-l border-border bg-background"
         >
           <DetailRightPanel
             :item="item"
+            show-panel-header
+            @hide-panel="hideMetadataPanel"
             @open-map-fullscreen="openMapFullscreen"
           />
         </aside>
@@ -324,6 +355,7 @@ watch(
           <DetailMediaViewer
             :item="item"
             :image-count="imageCount"
+            desktop-transcript-in-layout
             :transcript-visible="transcriptVisible"
             fullscreen
             @close="mobileViewerFullscreen = false"

@@ -175,20 +175,6 @@ const activeTranscript = computed(
               </Button>
             </div>
           </div>
-          <!-- Desktop: transcript panel to the right (stops above thumbnail strip) -->
-          <div
-            v-if="!isMobile && item.hasTranscript && transcriptVisible"
-            class="flex w-80 shrink-0 flex-col border-l border-border bg-background/95"
-          >
-            <ScrollArea class="min-h-0 flex-1 p-4">
-              <h3 class="mb-2 text-sm font-semibold text-foreground">
-                {{ isMulti ? `Obrázok ${currentIndex + 1}/${safeImageCount}` : 'Transcript' }}
-              </h3>
-              <p class="whitespace-pre-wrap text-sm text-muted-foreground">
-                {{ activeTranscript }}
-              </p>
-            </ScrollArea>
-          </div>
         </div>
         <!-- Thumbnail strip in its own row so it is never covered -->
         <div
