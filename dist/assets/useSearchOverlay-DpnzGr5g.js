@@ -1,0 +1,1 @@
+import{I as c,A as o}from"./navigation-COnpaZA_.js";import{a as t}from"./index-D6tyWIqb.js";function l(e){const r=t(()=>c.filter(s=>o(s,e.value))),a=t(()=>e.value.trim().length>0);return{searchFilteredItems:r,isSearchActive:a}}export{l as u};

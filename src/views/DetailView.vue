@@ -223,6 +223,7 @@ watch(
             class="pointer-events-none absolute left-4 right-4 top-4 z-40 flex items-start justify-between gap-2"
           >
             <Button
+              v-if="item.mediaType !== 'pdf'"
               variant="primary"
               size="sm"
               class="pointer-events-auto gap-1.5 shrink-0 rounded-md text-sm font-semibold text-white shadow-sm"
