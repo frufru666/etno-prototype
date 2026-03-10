@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCaretLeft, PhCaretRight, PhX } from '@phosphor-icons/vue'
 import type { EtnoItem } from '@/data/mockData'
-import { useIsMobile } from '@/composables/useIsMobile'
 
 const props = defineProps<{
   item: EtnoItem
@@ -17,9 +15,6 @@ defineEmits<{
   (e: 'close'): void
 }>()
 
-const router = useRouter()
-const isMobile = useIsMobile()
-
 // Mock page count (e.g. from document.size "245 strany" or default)
 const pageCount = computed(() => {
   const s = props.item.size
@@ -28,11 +23,6 @@ const pageCount = computed(() => {
 })
 
 const currentPage = ref(1)
-
-function goBackToExplore() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'explore' })
-}
 </script>
 
 <template>
@@ -43,17 +33,6 @@ function goBackToExplore() {
     <!-- Header: zoom + page nav + close when fullscreen -->
     <div class="flex flex-shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 py-2">
       <div class="flex items-center gap-2">
-        <Button
-          v-if="!isMobile"
-          variant="primary"
-          size="sm"
-          class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-          aria-label="Späť do Explore"
-          @click="goBackToExplore"
-        >
-          <PhCaretLeft class="size-4" />
-          Späť do Explore
-        </Button>
         <Button
           v-if="fullscreen"
           variant="ghost"

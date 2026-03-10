@@ -9,12 +9,15 @@ import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   item: EtnoItem
+  /** When set, detail page shows "Back to Collection" and returns to this collection slug */
+  fromCollectionSlug?: string
 }>()
 
 const router = useRouter()
 
 function goToDetail() {
-  router.push({ name: 'detail', params: { id: props.item.id } })
+  const query = props.fromCollectionSlug ? { fromCollection: props.fromCollectionSlug } : undefined
+  router.push({ name: 'detail', params: { id: props.item.id }, query })
 }
 
 const mediaType = getMediaType(props.item.documentType)

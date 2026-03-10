@@ -1,7 +1,7 @@
-import type { VariantProps } from "class-variance-authority"
-import { cva } from "class-variance-authority"
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
-export { default as Button } from "./Button.vue"
+export { default as Button } from "./Button.vue";
 
 export const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -12,12 +12,16 @@ export const buttonVariants = cva(
           "bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500",
         primary:
           "bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus-visible:ring-2 focus-visible:ring-primary-500",
+        // Navigation/tab-style button: blue text on white background
+        // Used for inactive nav items (Explore / Collections / Info)
+        nav:
+          "bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         secondary:
-          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         outline:
-          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         outlined:
-          "border-2 border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
+          "border border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         toggle:
           "bg-white text-[var(--ct-primary-500)] hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-2 focus-visible:ring-primary-500",
         ghost:
@@ -45,6 +49,6 @@ export const buttonVariants = cva(
       size: "default",
     },
   },
-)
+);
 
-export type ButtonVariants = VariantProps<typeof buttonVariants>
+export type ButtonVariants = VariantProps<typeof buttonVariants>;

@@ -42,7 +42,8 @@ watch(
 // Search query per expanded category
 const searchQuery = ref<Record<string, string>>({})
 
-function setValue(filterKey: string, value: string, selected: boolean) {
+function setValue(filterKey: string | null, value: string, selected: boolean) {
+  if (!filterKey) return
   const current = props.activeFilters[filterKey] ?? []
   const next = selected
     ? (current.includes(value) ? current : [...current, value])
@@ -53,7 +54,8 @@ function setValue(filterKey: string, value: string, selected: boolean) {
   emit('update:activeFilters', nextFilters)
 }
 
-function clearCategory(filterKey: string) {
+function clearCategory(filterKey: string | null) {
+  if (!filterKey) return
   const next = { ...props.activeFilters }
   delete next[filterKey]
   emit('update:activeFilters', next)
@@ -64,11 +66,13 @@ function clearAll() {
   if (props.mobile) activePanelKey.value = null
 }
 
-function getSearchKey(filterKey: string): string {
+function getSearchKey(filterKey: string | null): string {
+  if (!filterKey) return ''
   return searchQuery.value[filterKey] ?? ''
 }
 
-function setSearchKey(filterKey: string, q: string) {
+function setSearchKey(filterKey: string | null, q: string) {
+  if (!filterKey) return
   searchQuery.value = { ...searchQuery.value, [filterKey]: q }
 }
 
@@ -187,27 +191,33 @@ const totalActiveCount = computed(() =>
               :filter-key="activePanelKey"
               :active-filters="activeFilters"
               :search-query="getSearchKey(activePanelKey)"
-              @update:search-query="(q) => setSearchKey(activePanelKey!, q)"
-              @toggle="(val, sel) => setValue(activePanelKey!, val, sel)"
+              @update:search-query="(q) => setSearchKey(activePanelKey, q)"
+              @toggle="(val, sel) => setValue(activePanelKey, val, sel)"
             />
           </div>
         </div>
       </div>
     </template>
 
-    <!-- Mobile: top bar per wireframe — left: title, right: close (Zavrieť filter + X) -->
+    <!-- Mobile: top bar per wireframe — left close, right reset -->
     <template v-else>
       <header class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-        <h2 class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</h2>
-        <Button
-          variant="secondary"
-          size="sm"
-          class="gap-2 rounded-lg font-semibold"
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 text-base font-semibold text-primary-500 transition-opacity hover:opacity-80"
           @click="emit('close')"
         >
           <PhX class="h-5 w-5" aria-hidden />
           <span>Zavrieť filter</span>
-        </Button>
+        </button>
+        <button
+          type="button"
+          class="text-base font-semibold text-destructive transition-opacity hover:opacity-80 disabled:pointer-events-none disabled:opacity-50"
+          :disabled="totalActiveCount === 0"
+          @click="clearAll"
+        >
+          Reset
+        </button>
       </header>
       <!-- Mobile step 2: sub-panel -->
       <template v-if="activePanelKey">
@@ -231,8 +241,8 @@ const totalActiveCount = computed(() =>
               :filter-key="activePanelKey"
               :active-filters="activeFilters"
               :search-query="getSearchKey(activePanelKey)"
-              @update:search-query="(q) => setSearchKey(activePanelKey!, q)"
-              @toggle="(val, sel) => setValue(activePanelKey!, val, sel)"
+              @update:search-query="(q) => setSearchKey(activePanelKey, q)"
+              @toggle="(val, sel) => setValue(activePanelKey, val, sel)"
             />
           </div>
           <div class="flex flex-col gap-2 border-t border-border p-3">
@@ -241,12 +251,12 @@ const totalActiveCount = computed(() =>
               <PhMapPin class="h-4 w-4" />
             </Button>
             <button
-              v-if="totalActiveCount > 0"
               type="button"
-              class="w-full py-2 text-center text-sm font-semibold text-destructive transition-opacity hover:opacity-80"
+              class="w-full py-2 text-center text-sm font-semibold text-destructive transition-opacity hover:opacity-80 disabled:pointer-events-none disabled:opacity-50"
+              :disabled="totalActiveCount === 0"
               @click="clearAll"
             >
-              Resetovať všetky filtre ({{ totalActiveCount }})
+              Resetovať filter
             </button>
           </div>
         </div>
@@ -267,14 +277,13 @@ const totalActiveCount = computed(() =>
             <span>Zobraziť {{ filteredCount }} výsledkov</span>
             <PhMapPin class="h-4 w-4" />
           </Button>
-          <!-- Reset below CTA when a selection is made (wireframe) -->
           <button
-            v-if="totalActiveCount > 0"
             type="button"
-            class="w-full py-2 text-center text-sm font-semibold text-destructive transition-opacity hover:opacity-80"
+            class="w-full py-2 text-center text-sm font-semibold text-destructive transition-opacity hover:opacity-80 disabled:pointer-events-none disabled:opacity-50"
+            :disabled="totalActiveCount === 0"
             @click="clearAll"
           >
-            Resetovať všetky filtre ({{ totalActiveCount }})
+            Resetovať filter
           </button>
         </div>
       </template>

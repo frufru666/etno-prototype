@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import type { EtnoItem } from '@/data/mockData'
-import ObjectCard from '@/components/ct/ObjectCard.vue'
-import { Button } from '@/components/ui/button'
+import type { EtnoItem } from "@/data/mockData";
+import ObjectCard from "@/components/ct/ObjectCard.vue";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { PhCaretDown, PhCaretUp } from '@phosphor-icons/vue'
+} from "@/components/ui/select";
+import { PhCaretDown, PhCaretUp } from "@phosphor-icons/vue";
 
 const props = withDefaults(
   defineProps<{
-    items: EtnoItem[]
-    sortKey: string
-    sortOrder: 'asc' | 'desc'
+    items: EtnoItem[];
+    sortKey: string;
+    sortOrder: "asc" | "desc";
     /** When set and items empty, show search empty state */
-    searchQuery?: string
+    searchQuery?: string;
   }>(),
-  { searchQuery: '' }
-)
+  { searchQuery: "" },
+);
 
 const emit = defineEmits<{
-  (e: 'update:sortKey', value: string): void
-  (e: 'update:sortOrder', value: 'asc' | 'desc'): void
-}>()
+  (e: "update:sortKey", value: string): void;
+  (e: "update:sortOrder", value: "asc" | "desc"): void;
+}>();
 
 const sortOptions = [
-  { value: 'id', label: 'ID' },
-  { value: 'title', label: 'Názov' },
-  { value: 'studyPeriodStart', label: 'Čas aktivity' },
-] as const
+  { value: "id", label: "ID" },
+  { value: "title", label: "Názov" },
+  { value: "studyPeriodStart", label: "Čas aktivity" },
+] as const;
 
 function toggleSortOrder() {
-  emit('update:sortOrder', props.sortOrder === 'asc' ? 'desc' : 'asc')
+  emit("update:sortOrder", props.sortOrder === "asc" ? "desc" : "asc");
 }
 </script>
 
@@ -50,7 +50,9 @@ function toggleSortOrder() {
           :model-value="sortKey"
           @update:model-value="(v) => emit('update:sortKey', v ?? 'id')"
         >
-          <SelectTrigger class="w-[180px] rounded-lg border-border focus-visible:ring-2 focus-visible:ring-primary-500">
+          <SelectTrigger
+            class="w-[180px] rounded-lg border-border focus-visible:ring-2 focus-visible:ring-primary-500"
+          >
             <SelectValue placeholder="Vyberte" />
           </SelectTrigger>
           <SelectContent>
@@ -70,14 +72,8 @@ function toggleSortOrder() {
           aria-label="Zmeniť smer zoradenia"
           @click="toggleSortOrder"
         >
-          <PhCaretUp
-            v-if="sortOrder === 'asc'"
-            class="h-4 w-4"
-          />
-          <PhCaretDown
-            v-else
-            class="h-4 w-4"
-          />
+          <PhCaretUp v-if="sortOrder === 'asc'" class="h-4 w-4" />
+          <PhCaretDown v-else class="h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -92,11 +88,7 @@ function toggleSortOrder() {
       v-else
       class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 min-[1920px]:grid-cols-4"
     >
-      <ObjectCard
-        v-for="item in items"
-        :key="item.id"
-        :item="item"
-      />
+      <ObjectCard v-for="item in items" :key="item.id" :item="item" />
     </div>
   </section>
 </template>

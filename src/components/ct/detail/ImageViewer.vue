@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCaretLeft, PhX } from '@phosphor-icons/vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
@@ -24,7 +23,6 @@ const emit = defineEmits<{
   (e: 'show-transcript'): void
 }>()
 
-const router = useRouter()
 const isMobile = useIsMobile()
 const currentIndex = ref(0)
 const safeImageCount = computed(() => Math.max(props.imageCount, 1))
@@ -77,10 +75,6 @@ const transcriptChunks = computed(() =>
 const activeTranscript = computed(
   () => transcriptChunks.value[currentIndex.value] ?? transcriptChunks.value[0] ?? ''
 )
-
-function goBackToExplore() {
-  router.push({ name: 'explore' })
-}
 </script>
 
 <template>
@@ -120,20 +114,9 @@ function goBackToExplore() {
     <template v-else>
       <!-- Floating controls: close + transcript -->
       <div
-        v-if="fullscreen || isMulti || item.hasTranscript || !isMobile"
+        v-if="fullscreen || isMulti || (item.hasTranscript && (isMobile || fullscreen))"
         class="absolute left-2 right-2 top-2 z-10 flex items-center justify-between gap-2"
       >
-        <Button
-          v-if="!isMobile"
-          variant="primary"
-          size="sm"
-          class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-          aria-label="Späť do Explore"
-          @click="goBackToExplore"
-        >
-          <PhCaretLeft class="size-4" />
-          Späť do Explore
-        </Button>
         <Button
           v-if="fullscreen"
           variant="ghost"
@@ -147,7 +130,7 @@ function goBackToExplore() {
         </Button>
         <div class="flex-1" />
         <Button
-          v-if="item.hasTranscript"
+          v-if="item.hasTranscript && (isMobile || fullscreen)"
           variant="secondary"
           size="sm"
           @click="emit('show-transcript')"
@@ -169,7 +152,10 @@ function goBackToExplore() {
             <!-- Left toolbar: zoom only -->
             <div
               class="absolute left-2 top-1/2 flex -translate-y-1/2 flex-col gap-1"
-              :class="{ 'top-[calc(50%+24px)]': fullscreen || isMulti || item.hasTranscript }"
+              :class="{
+                'top-[calc(50%+24px)]':
+                  fullscreen || isMulti || (item.hasTranscript && (isMobile || fullscreen)),
+              }"
             >
               <Button
                 variant="secondary"

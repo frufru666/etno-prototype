@@ -6,6 +6,7 @@ import FilterSidebar from '@/components/ct/FilterSidebar.vue'
 import FilterChips from '@/components/ct/FilterChips.vue'
 import ResultsGrid from '@/components/ct/ResultsGrid.vue'
 import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
+import SearchInput from '@/components/ct/SearchInput.vue'
 import Footer from '@/components/ct/Footer.vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
@@ -16,8 +17,11 @@ import {
   ITEMS,
 } from '@/data/mockData'
 import MapView from '@/components/ct/MapView.vue'
+import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/composables/useIsMobile'
 import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
+import { pushExploreSearch } from '@/lib/navigation'
+import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -118,6 +122,10 @@ function onSearchQueryChange(value: string) {
   router.replace({ query: next })
 }
 
+function onSearchSubmit(value: string) {
+  pushExploreSearch(router, value)
+}
+
 // Desktop: close sub-panel when clicking outside the filter aside
 const filterAsideRef = ref<HTMLElement | null>(null)
 function onDocumentMousedown(e: MouseEvent) {
@@ -139,16 +147,80 @@ onUnmounted(() => {
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"
       :search-query="searchQuery"
+      :mobile-show-search="false"
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
+      @search-submit="onSearchSubmit"
     />
-    <!-- Mobile nav is 2 rows (~96px), desktop is 57px -->
-    <div class="relative flex-1 pt-[96px] md:pt-[57px]">
-      <!-- Desktop: floating filter container over map (no layout shift) -->
+    <!-- Mobile: search row with filter button -->
+    <div
+      v-if="isMobile"
+      class="ct-fixed-toolbar fixed left-0 right-0 top-[49px] z-40 px-2 pb-2"
+    >
+      <div class="flex items-center gap-2">
+        <Button
+          type="button"
+          :variant="filterOpen ? 'outline' : 'primary'"
+          size="lg"
+          class="gap-2 rounded-md shadow-sm"
+          :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
+          @click="filterOpen = !filterOpen"
+        >
+          <PhX v-if="filterOpen" class="size-6" />
+          <PhSlidersHorizontal v-else class="size-6" />
+          {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
+        </Button>
+        <SearchInput
+          class="flex-1 min-w-0"
+          :model-value="searchQuery"
+          @update:model-value="onSearchQueryChange"
+          @submit="onSearchSubmit"
+        />
+      </div>
+    </div>
+
+    <!-- Desktop: filter button + sidebar -->
+    <div
+      v-if="!isMobile"
+      class="ct-fixed-toolbar fixed left-4 top-[65px] z-40 flex flex-col gap-2"
+    >
+      <div class="flex items-center gap-2">
+        <Button
+          v-if="filterOpen"
+          type="button"
+          variant="outline"
+          size="lg"
+          class="gap-2 rounded-md shadow-sm"
+          aria-label="Zavrieť filter"
+          @click="filterOpen = false"
+        >
+          <PhX class="size-6" />
+          Zavrieť filter
+        </Button>
+        <Button
+          v-else
+          type="button"
+          variant="primary"
+          size="lg"
+          class="gap-2 rounded-md font-semibold shadow-sm"
+          aria-label="Filter"
+          @click="filterOpen = true"
+        >
+          <PhSlidersHorizontal class="size-6" />
+          Filter
+          <span
+            v-if="activeFilterCount > 0"
+            class="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-semibold"
+          >
+            {{ activeFilterCount }}
+          </span>
+        </Button>
+      </div>
+      <!-- Desktop: FilterSidebar directly below the Filter button -->
       <div
-        v-if="filterOpen && !isMobile"
+        v-if="filterOpen"
         ref="filterAsideRef"
-        class="fixed left-4 top-20 z-40 overflow-visible"
+        class="overflow-visible"
         aria-label="Filter panel"
       >
         <FilterSidebar
@@ -157,6 +229,9 @@ onUnmounted(() => {
           @update:active-filters="activeFilters = $event"
         />
       </div>
+    </div>
+
+    <div class="relative flex-1 pt-[96px] md:pt-[61px]">
 
       <SearchOverlayPanel
         :items="filteredItems"
@@ -165,7 +240,7 @@ onUnmounted(() => {
       />
 
       <div
-        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-57px)]"
+        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]"
       >
         <MapView :pins="mapPins" />
       </div>

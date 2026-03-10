@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import {
   DropdownMenuRoot,
   DropdownMenuTrigger,
@@ -11,9 +11,19 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import { useAuth } from '@/composables/useAuth'
-import { PhFolderOpen, PhInfo, PhUser, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
+import {
+  PhInfo,
+  PhUser,
+  PhTranslate,
+  PhSignIn,
+  PhUserPlus,
+  PhSignOut,
+} from '@phosphor-icons/vue'
 
-const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const route = useRoute()
+const isInfoActive = computed(() => route.name === 'info')
+const btnClass =
+  'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 const userMenuOpen = ref(false)
 const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
@@ -38,22 +48,25 @@ function handleLogout() {
 </script>
 
 <template>
-  <Button variant="secondary" size="lg" :class="['gap-2', btnClass]" aria-label="Collections" as-child>
-    <RouterLink to="/collections" class="flex items-center gap-2">
-      <PhFolderOpen class="size-6 text-primary-500" />
-      <span class="hidden sm:inline text-primary-500">Collections</span>
-    </RouterLink>
-  </Button>
-  <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Info" as-child>
-    <RouterLink to="/info" class="flex items-center justify-center">
-      <PhInfo class="size-6" />
+  <!-- Info as text button (no icon-only) -->
+  <Button
+    :variant="isInfoActive ? 'primary' : 'outline'"
+    size="lg"
+    :class="['gap-2', btnClass]"
+    aria-label="Info"
+    as-child
+  >
+    <RouterLink to="/info" class="flex items-center gap-2">
+      <PhInfo class="size-5" />
+      <span class="hidden sm:inline">Info</span>
     </RouterLink>
   </Button>
 
+  <!-- User is the only icon button -->
   <DropdownMenuRoot v-model:open="userMenuOpen">
     <DropdownMenuTrigger as-child>
       <Button
-        variant="secondary"
+        variant="nav"
         size="icon-lg"
         :class="btnClass"
         aria-label="Používateľ – možnosti"
@@ -89,6 +102,12 @@ function handleLogout() {
         <PhSignOut class="h-4 w-4" />
         Odhlásiť
       </DropdownMenuItem>
+      <DropdownMenuItem
+        class="mt-1 flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+      >
+        <PhTranslate class="h-4 w-4" />
+        Switch to English
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenuRoot>
 
@@ -99,8 +118,4 @@ function handleLogout() {
       @close="userDialogOpen = false"
     />
   </Dialog>
-
-  <Button variant="secondary" size="lg" :class="btnClass" aria-label="Language EN/SK">
-    EN/SK
-  </Button>
 </template>

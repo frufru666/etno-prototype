@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { PhCaretLeft, PhX } from '@phosphor-icons/vue'
+import { PhX } from '@phosphor-icons/vue'
 import PlaybackControls from '@/components/ct/detail/PlaybackControls.vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -20,7 +19,6 @@ const emit = defineEmits<{
   (e: 'show-transcript'): void
 }>()
 
-const router = useRouter()
 const isMobile = useIsMobile()
 const isPlaying = ref(false)
 const currentTime = ref(15)
@@ -28,11 +26,6 @@ const duration = ref(93)
 
 function seek(seconds: number) {
   currentTime.value = Math.max(0, Math.min(duration.value, currentTime.value + seconds))
-}
-
-function goBackToExplore() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'explore' })
 }
 </script>
 
@@ -42,17 +35,6 @@ function goBackToExplore() {
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
     <div class="absolute left-4 right-4 top-4 z-10 flex items-center justify-between">
-      <Button
-        v-if="!isMobile"
-        variant="primary"
-        size="sm"
-        class="gap-1.5 rounded-md text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2"
-        aria-label="Späť do Explore"
-        @click="goBackToExplore"
-      >
-        <PhCaretLeft class="size-4" />
-        Späť do Explore
-      </Button>
       <Button
         v-if="fullscreen"
         variant="ghost"
@@ -66,16 +48,16 @@ function goBackToExplore() {
       </Button>
       <div v-else class="flex-1" />
       <Button
-        v-if="item.hasTranscript"
+        v-if="item.hasTranscript && (isMobile || fullscreen)"
         variant="secondary"
         size="sm"
         @click="emit('show-transcript')"
       >
-        {{ transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript' }}
+        {{ transcriptVisible ? 'Hide Transcript' : 'Show Transcript' }}
       </Button>
     </div>
     <div
-      v-if="item.hasTranscript || fullscreen"
+      v-if="fullscreen || (item.hasTranscript && (isMobile || fullscreen))"
       class="h-12 shrink-0"
     />
 

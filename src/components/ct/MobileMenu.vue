@@ -12,7 +12,16 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useAuth } from '@/composables/useAuth'
-import { PhList, PhFolderOpen, PhInfo, PhUser, PhTranslate, PhSignIn, PhUserPlus, PhSignOut } from '@phosphor-icons/vue'
+import {
+  PhList,
+  PhFolderOpen,
+  PhInfo,
+  PhUser,
+  PhTranslate,
+  PhSignIn,
+  PhUserPlus,
+  PhSignOut,
+} from '@phosphor-icons/vue'
 
 const open = ref(false)
 const userDialogOpen = ref(false)
@@ -51,7 +60,7 @@ function handleLogout() {
 <template>
   <Sheet v-model:open="open">
     <SheetTrigger as-child>
-      <Button variant="secondary" size="icon-lg" :class="btnClass" aria-label="Open menu">
+      <Button variant="nav" size="icon-lg" :class="btnClass" aria-label="Open menu">
         <PhList class="size-6" />
       </Button>
     </SheetTrigger>
@@ -110,7 +119,7 @@ function handleLogout() {
         </Button>
         <Button variant="outline" class="justify-start gap-2 opacity-70">
           <PhTranslate class="h-4 w-4" />
-          EN/SK
+          Switch to English
         </Button>
       </div>
     </SheetContent>
