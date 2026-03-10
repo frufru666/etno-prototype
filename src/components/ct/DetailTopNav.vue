@@ -8,15 +8,20 @@ import SearchInput from '@/components/ct/SearchInput.vue'
 import { PhCaretLeft } from '@phosphor-icons/vue'
 import { useIsMobile } from '@/composables/useIsMobile'
 
-const props = defineProps<{
-  rightPanelOpen: boolean
-  searchQuery?: string
-  mobileContextLabel?: string
-  mobileContextId?: string
-  mobileBackToName?: string
-  mobileBackToParams?: Record<string, string | number>
-  mobileBackAriaLabel?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    rightPanelOpen: boolean
+    searchQuery?: string
+    mobileContextLabel?: string
+    mobileContextId?: string
+    mobileBackToName?: string
+    mobileBackToParams?: Record<string, string | number>
+    mobileBackAriaLabel?: string
+    /** When false, mobile nav is single row (no search bar). Use for object viewers. */
+    mobileShowSearch?: boolean
+  }>(),
+  { mobileShowSearch: true }
+)
 
 const emit = defineEmits<{
   (e: 'toggle-right-panel'): void
@@ -143,7 +148,10 @@ function onSearchSubmit(value: string) {
       </div>
       <MobileMenu />
     </div>
-    <div class="flex items-center gap-2 px-4 pb-2.5">
+    <div
+      v-if="props.mobileShowSearch"
+      class="flex items-center gap-2 px-4 pb-2.5"
+    >
       <SearchInput
         :model-value="searchQuery ?? ''"
         class="flex-1 min-w-0"

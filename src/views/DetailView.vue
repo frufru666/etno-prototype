@@ -7,6 +7,7 @@ import DetailTranscriptPanel from "@/components/ct/detail/DetailTranscriptPanel.
 import DetailMediaViewer from "@/components/ct/detail/DetailMediaViewer.vue";
 import DetailMobileHero from "@/components/ct/detail/DetailMobileHero.vue";
 import DetailMap from "@/components/ct/detail/DetailMap.vue";
+import MediaViewerMobileHeader from "@/components/ct/MediaViewerMobileHeader.vue";
 import SearchOverlayPanel from "@/components/ct/SearchOverlayPanel.vue";
 import { Button } from "@/components/ui/button";
 import { PhCaretLeft } from "@phosphor-icons/vue";
@@ -184,13 +185,14 @@ watch(
       :mobile-back-to-name="mobileBackTargetName"
       :mobile-back-to-params="mobileBackTargetParams"
       :mobile-back-aria-label="`Späť do ${detailBackLabel}`"
+      :mobile-show-search="false"
       @toggle-right-panel="toggleMetadataPanel"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
 
     <template v-if="!item">
-      <main class="p-6 pt-[96px] md:pt-[57px]">
+      <main class="p-6 pt-[49px] md:pt-[57px]">
         <p class="text-muted-foreground">
           Položka s ID <strong>{{ id }}</strong> nebola nájdená.
         </p>
@@ -212,7 +214,11 @@ watch(
       />
       <div
         class="md:flex md:flex-1 md:overflow-hidden"
-        :class="isMobile && item ? 'pt-[96px]' : 'pt-[96px] md:pt-[57px]'"
+        :class="
+          isMobile && item
+            ? 'pt-[49px]'
+            : 'pt-[96px] md:pt-[57px]'
+        "
       >
         <div
           class="relative min-w-0 md:flex-1 flex flex-col"
@@ -365,7 +371,7 @@ watch(
         </div>
       </div>
 
-      <!-- Mobile: fullscreen map overlay (floating buttons, no bar) -->
+      <!-- Mobile: fullscreen map overlay (Figma: header + map + bottom infobox) -->
       <div
         v-if="
           isMobile &&
@@ -375,23 +381,33 @@ watch(
         "
         class="fixed inset-0 z-[60] flex flex-col bg-background"
       >
+        <MediaViewerMobileHeader
+          right-label="Otvoriť v Maps"
+          @close="closeMapFullscreen"
+          @action="openInMaps"
+        />
         <div class="relative flex-1 min-h-0">
           <DetailMap :lat="item.lat" :lng="item.lng" />
-          <div
-            class="absolute left-4 right-4 top-2 z-10 flex items-center justify-between"
-          >
-            <Button variant="secondary" size="sm" @click="closeMapFullscreen"
-              >Zavrieť</Button
-            >
-            <div class="flex gap-2">
-              <Button variant="outline" size="sm" @click="openInMaps"
-                >Otvoriť v Maps</Button
-              >
-              <Button variant="outline" size="sm" @click="copyGps"
-                >Kopírovať GPS</Button
-              >
-            </div>
+        </div>
+        <div
+          class="absolute bottom-6 left-1/2 z-10 flex w-[calc(100%-32px)] max-w-[361px] -translate-x-1/2 items-center justify-between gap-2 rounded-lg border border-border bg-background px-2 py-1 shadow-sm"
+        >
+          <div class="flex min-w-0 items-center gap-1">
+            <span class="text-sm font-medium text-muted-foreground">
+              Poloha
+            </span>
+            <span class="truncate text-sm font-bold text-foreground">
+              {{ item.lat.toFixed(4) }}° N, {{ item.lng.toFixed(4) }}° E
+            </span>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="shrink-0 text-sm font-semibold text-primary-500"
+            @click="copyGps"
+          >
+            Kopírovať GPS
+          </Button>
         </div>
       </div>
     </template>

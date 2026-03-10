@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { Button } from '@/components/ui/button'
-import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhCaretLeft, PhX } from '@phosphor-icons/vue'
+import MediaViewerMobileHeader from '@/components/ct/MediaViewerMobileHeader.vue'
+import { PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhX } from '@phosphor-icons/vue'
 import { transcriptPreview, type EtnoItem } from '@/data/mockData'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/composables/useIsMobile'
@@ -82,37 +83,96 @@ const activeTranscript = computed(
     class="relative flex h-full w-full min-h-0 flex-col bg-muted"
     :class="{ 'fixed inset-0 z-[60]': fullscreen }"
   >
-    <!-- Mobile: transcript as separate full screen -->
-    <template v-if="isMobile && item.hasTranscript && transcriptVisible">
-      <div class="flex h-full flex-col bg-background">
-        <div class="flex shrink-0 items-center justify-between border-b border-border px-4 py-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            class="gap-1"
-            aria-label="Späť"
-            @click="emit('show-transcript')"
-          >
-            <PhCaretLeft class="h-4 w-4" />
-            Späť
-          </Button>
-          <span class="text-sm font-medium">Transcript</span>
-          <div class="w-14" />
+    <!-- Mobile fullscreen: Figma header + content + thumbnails -->
+    <template v-if="isMobile && fullscreen">
+      <MediaViewerMobileHeader
+        :right-label="
+          item.hasTranscript
+            ? (transcriptVisible ? 'Skryť Transcript' : 'Zobraziť Transcript')
+            : undefined
+        "
+        @close="emit('close')"
+        @action="emit('show-transcript')"
+      />
+      <!-- Transcript view: dimmed image + title + scrollable transcript -->
+      <template v-if="item.hasTranscript && transcriptVisible">
+        <div class="relative flex min-h-0 flex-1 flex-col bg-background">
+          <div
+            class="absolute inset-0 bg-muted opacity-20"
+            aria-hidden
+          />
+          <h2 class="relative z-10 px-6 pt-4 text-base font-bold text-foreground">
+            {{ isMulti ? `Transcript ${currentIndex + 1}/${safeImageCount}` : 'Transcript' }}
+          </h2>
+          <ScrollArea class="relative z-10 flex-1 px-6 pb-4">
+            <p class="whitespace-pre-wrap text-base leading-6 text-foreground">
+              {{ activeTranscript }}
+            </p>
+          </ScrollArea>
         </div>
-        <ScrollArea class="flex-1 p-4">
-          <h3 class="mb-2 text-sm font-semibold text-foreground">
-            {{ isMulti ? `Obrázok ${currentIndex + 1}/${safeImageCount}` : 'Transcript' }}
-          </h3>
-          <p class="whitespace-pre-wrap text-sm text-foreground">
-            {{ activeTranscript }}
-          </p>
-        </ScrollArea>
+      </template>
+      <!-- Image view: image area + zoom on right -->
+      <template v-else>
+        <div class="relative flex min-h-0 flex-1 flex-col">
+          <div class="relative flex min-h-0 flex-1 items-center justify-center p-4">
+            <div
+              class="flex aspect-[4/3] w-full max-w-4xl items-center justify-center rounded bg-muted text-muted-foreground"
+            >
+              Image viewer {{ isMulti ? `(${currentIndex + 1} / ${safeImageCount})` : '' }}
+            </div>
+            <!-- Right-side zoom (Figma) -->
+            <div
+              class="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-1"
+            >
+              <Button
+                variant="secondary"
+                size="icon"
+                class="h-8 w-8 border-2 border-primary-500 bg-background"
+                aria-label="Priblížiť"
+              >
+                <PhMagnifyingGlassPlus class="h-4 w-4" />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                class="h-8 w-8 border-2 border-primary-500 bg-background"
+                aria-label="Oddialiť"
+              >
+                <PhMagnifyingGlassMinus class="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </template>
+      <!-- Thumbnails at bottom (both image and transcript view) -->
+      <div
+        v-if="isMulti"
+        class="shrink-0 border-t border-border bg-background p-4"
+      >
+        <div class="flex gap-2 overflow-x-auto">
+          <button
+            v-for="idx in thumbIndices"
+            :key="idx"
+            type="button"
+            class="h-12 w-12 shrink-0 overflow-hidden rounded border-2 transition-colors"
+            :class="
+              currentIndex === idx
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-border bg-muted opacity-50 hover:border-primary-200'
+            "
+            @click="currentIndex = idx"
+          >
+            <span class="flex h-full w-full items-center justify-center text-xs">
+              {{ idx + 1 }}
+            </span>
+          </button>
+        </div>
       </div>
     </template>
 
-    <!-- Main view: image (or desktop with transcript panel on right) -->
+    <!-- Desktop or non-fullscreen mobile: original layout -->
     <template v-else>
-      <!-- Floating controls: close + transcript -->
+      <!-- Floating controls when desktop fullscreen or with transcript -->
       <div
         v-if="fullscreen || isMulti || (item.hasTranscript && (isMobile || fullscreen))"
         class="absolute left-2 right-2 top-2 z-10 flex items-center justify-between gap-2"
@@ -139,9 +199,7 @@ const activeTranscript = computed(
         </Button>
       </div>
 
-      <!-- Desktop: column layout so thumbnail strip is never covered by transcript -->
       <div class="flex flex-1 min-h-0 flex-col pt-12">
-        <!-- Row: image area + transcript panel (transcript does not extend into strip) -->
         <div class="flex min-h-0 flex-1">
           <div class="relative flex min-w-0 flex-1 items-center justify-center p-4">
             <div
@@ -149,7 +207,6 @@ const activeTranscript = computed(
             >
               Image viewer {{ isMulti ? `(${currentIndex + 1} / ${safeImageCount})` : '' }}
             </div>
-            <!-- Left toolbar: zoom only -->
             <div
               class="absolute left-2 top-1/2 flex -translate-y-1/2 flex-col gap-1"
               :class="{
@@ -176,7 +233,6 @@ const activeTranscript = computed(
             </div>
           </div>
         </div>
-        <!-- Thumbnail strip in its own row so it is never covered -->
         <div
           v-if="isMulti"
           class="shrink-0 border-t border-border bg-background/90 p-2"
