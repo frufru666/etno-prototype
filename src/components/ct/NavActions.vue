@@ -50,13 +50,20 @@ function handleLogout() {
 <template>
   <!-- Info as text button (no icon-only) -->
   <Button
-    :variant="isInfoActive ? 'primary' : 'outline'"
+    :variant="isInfoActive ? 'primary' : 'nav'"
     size="lg"
     :class="['gap-2', btnClass]"
     aria-label="Info"
     as-child
   >
-    <RouterLink to="/info" class="flex items-center gap-2">
+    <RouterLink
+      to="/info"
+      :class="
+        isInfoActive
+          ? 'flex items-center gap-2 text-white'
+          : 'flex items-center gap-2 text-primary-500'
+      "
+    >
       <PhInfo class="size-5" />
       <span class="hidden sm:inline">Info</span>
     </RouterLink>

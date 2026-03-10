@@ -26,7 +26,7 @@ import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
 const route = useRoute()
 const router = useRouter()
 const isMobile = useIsMobile()
-const filterOpen = ref(false)
+const filterOpen = ref(true)
 const openSubPanelKey = ref<string | null>(null)
 const activeFilters = ref<Record<string, string[]>>({})
 const sortKey = ref<ItemSortKey>('id')
@@ -54,7 +54,7 @@ function syncFiltersFromQuery() {
 }
 
 onMounted(() => {
-  filterOpen.value = !isMobile.value
+  filterOpen.value = true
   syncFiltersFromQuery()
   const q = route.query.q ?? route.query.query
   searchQuery.value = typeof q === 'string' ? q : ''
@@ -80,11 +80,6 @@ watch(activeFilters, (filters) => {
 
   router.replace({ query: nextQuery })
 }, { deep: true })
-watch(isMobile, (mobile) => {
-  if (mobile) filterOpen.value = false
-  else filterOpen.value = true
-})
-
 const filteredItems = computed(() => {
   let list = ITEMS.filter((item) =>
     matchesFilters(item, activeFilters.value)
@@ -161,13 +156,13 @@ onUnmounted(() => {
         <Button
           type="button"
           :variant="filterOpen ? 'outline' : 'primary'"
-          size="lg"
+          size="sm"
           class="gap-2 rounded-md shadow-sm"
           :aria-label="filterOpen ? 'Zavrieť filter' : 'Filter'"
           @click="filterOpen = !filterOpen"
         >
-          <PhX v-if="filterOpen" class="size-6" />
-          <PhSlidersHorizontal v-else class="size-6" />
+          <PhX v-if="filterOpen" class="size-4" />
+          <PhSlidersHorizontal v-else class="size-4" />
           {{ filterOpen ? 'Zavrieť filter' : 'Filter' }}
         </Button>
         <SearchInput
@@ -189,24 +184,24 @@ onUnmounted(() => {
           v-if="filterOpen"
           type="button"
           variant="outline"
-          size="lg"
+          size="sm"
           class="gap-2 rounded-md shadow-sm"
           aria-label="Zavrieť filter"
           @click="filterOpen = false"
         >
-          <PhX class="size-6" />
+          <PhX class="size-4" />
           Zavrieť filter
         </Button>
         <Button
           v-else
           type="button"
           variant="primary"
-          size="lg"
+          size="sm"
           class="gap-2 rounded-md font-semibold shadow-sm"
           aria-label="Filter"
           @click="filterOpen = true"
         >
-          <PhSlidersHorizontal class="size-6" />
+          <PhSlidersHorizontal class="size-4" />
           Filter
           <span
             v-if="activeFilterCount > 0"

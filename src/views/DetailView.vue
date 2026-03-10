@@ -44,6 +44,31 @@ const mobileBackTargetParams = computed(() =>
   fromCollectionSlug.value ? { slug: fromCollectionSlug.value } : undefined,
 );
 
+function labelForRouteName(name: string | symbol | null | undefined): string | null {
+  if (name === "explore") return "Explore";
+  if (name === "collections") return "Collections";
+  if (name === "collection-detail") return "Collection Detail";
+  if (name === "info") return "Info";
+  return null;
+}
+
+const historyBackTarget = computed(() => {
+  const back = window.history.state?.back as string | undefined;
+  if (!back || !back.startsWith("/")) return null;
+  const resolved = router.resolve(back);
+  const label = labelForRouteName(resolved.name);
+  if (!label) return null;
+  return { path: back, label };
+});
+
+const fallbackBackLabel = computed(() =>
+  fromCollectionSlug.value ? "Collection Detail" : "Explore",
+);
+
+const detailBackLabel = computed(
+  () => historyBackTarget.value?.label ?? fallbackBackLabel.value,
+);
+
 function onSearchSubmit(value: string) {
   pushExploreSearch(router, value);
 }
@@ -79,6 +104,21 @@ function toggleRightPanel() {
   rightPanelOpen.value = !rightPanelOpen.value;
   // Keep viewer content visible and full-width when panel is hidden.
   leftPanelView.value = "media";
+}
+
+function goBackFromDetail() {
+  if (historyBackTarget.value) {
+    router.back();
+    return;
+  }
+  if (fromCollectionSlug.value) {
+    router.push({
+      name: "collection-detail",
+      params: { slug: fromCollectionSlug.value },
+    });
+    return;
+  }
+  router.push({ name: "explore" });
 }
 
 const imageCount = computed(() => {
@@ -118,10 +158,8 @@ watch(
       :mobile-context-id="fromCollectionSlug ? undefined : item?.id"
       :mobile-back-to-name="mobileBackTargetName"
       :mobile-back-to-params="mobileBackTargetParams"
-      :mobile-back-aria-label="
-        fromCollectionSlug ? 'Späť do kolekcie' : 'Späť do Explore'
-      "
-      @toggle-right-panel="rightPanelOpen = !rightPanelOpen"
+      :mobile-back-aria-label="`Späť do ${detailBackLabel}`"
+      @toggle-right-panel="toggleRightPanel"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
@@ -135,21 +173,12 @@ watch(
         <Button
           variant="primary"
           size="sm"
-          class="gap-1.5 shrink-0 rounded-md text-sm font-semibold shadow-sm"
-          :aria-label="
-            fromCollectionSlug ? 'Späť do kolekcie' : 'Späť do Explore'
-          "
-          @click="
-            fromCollectionSlug
-              ? router.push({
-                  name: 'collection-detail',
-                  params: { slug: fromCollectionSlug },
-                })
-              : router.push({ name: 'explore' })
-          "
+          class="gap-1.5 shrink-0 rounded-md text-sm font-semibold text-white shadow-sm"
+          :aria-label="`Back to ${detailBackLabel}`"
+          @click="goBackFromDetail"
         >
           <PhCaretLeft class="size-4" />
-          {{ fromCollectionSlug ? "Back to Collection" : "Back to Explore" }}
+          {{ `Back to ${detailBackLabel}` }}
         </Button>
       </div>
       <div class="ml-auto flex items-center gap-2">
@@ -163,17 +192,19 @@ watch(
         >
           {{ transcriptVisible ? "Hide Transcript" : "Show Transcript" }}
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          class="gap-1.5 shrink-0 rounded-md text-sm font-semibold shadow-sm"
-        :aria-label="rightPanelOpen ? 'Hide right panel' : 'Show right panel'"
-        @click="toggleRightPanel"
-        >
-          <PhSidebar v-if="!rightPanelOpen" class="size-4" />
-          <PhSidebarSimple v-else class="size-4" />
-          {{ rightPanelOpen ? "Hide right panel" : "Show right panel" }}
-        </Button>
+        <div class="flex items-center border-y border-l border-border bg-muted/30 px-2 py-1">
+          <Button
+            variant="outline"
+            size="sm"
+            class="gap-1.5 shrink-0 rounded-md text-sm font-semibold shadow-sm"
+            :aria-label="rightPanelOpen ? 'Hide right panel' : 'Show right panel'"
+            @click="toggleRightPanel"
+          >
+            <PhSidebar v-if="!rightPanelOpen" class="size-4" />
+            <PhSidebarSimple v-else class="size-4" />
+            {{ rightPanelOpen ? "Hide right panel" : "Show right panel" }}
+          </Button>
+        </div>
       </div>
     </div>
 
@@ -202,14 +233,14 @@ watch(
         class="md:flex md:flex-1 md:overflow-hidden"
         :class="isMobile && item ? 'pt-[96px]' : 'pt-[96px] md:pt-[57px]'"
       >
-        <div class="min-w-0 md:flex-1 flex flex-col">
+        <div
+          class="min-w-0 md:flex-1 flex flex-col"
+          :class="{ 'md:w-full': !rightPanelOpen }"
+        >
           <!-- Desktop: layered media + map -->
           <template v-if="!isMobile">
-            <div class="flex-1 relative overflow-hidden h-[calc(100vh-57px)]">
-              <div
-                class="absolute inset-0"
-                :class="{ invisible: leftPanelView !== 'media' }"
-              >
+            <div class="flex-1 overflow-hidden h-[calc(100vh-57px)]">
+              <div v-if="leftPanelView === 'media'" class="h-full">
                 <DetailMediaViewer
                   :item="item"
                   :image-count="imageCount"
@@ -219,7 +250,7 @@ watch(
               </div>
               <div
                 v-if="leftPanelView === 'map'"
-                class="absolute inset-0 z-30 flex flex-col bg-background"
+                class="relative z-30 flex h-full flex-col bg-background"
               >
                 <template v-if="item.lat != null && item.lng != null">
                   <DetailMap :lat="item.lat" :lng="item.lng" />

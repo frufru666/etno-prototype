@@ -49,6 +49,31 @@ function onSearchSubmit(value: string) {
 function updateSearchQuery(value: string) {
   searchQuery.value = value;
 }
+
+function labelForRouteName(name: string | symbol | null | undefined): string | null {
+  if (name === "collections") return "Collections";
+  if (name === "explore") return "Explore";
+  if (name === "detail") return "Item Detail";
+  if (name === "info") return "Info";
+  return null;
+}
+
+const historyBackLabel = computed(() => {
+  const back = window.history.state?.back as string | undefined;
+  if (!back || !back.startsWith("/")) return null;
+  const resolved = router.resolve(back);
+  return labelForRouteName(resolved.name);
+});
+
+const collectionBackLabel = computed(() => historyBackLabel.value ?? "Collections");
+
+function goBackFromCollectionDetail() {
+  if (historyBackLabel.value) {
+    router.back();
+    return;
+  }
+  router.push({ name: "collections" });
+}
 </script>
 
 <template>
@@ -58,7 +83,7 @@ function updateSearchQuery(value: string) {
       :search-query="searchQuery"
       mobile-context-label="Collection Detail"
       mobile-back-to-name="collections"
-      mobile-back-aria-label="Späť do Kolekcií"
+      :mobile-back-aria-label="`Späť do ${collectionBackLabel}`"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
     />
@@ -69,12 +94,12 @@ function updateSearchQuery(value: string) {
       <Button
         variant="primary"
         size="sm"
-        class="gap-1.5 rounded-md text-sm font-semibold"
-        aria-label="Späť do Kolekcií"
-        @click="router.push({ name: 'collections' })"
+        class="gap-1.5 rounded-md text-sm font-semibold text-white"
+        :aria-label="`Back to ${collectionBackLabel}`"
+        @click="goBackFromCollectionDetail"
       >
         <PhCaretLeft class="size-4" />
-        Back to Collections
+        {{ `Back to ${collectionBackLabel}` }}
       </Button>
     </div>
 
