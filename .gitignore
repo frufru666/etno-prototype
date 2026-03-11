@@ -4,3 +4,4 @@ dist
 .env.local
 public/env.js
 .env.*.local
+public/env.js

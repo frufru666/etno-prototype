@@ -32,7 +32,11 @@ const markersRef = ref<mapboxgl.Marker[]>([])
 const tooltipPin = ref<MapPin | null>(null)
 const tooltipPos = ref({ x: 0, y: 0 })
 
-const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
+// Token from runtime env.js only (never inlined in bundle; env.js is generated from .env)
+const token =
+  typeof window !== 'undefined'
+    ? (window as unknown as { __VITE_MAPBOX_ACCESS_TOKEN__?: string }).__VITE_MAPBOX_ACCESS_TOKEN__
+    : undefined
 const hasToken = Boolean(token?.trim())
 
 // Grid-based clustering: same cell = same cluster
@@ -264,7 +268,7 @@ onUnmounted(() => {
       class="flex h-full w-full items-center justify-center"
       style="background: linear-gradient(180deg, #e8f0e8 0%, #d0e0d0 50%, #c5d8c5 100%);"
     >
-      <p class="text-sm text-muted-foreground">Nastavte VITE_MAPBOX_ACCESS_TOKEN v .env</p>
+      <p class="text-sm text-muted-foreground">Nastavte VITE_MAPBOX_ACCESS_TOKEN v .env a spustite npm run env:generate</p>
     </div>
 
     <!-- Mapbox map -->
