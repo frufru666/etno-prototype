@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    width: 100%;
+  }
+
   :root {
     /* CT design tokens */
     --ct-primary-50: #e5f0ff;

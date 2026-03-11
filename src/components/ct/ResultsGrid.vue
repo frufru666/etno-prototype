@@ -40,22 +40,23 @@ function toggleSortOrder() {
 
 <template>
   <section class="px-4 py-4 md:px-6">
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-lg font-semibold text-foreground md:text-xl">
+    <div class="mb-4 flex flex-nowrap items-center justify-between gap-16">
+      <h2 class="shrink-0 truncate text-lg font-semibold text-foreground md:text-xl">
         {{ items.length }} objektov
       </h2>
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-muted-foreground">Zoradiť podľa:</span>
-        <Select
-          :model-value="sortKey"
-          @update:model-value="(v) => emit('update:sortKey', v ?? 'id')"
-        >
-          <SelectTrigger
-            class="w-[180px] rounded-lg border-border focus-visible:ring-2 focus-visible:ring-primary-500"
+      <div class="flex min-w-0 shrink items-center gap-2">
+        <span class="shrink-0 text-sm text-muted-foreground">Zoradiť:</span>
+        <div class="min-w-0 w-[180px] max-w-full shrink">
+          <Select
+            :model-value="sortKey"
+            @update:model-value="(v) => emit('update:sortKey', v ?? 'id')"
           >
-            <SelectValue placeholder="Vyberte" />
-          </SelectTrigger>
-          <SelectContent>
+            <SelectTrigger
+              class="w-full min-w-0 rounded-lg border-border focus-visible:ring-2 focus-visible:ring-primary-500 [&>span]:min-w-0 [&>span]:truncate"
+            >
+              <SelectValue placeholder="Vyberte" />
+            </SelectTrigger>
+            <SelectContent>
             <SelectItem
               v-for="opt in sortOptions"
               :key="opt.value"
@@ -65,6 +66,7 @@ function toggleSortOrder() {
             </SelectItem>
           </SelectContent>
         </Select>
+        </div>
         <Button
           variant="outline"
           size="icon"

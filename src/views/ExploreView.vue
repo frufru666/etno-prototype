@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopNav from '@/components/ct/TopNav.vue'
 import FilterSidebar from '@/components/ct/FilterSidebar.vue'
@@ -26,6 +26,11 @@ import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
 const route = useRoute()
 const router = useRouter()
 const isMobile = useIsMobile()
+/** Mobile only: 'map' | 'list' for tab; map is base layer, list is sliding overlay */
+const mobileExploreTab = ref<'map' | 'list'>('map')
+/** Mobile: restore scroll position when returning to list view */
+const resultsScrollY = ref(0)
+const resultsPanelRef = ref<HTMLElement | null>(null)
 const filterOpen = ref(false)
 const openSubPanelKey = ref<string | null>(null)
 const activeFilters = ref<Record<string, string[]>>({})
@@ -121,6 +126,18 @@ function onSearchSubmit(value: string) {
   pushExploreSearch(router, value)
 }
 
+function setMobileExploreTab(tab: 'map' | 'list') {
+  if (mobileExploreTab.value === 'list' && tab === 'map' && resultsPanelRef.value) {
+    resultsScrollY.value = resultsPanelRef.value.scrollTop
+  }
+  mobileExploreTab.value = tab
+  if (tab === 'list') {
+    nextTick(() => {
+      if (resultsPanelRef.value) resultsPanelRef.value.scrollTop = resultsScrollY.value
+    })
+  }
+}
+
 // Desktop: close sub-panel when clicking outside the filter aside
 const filterAsideRef = ref<HTMLElement | null>(null)
 function onDocumentMousedown(e: MouseEvent) {
@@ -201,24 +218,22 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="relative flex-1 pt-[108px] md:pt-[56px]">
-
+    <!-- Desktop: map above, list below -->
+    <div
+      v-if="!isMobile"
+      class="relative flex-1 pt-[56px]"
+    >
       <SearchOverlayPanel
         :items="filteredItems"
         :query="searchQuery"
-        :mobile="isMobile"
+        :mobile="false"
       />
-
-      <div
-        class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]"
-      >
+      <div class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]">
         <MapView :pins="mapPins" />
       </div>
-
-      <!-- Cards: shift right on desktop when filter open so filter doesn't cover them -->
       <div
         class="transition-[margin] duration-200"
-        :class="filterOpen && !isMobile ? (openSubPanelKey ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]' : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]') : ''"
+        :class="filterOpen ? (openSubPanelKey ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]' : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]') : ''"
       >
         <FilterChips
           :active-filters="activeFilters"
@@ -234,10 +249,83 @@ onUnmounted(() => {
           @update:sort-order="sortOrder = $event"
         />
       </div>
+      <Footer />
+    </div>
 
-      <!-- Mobile: Sheet from top when filter open -->
+    <!-- Mobile: full-bleed map base + sliding results panel + ViewSwitcher -->
+    <template v-else>
+      <div class="h-[100dvh] max-h-[100dvh] overflow-hidden relative">
+        <!-- Layer 1: Map (always mounted, full viewport, z-10) -->
+        <div class="absolute inset-0 z-[10]">
+          <MapView :pins="mapPins" />
+        </div>
+        <!-- Layer 2: Results panel (slides up over map, z-20) -->
+        <Transition
+          enter-active-class="transition-[transform] duration-250 ease-out"
+          enter-from-class="translate-y-full"
+          enter-to-class="translate-y-0"
+          leave-active-class="transition-[transform] duration-200 ease-in"
+          leave-from-class="translate-y-0"
+          leave-to-class="translate-y-full"
+        >
+          <div
+            v-show="mobileExploreTab === 'list'"
+            ref="resultsPanelRef"
+            class="fixed left-0 right-0 bottom-0 z-[20] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
+            :style="{ top: '108px', paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }"
+          >
+            <FilterChips
+              :active-filters="activeFilters"
+              @remove="removeFilter"
+              @clear="clearFilters"
+            />
+            <ResultsGrid
+              :items="filteredItems"
+              :sort-key="sortKey"
+              :sort-order="sortOrder"
+              :search-query="searchQuery"
+              @update:sort-key="sortKey = $event"
+              @update:sort-order="sortOrder = $event"
+            />
+            <Footer />
+          </div>
+        </Transition>
+        <!-- Layer 3: ViewSwitcher (fixed bottom, z-40) – active = white bg, blue text, smaller inner pill / more padding -->
+        <div
+          class="fixed left-1/2 -translate-x-1/2 z-40 flex h-14 w-[min(371px,calc(100vw-24px))] items-center rounded-full bg-primary-500 px-2 py-2 shadow-[0_4px_6.5px_rgba(0,0,0,0.25)]"
+          style="bottom: calc(16px + env(safe-area-inset-bottom, 0px));"
+          role="tablist"
+          aria-label="Map or list view"
+        >
+          <button
+            type="button"
+            class="flex-1 rounded-full py-2.5 text-base font-bold tracking-tight transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
+            :class="mobileExploreTab === 'map' ? 'bg-white text-primary-500' : 'bg-transparent text-white/80 hover:text-white'"
+            role="tab"
+            :aria-selected="mobileExploreTab === 'map'"
+            @click="setMobileExploreTab('map')"
+          >
+            Map
+          </button>
+          <button
+            type="button"
+            class="flex-1 rounded-full py-2.5 text-base font-bold tracking-tight transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
+            :class="mobileExploreTab === 'list' ? 'bg-white text-primary-500' : 'bg-transparent text-white/80 hover:text-white'"
+            role="tab"
+            :aria-selected="mobileExploreTab === 'list'"
+            @click="setMobileExploreTab('list')"
+          >
+            List view
+          </button>
+        </div>
+      </div>
+      <SearchOverlayPanel
+        :items="filteredItems"
+        :query="searchQuery"
+        :mobile="true"
+      />
       <Sheet
-        :open="isMobile && filterOpen"
+        :open="filterOpen"
         @update:open="(v) => { if (!v) filterOpen = false }"
       >
         <SheetContent
@@ -254,8 +342,6 @@ onUnmounted(() => {
           />
         </SheetContent>
       </Sheet>
-
-      <Footer />
-    </div>
+    </template>
   </div>
 </template>
