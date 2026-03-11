@@ -1,166 +1,185 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import TopNav from '@/components/ct/TopNav.vue'
-import FilterSidebar from '@/components/ct/FilterSidebar.vue'
-import FilterChips from '@/components/ct/FilterChips.vue'
-import ResultsGrid from '@/components/ct/ResultsGrid.vue'
-import SearchOverlayPanel from '@/components/ct/SearchOverlayPanel.vue'
-import SearchInput from '@/components/ct/SearchInput.vue'
-import Footer from '@/components/ct/Footer.vue'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import TopNav from "@/components/ct/TopNav.vue";
+import FloatingExploreHeader from "@/components/ct/FloatingExploreHeader.vue";
+import ViewSwitcher from "@/components/ct/ViewSwitcher.vue";
+import FilterSidebar from "@/components/ct/FilterSidebar.vue";
+import FilterChips from "@/components/ct/FilterChips.vue";
+import ResultsGrid from "@/components/ct/ResultsGrid.vue";
+import SearchOverlayPanel from "@/components/ct/SearchOverlayPanel.vue";
+import Footer from "@/components/ct/Footer.vue";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   getMapPins,
   getFilterQueryKeys,
   matchesFilters,
   matchesSearch,
   ITEMS,
-} from '@/data/mockData'
-import MapView from '@/components/ct/MapView.vue'
-import { Button } from '@/components/ui/button'
-import { useIsMobile } from '@/composables/useIsMobile'
-import { sortEtnoItems, type ItemSortKey } from '@/lib/itemPresentation'
-import { pushExploreSearch } from '@/lib/navigation'
-import { PhSlidersHorizontal, PhX } from '@phosphor-icons/vue'
+} from "@/data/mockData";
+import MapView from "@/components/ct/MapView.vue";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/composables/useIsMobile";
+import { sortEtnoItems, type ItemSortKey } from "@/lib/itemPresentation";
+import { pushExploreSearch } from "@/lib/navigation";
+import { PhSlidersHorizontal, PhX } from "@phosphor-icons/vue";
 
-const route = useRoute()
-const router = useRouter()
-const isMobile = useIsMobile()
+const route = useRoute();
+const router = useRouter();
+const isMobile = useIsMobile();
 /** Mobile only: 'map' | 'list' for tab; map is base layer, list is sliding overlay */
-const mobileExploreTab = ref<'map' | 'list'>('map')
+const mobileExploreTab = ref<"map" | "list">("map");
 /** Mobile: restore scroll position when returning to list view */
-const resultsScrollY = ref(0)
-const resultsPanelRef = ref<HTMLElement | null>(null)
-const filterOpen = ref(false)
-const openSubPanelKey = ref<string | null>(null)
-const activeFilters = ref<Record<string, string[]>>({})
-const sortKey = ref<ItemSortKey>('id')
-const sortOrder = ref<'asc' | 'desc'>('asc')
-const searchQuery = ref('')
+const resultsScrollY = ref(0);
+const resultsPanelRef = ref<HTMLElement | null>(null);
+const filterOpen = ref(false);
+const openSubPanelKey = ref<string | null>(null);
+const activeFilters = ref<Record<string, string[]>>({});
+const sortKey = ref<ItemSortKey>("id");
+const sortOrder = ref<"asc" | "desc">("asc");
+const searchQuery = ref("");
 
 // Build activeFilters from route.query (e.g. from Detail filter links)
-const filterKeys = getFilterQueryKeys()
+const filterKeys = getFilterQueryKeys();
 
-let syncingFromQuery = false
+let syncingFromQuery = false;
 function syncFiltersFromQuery() {
-  syncingFromQuery = true
-  const q = route.query
-  const next: Record<string, string[]> = {}
+  syncingFromQuery = true;
+  const q = route.query;
+  const next: Record<string, string[]> = {};
   for (const key of filterKeys) {
-    const val = q[key]
-    if (val == null) continue
-    const arr = Array.isArray(val) ? val : [val]
-    if (arr.length) next[key] = arr
+    const val = q[key];
+    if (val == null) continue;
+    const arr = Array.isArray(val) ? val : [val];
+    if (arr.length) next[key] = arr;
   }
-  activeFilters.value = next
+  activeFilters.value = next;
   queueMicrotask(() => {
-    syncingFromQuery = false
-  })
+    syncingFromQuery = false;
+  });
 }
 
 onMounted(() => {
-  if (!isMobile.value) filterOpen.value = true
-  syncFiltersFromQuery()
-  const q = route.query.q ?? route.query.query
-  searchQuery.value = typeof q === 'string' ? q : ''
-})
-watch(() => route.query, (query) => {
-  syncFiltersFromQuery()
-  const q = query.q ?? query.query
-  searchQuery.value = typeof q === 'string' ? q : ''
-}, { deep: true })
+  if (!isMobile.value) filterOpen.value = true;
+  syncFiltersFromQuery();
+  const q = route.query.q ?? route.query.query;
+  searchQuery.value = typeof q === "string" ? q : "";
+});
+watch(
+  () => route.query,
+  (query) => {
+    syncFiltersFromQuery();
+    const q = query.q ?? query.query;
+    searchQuery.value = typeof q === "string" ? q : "";
+  },
+  { deep: true },
+);
 
-watch(activeFilters, (filters) => {
-  if (syncingFromQuery) return
-  const nextQuery: Record<string, unknown> = { ...route.query }
+watch(
+  activeFilters,
+  (filters) => {
+    if (syncingFromQuery) return;
+    const nextQuery: Record<string, unknown> = { ...route.query };
 
-  // remove existing filter keys from query
-  for (const key of filterKeys) delete nextQuery[key]
+    // remove existing filter keys from query
+    for (const key of filterKeys) delete nextQuery[key];
 
-  // add active filters into query (so they persist on back navigation)
-  for (const [key, values] of Object.entries(filters)) {
-    if (!values?.length) continue
-    nextQuery[key] = values.length === 1 ? values[0] : values
-  }
+    // add active filters into query (so they persist on back navigation)
+    for (const [key, values] of Object.entries(filters)) {
+      if (!values?.length) continue;
+      nextQuery[key] = values.length === 1 ? values[0] : values;
+    }
 
-  router.replace({ query: nextQuery })
-}, { deep: true })
+    router.replace({ query: nextQuery });
+  },
+  { deep: true },
+);
 const filteredItems = computed(() => {
-  let list = ITEMS.filter((item) =>
-    matchesFilters(item, activeFilters.value)
-  )
-  list = list.filter((item) => matchesSearch(item, searchQuery.value))
-  return sortEtnoItems(list, sortKey.value, sortOrder.value)
-})
+  let list = ITEMS.filter((item) => matchesFilters(item, activeFilters.value));
+  list = list.filter((item) => matchesSearch(item, searchQuery.value));
+  return sortEtnoItems(list, sortKey.value, sortOrder.value);
+});
 
 const activeFilterCount = computed(() => {
   return Object.values(activeFilters.value).reduce(
     (sum, arr) => sum + (arr?.length ?? 0),
-    0
-  )
-})
+    0,
+  );
+});
 
-const mapPins = computed(() => getMapPins(filteredItems.value))
+const mapPins = computed(() => getMapPins(filteredItems.value));
 
 function removeFilter(key: string, value: string) {
-  const next = { ...activeFilters.value }
-  const arr = next[key]?.filter((v) => v !== value) ?? []
-  if (arr.length) next[key] = arr
-  else delete next[key]
-  activeFilters.value = next
+  const next = { ...activeFilters.value };
+  const arr = next[key]?.filter((v) => v !== value) ?? [];
+  if (arr.length) next[key] = arr;
+  else delete next[key];
+  activeFilters.value = next;
 }
 
 function clearFilters() {
-  activeFilters.value = {}
+  activeFilters.value = {};
 }
 
 function onSearchQueryChange(value: string) {
-  searchQuery.value = value
-  const next = { ...route.query }
-  if (value.trim()) next.q = value.trim()
-  else delete next.q
-  router.replace({ query: next })
+  searchQuery.value = value;
+  const next = { ...route.query };
+  if (value.trim()) next.q = value.trim();
+  else delete next.q;
+  router.replace({ query: next });
 }
 
 function onSearchSubmit(value: string) {
-  pushExploreSearch(router, value)
+  pushExploreSearch(router, value);
 }
 
-function setMobileExploreTab(tab: 'map' | 'list') {
-  if (mobileExploreTab.value === 'list' && tab === 'map' && resultsPanelRef.value) {
-    resultsScrollY.value = resultsPanelRef.value.scrollTop
+function setMobileExploreTab(tab: "map" | "list") {
+  if (
+    mobileExploreTab.value === "list" &&
+    tab === "map" &&
+    resultsPanelRef.value
+  ) {
+    resultsScrollY.value = resultsPanelRef.value.scrollTop;
   }
-  mobileExploreTab.value = tab
-  if (tab === 'list') {
+  mobileExploreTab.value = tab;
+  if (tab === "list") {
     nextTick(() => {
-      if (resultsPanelRef.value) resultsPanelRef.value.scrollTop = resultsScrollY.value
-    })
+      if (resultsPanelRef.value)
+        resultsPanelRef.value.scrollTop = resultsScrollY.value;
+    });
   }
 }
 
 // Desktop: close sub-panel when clicking outside the filter aside
-const filterAsideRef = ref<HTMLElement | null>(null)
+const filterAsideRef = ref<HTMLElement | null>(null);
 function onDocumentMousedown(e: MouseEvent) {
-  if (!isMobile.value && openSubPanelKey.value && filterAsideRef.value && !filterAsideRef.value.contains(e.target as Node)) {
-    openSubPanelKey.value = null
+  if (
+    !isMobile.value &&
+    openSubPanelKey.value &&
+    filterAsideRef.value &&
+    !filterAsideRef.value.contains(e.target as Node)
+  ) {
+    openSubPanelKey.value = null;
   }
 }
 onMounted(() => {
-  document.addEventListener('mousedown', onDocumentMousedown)
-})
+  document.addEventListener("mousedown", onDocumentMousedown);
+});
 onUnmounted(() => {
-  document.removeEventListener('mousedown', onDocumentMousedown)
-})
+  document.removeEventListener("mousedown", onDocumentMousedown);
+});
 </script>
 
 <template>
   <div class="min-h-dvh bg-background flex flex-col">
+    <!-- Desktop: TopNav with Filter + Search in nav -->
     <TopNav
+      v-if="!isMobile"
       :filter-open="filterOpen"
       :active-filter-count="activeFilterCount"
       :search-query="searchQuery"
       :mobile-show-search="false"
-      :mobile-show-filter-row="isMobile"
+      :mobile-show-filter-row="false"
       @toggle-filter="filterOpen = !filterOpen"
       @update:search-query="onSearchQueryChange"
       @search-submit="onSearchSubmit"
@@ -204,8 +223,8 @@ onUnmounted(() => {
         </Button>
       </div>
       <!-- Desktop: FilterSidebar directly below the Filter button -->
-<div
-      v-if="filterOpen"
+      <div
+        v-if="filterOpen"
         ref="filterAsideRef"
         class="flex min-h-0 max-h-[calc(100vh-80px)] flex-col overflow-visible"
         aria-label="Filter panel"
@@ -219,10 +238,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Desktop: map above, list below -->
-    <div
-      v-if="!isMobile"
-      class="relative flex-1 pt-[56px]"
-    >
+    <div v-if="!isMobile" class="relative flex-1 pt-[56px]">
       <SearchOverlayPanel
         :items="filteredItems"
         :query="searchQuery"
@@ -233,7 +249,13 @@ onUnmounted(() => {
       </div>
       <div
         class="transition-[margin] duration-200"
-        :class="filterOpen ? (openSubPanelKey ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]' : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]') : ''"
+        :class="
+          filterOpen
+            ? openSubPanelKey
+              ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]'
+              : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]'
+            : ''
+        "
       >
         <FilterChips
           :active-filters="activeFilters"
@@ -252,12 +274,17 @@ onUnmounted(() => {
       <Footer />
     </div>
 
-    <!-- Mobile: full-bleed map base + sliding results panel + ViewSwitcher -->
+    <!-- Mobile: full-bleed map + floating header + sliding results panel + ViewSwitcher (Figma) -->
     <template v-else>
       <div class="h-[100dvh] max-h-[100dvh] overflow-hidden relative">
         <!-- Layer 1: Map (always mounted, full viewport, z-10) -->
         <div class="absolute inset-0 z-[10]">
-          <MapView :pins="mapPins" />
+          <MapView
+            :pins="mapPins"
+            pin-style="secondary"
+            cluster-style="dark"
+            :show-zoom-controls="false"
+          />
         </div>
         <!-- Layer 2: Results panel (slides up over map, z-20) -->
         <Transition
@@ -271,8 +298,11 @@ onUnmounted(() => {
           <div
             v-show="mobileExploreTab === 'list'"
             ref="resultsPanelRef"
-            class="fixed left-0 right-0 bottom-0 z-[20] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
-            :style="{ top: '108px', paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }"
+            class="fixed left-0 right-0 bottom-0 z-[20] rounded-[24px_24px_24px_0] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
+            :style="{
+              top: 'calc(env(safe-area-inset-top, 0px) + 56px)',
+              paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+            }"
           >
             <FilterChips
               :active-filters="activeFilters"
@@ -290,43 +320,33 @@ onUnmounted(() => {
             <Footer />
           </div>
         </Transition>
-        <!-- Layer 3: ViewSwitcher (fixed bottom, z-40) – active = white bg, blue text, smaller inner pill / more padding -->
-        <div
-          class="fixed left-1/2 -translate-x-1/2 z-40 flex h-14 w-[min(371px,calc(100vw-24px))] items-center rounded-full bg-primary-500 px-2 py-2 shadow-[0_4px_6.5px_rgba(0,0,0,0.25)]"
-          style="bottom: calc(16px + env(safe-area-inset-bottom, 0px));"
-          role="tablist"
-          aria-label="Map or list view"
-        >
-          <button
-            type="button"
-            class="flex-1 rounded-full py-2.5 text-base font-bold tracking-tight transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
-            :class="mobileExploreTab === 'map' ? 'bg-white text-primary-500' : 'bg-transparent text-white/80 hover:text-white'"
-            role="tab"
-            :aria-selected="mobileExploreTab === 'map'"
-            @click="setMobileExploreTab('map')"
-          >
-            Map
-          </button>
-          <button
-            type="button"
-            class="flex-1 rounded-full py-2.5 text-base font-bold tracking-tight transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
-            :class="mobileExploreTab === 'list' ? 'bg-white text-primary-500' : 'bg-transparent text-white/80 hover:text-white'"
-            role="tab"
-            :aria-selected="mobileExploreTab === 'list'"
-            @click="setMobileExploreTab('list')"
-          >
-            List view
-          </button>
-        </div>
+        <!-- Layer 3: Floating header (Filter + Search + Menu) -->
+        <FloatingExploreHeader
+          :search-query="searchQuery"
+          :active-filter-count="activeFilterCount"
+          @toggle-filter="filterOpen = !filterOpen"
+          @update:search-query="onSearchQueryChange"
+          @search-submit="onSearchSubmit"
+        />
+        <!-- Layer 4: ViewSwitcher (Map | Item List) -->
+        <ViewSwitcher
+          :model-value="mobileExploreTab"
+          @update:model-value="setMobileExploreTab"
+        />
       </div>
       <SearchOverlayPanel
         :items="filteredItems"
         :query="searchQuery"
         :mobile="true"
+        position-class="fixed left-2 right-2 z-30 top-[calc(env(safe-area-inset-top,0px)+56px)] md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
       />
       <Sheet
         :open="filterOpen"
-        @update:open="(v) => { if (!v) filterOpen = false }"
+        @update:open="
+          (v) => {
+            if (!v) filterOpen = false;
+          }
+        "
       >
         <SheetContent
           side="top"

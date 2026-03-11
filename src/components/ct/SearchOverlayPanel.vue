@@ -12,7 +12,7 @@ withDefaults(
   {
     mobile: false,
     positionClass:
-      'fixed left-4 right-4 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2',
+      'fixed left-2 right-2 top-[104px] z-30 md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2',
   }
 )
 </script>

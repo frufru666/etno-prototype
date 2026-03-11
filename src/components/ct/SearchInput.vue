@@ -2,10 +2,12 @@
 import { Input } from '@/components/ui/input'
 import { PhMagnifyingGlass, PhX } from '@phosphor-icons/vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     modelValue: string
     placeholder?: string
+    /** When set, placeholder is "Search " + bold brand (e.g. "EtnoExplorer") */
+    placeholderBrand?: string
     inputClass?: string
   }>(),
   { placeholder: 'Hľadať v databáze', inputClass: '' }
@@ -16,6 +18,8 @@ const emit = defineEmits<{
   (e: 'submit', value: string): void
 }>()
 
+const effectivePlaceholder = props.placeholderBrand ? ' ' : props.placeholder
+
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter') {
     emit('submit', (e.target as HTMLInputElement).value ?? '')
@@ -24,14 +28,22 @@ function onKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="relative">
-    <PhMagnifyingGlass class="absolute left-3 top-1/2 h-6 w-6 -translate-y-1/2 text-[#A3A3A3]" aria-hidden />
+  <div class="relative flex w-full gap-1">
+    <PhMagnifyingGlass class="absolute left-3 top-1/2 z-10 h-6 w-6 -translate-y-1/2 text-[#A3A3A3]" aria-hidden />
+    <!-- When placeholderBrand is set, show "Search **brand**" as overlay when empty -->
+    <div
+      v-if="placeholderBrand && !modelValue"
+      class="pointer-events-none absolute left-11 top-1/2 z-10 -translate-y-1/2 text-[14px] text-[#A3A3A3]"
+      aria-hidden
+    >
+      Search <strong class="font-bold text-ct-neutral-700">{{ placeholderBrand }}</strong>
+    </div>
     <Input
       :model-value="modelValue"
       type="search"
       class="h-10 rounded-md pl-11 pr-9 [&::-webkit-search-cancel-button]:hidden"
       :class="inputClass"
-      :placeholder="placeholder"
+      :placeholder="effectivePlaceholder"
       aria-label="Search"
       @update:model-value="emit('update:modelValue', $event ?? '')"
       @keydown="onKeydown"
@@ -39,7 +51,7 @@ function onKeydown(e: KeyboardEvent) {
     <button
       v-if="modelValue.length > 0"
       type="button"
-      class="absolute right-2.5 top-1/2 -translate-y-1/2 text-primary-600 transition-colors hover:text-primary-700"
+      class="absolute right-2.5 top-1/2 z-10 -translate-y-1/2 text-primary-600 transition-colors hover:text-primary-700"
       aria-label="Clear search"
       @click="$emit('update:modelValue', '')"
     >
