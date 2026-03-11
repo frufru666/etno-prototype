@@ -187,10 +187,10 @@ onUnmounted(() => {
         </Button>
       </div>
       <!-- Desktop: FilterSidebar directly below the Filter button -->
-      <div
-        v-if="filterOpen"
+<div
+      v-if="filterOpen"
         ref="filterAsideRef"
-        class="overflow-visible"
+        class="flex min-h-0 max-h-[calc(100vh-80px)] flex-col overflow-visible"
         aria-label="Filter panel"
       >
         <FilterSidebar
