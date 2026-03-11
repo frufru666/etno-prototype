@@ -138,9 +138,10 @@
   }
 }
 
-/* Map markers and popup button use primary token */
-.mapboxgl-marker {
-  background-color: hsl(var(--primary)) !important;
+/* Mapbox canvas: avoid fixed left/top so layout flows correctly */
+.mapboxgl-canvas {
+  left: unset;
+  top: unset;
 }
 
 .detail-link-map {

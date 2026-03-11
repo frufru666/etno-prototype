@@ -61,9 +61,11 @@ function handleLogout() {
 <template>
   <Sheet v-model:open="open">
     <SheetTrigger as-child>
-      <Button variant="nav" size="icon-lg" :class="btnClass" aria-label="Open menu">
-        <PhList class="size-6" />
-      </Button>
+      <slot name="trigger">
+        <Button variant="nav" size="icon-lg" :class="btnClass" aria-label="Open menu">
+          <PhList class="size-6" />
+        </Button>
+      </slot>
     </SheetTrigger>
     <SheetContent side="right" class="w-[280px] sm:max-w-[320px]">
       <SheetHeader>

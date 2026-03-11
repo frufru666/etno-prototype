@@ -27,8 +27,14 @@ const props = withDefaults(
     pins: MapPin[];
     /** Compact mode for detail panel (single pin, no controls) */
     compact?: boolean;
+    /** Pin marker style: primary (blue), secondary (coral), or error (red) */
+    pinStyle?: "primary" | "secondary" | "error";
+    /** Cluster marker style: secondary (coral) or dark (Figma mobile) */
+    clusterStyle?: "secondary" | "dark";
+    /** When false, zoom/fit controls are hidden (e.g. on mobile) */
+    showZoomControls?: boolean;
   }>(),
-  { compact: false },
+  { compact: false, pinStyle: "secondary", clusterStyle: "secondary", showZoomControls: true },
 );
 
 const router = useRouter();
@@ -169,11 +175,22 @@ function focusCluster(lng: number, lat: number) {
   });
 }
 
+const MAP_PIN_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M128 16a88.1 88.1 0 0 0-88 88c0 75.3 80 132.17 83.41 134.55a8 8 0 0 0 9.18 0C136 236.17 216 179.3 216 104a88.1 88.1 0 0 0-88-88zm0 56a32 32 0 1 1-32 32 32 32 0 0 1 32-32z"/></svg>';
+
 function createPinElement(pin: MapPin): HTMLButtonElement {
   const el = document.createElement("button");
   el.type = "button";
+  const isError = props.pinStyle === "error";
+  const isCoral = props.pinStyle === "secondary";
+  const pinBg = isError ? "bg-error" : isCoral ? "bg-secondary-700" : "bg-primary-500";
   el.className =
-    "absolute z-10 h-7 w-7 -translate-x-1/2 -translate-y-full cursor-pointer rounded-full border-2 border-white bg-primary-500 shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin";
+    isError
+      ? "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-full cursor-pointer items-center justify-center rounded-[19px] border border-white bg-error shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin text-white"
+      : `absolute z-10 h-7 w-7 -translate-x-1/2 -translate-y-full cursor-pointer rounded-full border-2 border-white ${pinBg} shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin`;
+  if (isError) {
+    el.innerHTML = MAP_PIN_SVG;
+  }
   el.setAttribute("aria-label", pin.title);
   el.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -190,8 +207,14 @@ function createClusterElement(
 ): HTMLButtonElement {
   const el = document.createElement("button");
   el.type = "button";
+  const isDark = props.clusterStyle === "dark";
   el.className =
-    "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-secondary-500 text-xs font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster";
+    isDark
+      ? "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-[20px] border border-white text-base font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster"
+      : "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-secondary-500 text-xs font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster";
+  if (isDark) {
+    el.style.backgroundColor = "rgba(23, 23, 23, 0.4)";
+  }
   el.setAttribute("aria-label", `Klastre ${count} bodov`);
   el.textContent = String(count);
   el.addEventListener("click", (e) => {
@@ -210,9 +233,10 @@ function syncMarkers() {
   for (const item of displayItems.value) {
     if (item.type === "single") {
       const el = createPinElement(item.pin);
+      const pinOffset = props.pinStyle === "error" ? -16 : -14;
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([item.pin.lng, item.pin.lat])
-        .setOffset([0, -14])
+        .setOffset([0, pinOffset])
         .addTo(m);
       newMarkers.push(marker);
     } else {
@@ -366,10 +390,10 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- Map controls: top-right (below nav on mobile via top offset) -->
+      <!-- Map controls: top-right (hidden on mobile when showZoomControls is false) -->
       <div
-        v-if="!compact && pins.length > 0 && hasToken"
-        class="absolute right-2 top-[7.5rem] z-10 flex flex-col gap-1 rounded-lg border border-border bg-background/95 p-1 shadow-sm md:top-2"
+        v-if="showZoomControls && !compact && pins.length > 0 && hasToken"
+        class="absolute right-2 top-[7.5rem] z-10 flex flex-col gap-1 rounded-lg border border-border bg-background/95 p-1 md:top-2"
       >
         <Button
           variant="ghost"

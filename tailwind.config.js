@@ -32,6 +32,7 @@ module.exports = {
   			error: '#EF4444',
   			warning: '#F59E0B',
   			success: '#22C55E',
+  			'view-switcher-active': '#f0f5ef',
   			ct: {
   				neutral: {
   					'0': '#FFFFFF',
