@@ -42,7 +42,7 @@ const emit = defineEmits<{
       <SearchInput
         :model-value="searchQuery"
         placeholder-brand="EtnoExplorer"
-        input-class="h-10 w-full rounded-full bg-white border-0 text-[13px]"
+        input-class="h-10 w-full rounded-full bg-white border-0 text-base"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="emit('searchSubmit', $event)"
       />
