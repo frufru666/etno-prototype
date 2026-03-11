@@ -12,7 +12,6 @@ import { Dialog } from '@/components/ui/dialog'
 import UserAuthModal from '@/components/ct/UserAuthModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import {
-  PhInfo,
   PhUser,
   PhTranslate,
   PhSignIn,
@@ -64,8 +63,7 @@ function handleLogout() {
           : 'flex items-center gap-2 text-primary-500'
       "
     >
-      <PhInfo class="size-5" />
-      <span class="hidden sm:inline">Info</span>
+      Info
     </RouterLink>
   </Button>
 
