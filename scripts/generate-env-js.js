@@ -26,8 +26,9 @@ if (!existsSync(outDir)) {
   mkdirSync(outDir, { recursive: true })
 }
 
+const escaped = token ? token.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : ''
 const js = `// Generated from .env – do not commit. See .env.example.
-window.__VITE_MAPBOX_ACCESS_TOKEN__ = ${token ? `"${token.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : '""'};
+window.__VITE_MAPBOX_ACCESS_TOKEN__ = "${escaped}";
 `
 
 writeFileSync(outPath, js, 'utf-8')
