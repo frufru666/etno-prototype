@@ -45,7 +45,7 @@ function getSelectedCount(key: string): number {
               v-for="filter in FILTER_CATEGORIES[catKey].filters"
               :key="filter.key"
               type="button"
-              class="flex h-10 w-full cursor-pointer items-center justify-between rounded-md border px-3 py-2 transition-colors focus-visible:border-2 focus-visible:border-primary-500 focus-visible:bg-white focus-visible:outline-none"
+              class="flex h-10 [@media(max-height:900px)]:h-8 w-full cursor-pointer items-center justify-between rounded-md border px-3 py-2 transition-colors focus-visible:border-2 focus-visible:border-primary-500 focus-visible:bg-white focus-visible:outline-none"
               :class="[
                 activeKey === filter.key
                   ? 'border-2 border-primary-600 bg-primary-100 text-primary-600'

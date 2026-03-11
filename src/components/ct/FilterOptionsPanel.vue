@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import SearchInput from '@/components/ct/SearchInput.vue'
 import { getOptionsWithCounts } from '@/data/mockData'
 
@@ -40,17 +39,17 @@ const filteredOptions = computed(() => {
         @update:model-value="emit('update:searchQuery', String($event))"
       />
     </div>
-    <ScrollArea class="flex-1 min-h-0">
+    <div class="min-h-0 flex-1 overflow-y-auto">
       <div class="flex flex-col">
         <button
           v-for="opt in filteredOptions"
           :key="opt.value"
           type="button"
-          class="flex h-10 cursor-pointer items-center justify-between px-4 py-2 text-left transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
+          class="flex min-h-10 [@media(max-height:900px)]:min-h-8 cursor-pointer items-start justify-between gap-2 px-4 py-2 text-left transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
           :class="isSelected(opt.value) ? 'border border-primary-500 bg-primary-100' : 'border-b border-[#E5E5E5]'"
           @click="emit('toggle', opt.value, !isSelected(opt.value))"
         >
-          <div class="flex items-center gap-3">
+          <div class="flex min-w-0 flex-1 items-start gap-3">
             <Checkbox
               :model-value="isSelected(opt.value)"
               class="pointer-events-none h-5 w-5 rounded-sm border border-[#D4D4D4] shadow-none data-[state=checked]:border-primary-600 data-[state=checked]:bg-primary-100 data-[state=checked]:text-primary-600"
@@ -60,6 +59,6 @@ const filteredOptions = computed(() => {
           <span class="ml-2 shrink-0 text-sm font-medium text-primary-500">{{ opt.count }}</span>
         </button>
       </div>
-    </ScrollArea>
+    </div>
   </div>
 </template>

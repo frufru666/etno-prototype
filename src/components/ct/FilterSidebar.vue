@@ -173,10 +173,10 @@ const totalActiveCount = computed(() =>
           </div>
         </div>
         <!-- Panel 2: sub-panel — min-width 300px (closes on click outside) -->
-        <div
-          v-if="activePanelKey"
+<div
+        v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="min-w-[300px] w-[300px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+          class="min-w-[300px] w-[300px] shrink-0 flex h-[calc(100vh-90px)] min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div
             class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4"
