@@ -62,35 +62,27 @@ const mobileHeaderTitle = computed(() => {
         Etno Explorer SAV
       </RouterLink>
       <Button
-        :variant="isExploreActive ? 'primary' : 'nav'"
+        :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
         class="gap-2 rounded-md"
         as-child
       >
         <RouterLink
           to="/"
-          :class="
-            isExploreActive
-              ? 'flex items-center gap-2 text-white'
-              : 'flex items-center gap-2 text-primary-500'
-          "
+          class="flex items-center gap-2 text-primary-500"
         >
           Explore
         </RouterLink>
       </Button>
       <Button
-        :variant="isCollectionsActive ? 'primary' : 'nav'"
+        :variant="isCollectionsActive ? 'navActive' : 'nav'"
         size="lg"
         class="gap-2 rounded-md"
         as-child
       >
         <RouterLink
           to="/collections"
-          :class="
-            isCollectionsActive
-              ? 'flex items-center gap-2 text-white'
-              : 'flex items-center gap-2 text-primary-500'
-          "
+          class="flex items-center gap-2 text-primary-500"
         >
           Collections
         </RouterLink>

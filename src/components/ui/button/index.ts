@@ -16,6 +16,9 @@ export const buttonVariants = cva(
         // Used for inactive nav items (Explore / Collections / Info)
         nav:
           "bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
+        // Active nav item: 2px primary outline, blue text
+        navActive:
+          "border-2 border-primary-500 bg-transparent text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         secondary:
           "border border-primary-500 bg-white text-[var(--ct-primary-500)] hover:bg-primary-50 active:bg-primary-100 focus-visible:ring-2 focus-visible:ring-primary-500",
         outline:

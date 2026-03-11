@@ -201,7 +201,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="relative flex-1 pt-[108px] md:pt-[61px]">
+    <div class="relative flex-1 pt-[108px] md:pt-[56px]">
 
       <SearchOverlayPanel
         :items="filteredItems"

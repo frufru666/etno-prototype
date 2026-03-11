@@ -1,1 +1,7 @@
 node_modules
+dist
+.env
+.env.local
+public/env.js
+.env.*.local
+public/env.js

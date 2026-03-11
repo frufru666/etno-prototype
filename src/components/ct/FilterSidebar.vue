@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   PhArrowLeft,
   PhX,
-  PhSlidersHorizontal,
   PhMapPin,
 } from "@phosphor-icons/vue";
 import FilterCategoryList from "@/components/ct/FilterCategoryList.vue";
@@ -146,11 +145,7 @@ const totalActiveCount = computed(() =>
         >
           <div class="flex shrink-0 items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
-              <PhSlidersHorizontal
-                class="h-5 w-5 text-foreground"
-                aria-hidden
-              />
-              <span class="text-lg font-bold tracking-tight text-foreground"
+              <span class="text-lg font-semibold tracking-tight text-foreground"
                 >Filter Aktivít</span
               >
             </div>
