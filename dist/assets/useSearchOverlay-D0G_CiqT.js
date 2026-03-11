@@ -1,1 +1,0 @@
-import{I as c,A as o}from"./navigation-C1Xrz9Hz.js";import{a as t}from"./index-Cf-o2TQ1.js";function l(e){const r=t(()=>c.filter(s=>o(s,e.value))),a=t(()=>e.value.trim().length>0);return{searchFilteredItems:r,isSearchActive:a}}export{l as u};
