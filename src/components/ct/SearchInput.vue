@@ -41,7 +41,7 @@ function onKeydown(e: KeyboardEvent) {
     <Input
       :model-value="modelValue"
       type="search"
-      class="h-10 rounded-md pl-11 pr-9 [&::-webkit-search-cancel-button]:hidden"
+      class="h-10 rounded-md pl-11 pr-9 text-base [&::-webkit-search-cancel-button]:hidden"
       :class="inputClass"
       :placeholder="effectivePlaceholder"
       aria-label="Search"
