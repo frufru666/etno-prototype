@@ -1,125 +1,135 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
-import { FILTER_CATEGORIES } from '@/data/mockData'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { PhArrowLeft, PhX, PhSlidersHorizontal, PhMapPin } from '@phosphor-icons/vue'
-import FilterCategoryList from '@/components/ct/FilterCategoryList.vue'
-import FilterOptionsPanel from '@/components/ct/FilterOptionsPanel.vue'
+import { ref, watch, computed, onMounted, onUnmounted } from "vue";
+import { FILTER_CATEGORIES } from "@/data/mockData";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  PhArrowLeft,
+  PhX,
+  PhSlidersHorizontal,
+  PhMapPin,
+} from "@phosphor-icons/vue";
+import FilterCategoryList from "@/components/ct/FilterCategoryList.vue";
+import FilterOptionsPanel from "@/components/ct/FilterOptionsPanel.vue";
 
 const props = withDefaults(
   defineProps<{
-    activeFilters: Record<string, string[]>
-    mobile?: boolean
-    filteredCount?: number
+    activeFilters: Record<string, string[]>;
+    mobile?: boolean;
+    filteredCount?: number;
     /** Desktop: which category sub-panel is open (filter key). Lifted from parent for two-panel layout. */
-    openSubPanelKey?: string | null
+    openSubPanelKey?: string | null;
   }>(),
-  { mobile: false, filteredCount: 0, openSubPanelKey: null }
-)
+  { mobile: false, filteredCount: 0, openSubPanelKey: null },
+);
 
 const emit = defineEmits<{
-  (e: 'update:activeFilters', payload: Record<string, string[]>): void
-  (e: 'apply'): void
-  (e: 'close'): void
-  (e: 'update:openSubPanelKey', key: string | null): void
-}>()
+  (e: "update:activeFilters", payload: Record<string, string[]>): void;
+  (e: "apply"): void;
+  (e: "close"): void;
+  (e: "update:openSubPanelKey", key: string | null): void;
+}>();
 
 // Unified active panel key (used for both mobile and desktop)
-const activePanelKey = ref<string | null>(null)
+const activePanelKey = ref<string | null>(null);
 
 // Sync from parent when e.g. click-outside closes the panel (Desktop)
 watch(
   () => props.openSubPanelKey,
   (v) => {
     if (!props.mobile) {
-      activePanelKey.value = v ?? null
+      activePanelKey.value = v ?? null;
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 // Search query per expanded category
-const searchQuery = ref<Record<string, string>>({})
+const searchQuery = ref<Record<string, string>>({});
 
 function setValue(filterKey: string | null, value: string, selected: boolean) {
-  if (!filterKey) return
-  const current = props.activeFilters[filterKey] ?? []
+  if (!filterKey) return;
+  const current = props.activeFilters[filterKey] ?? [];
   const next = selected
-    ? (current.includes(value) ? current : [...current, value])
-    : current.filter((v) => v !== value)
-  const nextFilters = { ...props.activeFilters }
-  if (next.length) nextFilters[filterKey] = next
-  else delete nextFilters[filterKey]
-  emit('update:activeFilters', nextFilters)
+    ? current.includes(value)
+      ? current
+      : [...current, value]
+    : current.filter((v) => v !== value);
+  const nextFilters = { ...props.activeFilters };
+  if (next.length) nextFilters[filterKey] = next;
+  else delete nextFilters[filterKey];
+  emit("update:activeFilters", nextFilters);
 }
 
 function clearCategory(filterKey: string | null) {
-  if (!filterKey) return
-  const next = { ...props.activeFilters }
-  delete next[filterKey]
-  emit('update:activeFilters', next)
+  if (!filterKey) return;
+  const next = { ...props.activeFilters };
+  delete next[filterKey];
+  emit("update:activeFilters", next);
 }
 
 function clearAll() {
-  emit('update:activeFilters', {})
-  if (props.mobile) activePanelKey.value = null
+  emit("update:activeFilters", {});
+  if (props.mobile) activePanelKey.value = null;
 }
 
 function getSearchKey(filterKey: string | null): string {
-  if (!filterKey) return ''
-  return searchQuery.value[filterKey] ?? ''
+  if (!filterKey) return "";
+  return searchQuery.value[filterKey] ?? "";
 }
 
 function setSearchKey(filterKey: string | null, q: string) {
-  if (!filterKey) return
-  searchQuery.value = { ...searchQuery.value, [filterKey]: q }
+  if (!filterKey) return;
+  searchQuery.value = { ...searchQuery.value, [filterKey]: q };
 }
 
 function toggleCategory(key: string) {
   if (activePanelKey.value === key) {
-    closeSubPanel()
+    closeSubPanel();
   } else {
-    activePanelKey.value = key
+    activePanelKey.value = key;
     if (!props.mobile) {
-      emit('update:openSubPanelKey', key)
+      emit("update:openSubPanelKey", key);
     }
   }
 }
 
 function closeSubPanel() {
-  activePanelKey.value = null
+  activePanelKey.value = null;
   if (!props.mobile) {
-    emit('update:openSubPanelKey', null)
+    emit("update:openSubPanelKey", null);
   }
 }
 
 // Desktop: close second panel on click outside it (selection is kept)
-const desktopSubPanelRef = ref<HTMLElement | null>(null)
+const desktopSubPanelRef = ref<HTMLElement | null>(null);
 function onDocumentMousedown(e: MouseEvent) {
-  if (props.mobile) return
-  if (!activePanelKey.value || !desktopSubPanelRef.value) return
-  const target = e.target as Node
-  if (!desktopSubPanelRef.value.contains(target)) closeSubPanel()
+  if (props.mobile) return;
+  if (!activePanelKey.value || !desktopSubPanelRef.value) return;
+  const target = e.target as Node;
+  if (!desktopSubPanelRef.value.contains(target)) closeSubPanel();
 }
 onMounted(() => {
-  document.addEventListener('mousedown', onDocumentMousedown)
-})
+  document.addEventListener("mousedown", onDocumentMousedown);
+});
 onUnmounted(() => {
-  document.removeEventListener('mousedown', onDocumentMousedown)
-})
+  document.removeEventListener("mousedown", onDocumentMousedown);
+});
 
 function getCategoryLabel(filterKey: string): string {
   for (const cat of Object.values(FILTER_CATEGORIES)) {
-    const f = cat.filters.find((x) => x.key === filterKey)
-    if (f) return f.label
+    const f = cat.filters.find((x) => x.key === filterKey);
+    if (f) return f.label;
   }
-  return filterKey
+  return filterKey;
 }
 
 const totalActiveCount = computed(() =>
-  Object.values(props.activeFilters).reduce((sum, arr) => sum + (arr?.length ?? 0), 0)
-)
+  Object.values(props.activeFilters).reduce(
+    (sum, arr) => sum + (arr?.length ?? 0),
+    0,
+  ),
+);
 </script>
 
 <template>
@@ -130,17 +140,26 @@ const totalActiveCount = computed(() =>
     <!-- Desktop: two separate floating panels over map (wireframe) -->
     <template v-if="!mobile">
       <div class="flex items-start gap-3 min-w-0">
-        <!-- Panel 1: category list — standalone floating card 280px -->
-        <div class="w-[220px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:w-[240px] xl:w-[280px]">
+        <!-- Panel 1: category list — min-width 300px -->
+        <div
+          class="min-w-[300px] w-[300px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+        >
           <div class="flex shrink-0 items-center justify-between p-4 pb-0 mb-3">
             <div class="flex items-center gap-1.5">
-              <PhSlidersHorizontal class="h-5 w-5 text-foreground" aria-hidden />
-              <span class="text-lg font-bold tracking-tight text-foreground">Filter Aktivít</span>
+              <PhSlidersHorizontal
+                class="h-5 w-5 text-foreground"
+                aria-hidden
+              />
+              <span class="text-lg font-bold tracking-tight text-foreground"
+                >Filter Aktivít</span
+              >
             </div>
             <button
               type="button"
               class="text-sm font-semibold text-destructive px-1 py-0.5 transition-opacity hover:opacity-80"
-              :class="totalActiveCount === 0 && 'opacity-50 pointer-events-none'"
+              :class="
+                totalActiveCount === 0 && 'opacity-50 pointer-events-none'
+              "
               @click="clearAll"
             >
               Reset all
@@ -158,13 +177,15 @@ const totalActiveCount = computed(() =>
             </ScrollArea>
           </div>
         </div>
-        <!-- Panel 2: sub-panel — standalone floating card 320px (closes on click outside) -->
+        <!-- Panel 2: sub-panel — min-width 300px (closes on click outside) -->
         <div
           v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="w-[260px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:w-[280px] xl:w-[320px]"
+          class="min-w-[300px] w-[300px] shrink-0 flex min-h-0 flex-col max-h-[calc(100vh-90px)] overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
-          <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
+          <div
+            class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4"
+          >
             <div class="flex items-center gap-2">
               <Button
                 type="button"
@@ -175,12 +196,18 @@ const totalActiveCount = computed(() =>
               >
                 <PhArrowLeft class="h-5 w-5" />
               </Button>
-              <span class="text-base font-semibold tracking-tight text-foreground">{{ getCategoryLabel(activePanelKey) }}</span>
+              <span
+                class="text-base font-semibold tracking-tight text-foreground"
+                >{{ getCategoryLabel(activePanelKey) }}</span
+              >
             </div>
             <button
               type="button"
               class="text-sm font-semibold text-destructive px-2 py-1 transition-opacity hover:opacity-80"
-              :class="(activeFilters[activePanelKey]?.length ?? 0) === 0 && 'opacity-50 pointer-events-none'"
+              :class="
+                (activeFilters[activePanelKey]?.length ?? 0) === 0 &&
+                'opacity-50 pointer-events-none'
+              "
               @click="clearCategory(activePanelKey)"
             >
               Reset
@@ -201,7 +228,9 @@ const totalActiveCount = computed(() =>
 
     <!-- Mobile: top bar per wireframe — left close, right reset -->
     <template v-else>
-      <header class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+      <header
+        class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3"
+      >
         <button
           type="button"
           class="inline-flex items-center gap-2 text-base font-semibold text-primary-500 transition-opacity hover:opacity-80"
@@ -222,7 +251,9 @@ const totalActiveCount = computed(() =>
       <!-- Mobile step 2: sub-panel -->
       <template v-if="activePanelKey">
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4">
+          <div
+            class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4"
+          >
             <div class="flex items-center gap-2">
               <Button
                 type="button"
@@ -233,7 +264,10 @@ const totalActiveCount = computed(() =>
               >
                 <PhArrowLeft class="h-5 w-5" />
               </Button>
-              <span class="text-base font-semibold tracking-tight text-foreground">{{ getCategoryLabel(activePanelKey) }}</span>
+              <span
+                class="text-base font-semibold tracking-tight text-foreground"
+                >{{ getCategoryLabel(activePanelKey) }}</span
+              >
             </div>
           </div>
           <div class="flex min-h-0 flex-1 flex-col pb-4">
