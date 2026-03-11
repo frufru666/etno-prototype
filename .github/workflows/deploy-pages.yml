@@ -30,6 +30,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Inject Mapbox token so the map works on GitHub Pages.
+      # Add repo secret: Settings → Secrets and variables → Actions → MAPBOX_ACCESS_TOKEN
+      - name: Create .env for build
+        run: echo "VITE_MAPBOX_ACCESS_TOKEN=${{ secrets.MAPBOX_ACCESS_TOKEN }}" >> .env
+
       - name: Build
         run: npm run build
         env:
