@@ -172,11 +172,11 @@ const totalActiveCount = computed(() =>
             </ScrollArea>
           </div>
         </div>
-        <!-- Panel 2: sub-panel — min-width 300px (closes on click outside) -->
-<div
-        v-if="activePanelKey"
+        <!-- Panel 2: sub-panel — height fits content, max viewport, scrolls when overflow -->
+        <div
+          v-if="activePanelKey"
           ref="desktopSubPanelRef"
-          class="min-w-[300px] w-[300px] shrink-0 flex h-[calc(100vh-90px)] min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+          class="min-w-[300px] w-[300px] shrink-0 flex max-h-[calc(100vh-90px)] min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg"
         >
           <div
             class="shrink-0 flex items-center justify-between gap-2 px-4 pb-3 pt-4"
@@ -208,7 +208,7 @@ const totalActiveCount = computed(() =>
               Reset
             </button>
           </div>
-          <div class="flex min-h-0 flex-1 flex-col overflow-hidden pb-4">
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto pb-4">
             <FilterOptionsPanel
               :filter-key="activePanelKey"
               :active-filters="activeFilters"
