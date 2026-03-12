@@ -18,6 +18,7 @@ import {
   ITEMS,
 } from "@/data/mockData";
 import MapView from "@/components/ct/MapView.vue";
+import MapFilterInfobox from "@/components/ct/MapFilterInfobox.vue";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/composables/useIsMobile";
 import { sortEtnoItems, type ItemSortKey } from "@/lib/itemPresentation";
@@ -37,6 +38,7 @@ const mobileExploreTab = ref<"map" | "list">("map");
 /** Mobile: restore scroll position when returning to list view */
 const resultsScrollY = ref(0);
 const resultsPanelRef = ref<HTMLElement | null>(null);
+const desktopListRef = ref<HTMLElement | null>(null);
 const mapViewRef = ref<InstanceType<typeof MapView> | null>(null);
 const filterOpen = ref(false);
 const openSubPanelKey = ref<string | null>(null);
@@ -156,6 +158,11 @@ function setMobileExploreTab(tab: "map" | "list") {
   }
 }
 
+function scrollDesktopListIntoView() {
+  if (!desktopListRef.value) return;
+  desktopListRef.value.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 // Desktop: close sub-panel when clicking outside the filter aside
 const filterAsideRef = ref<HTMLElement | null>(null);
 function onDocumentMousedown(e: MouseEvent) {
@@ -202,7 +209,7 @@ onUnmounted(() => {
           type="button"
           variant="outline"
           size="sm"
-          class="gap-2 rounded-md shadow-sm"
+          class="gap-2 rounded-md border-0 shadow-sm"
           aria-label="Zavrieť filter"
           @click="filterOpen = false"
         >
@@ -222,7 +229,7 @@ onUnmounted(() => {
           Filter
           <span
             v-if="activeFilterCount > 0"
-            class="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-semibold"
+            class="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-semibold text-white"
           >
             {{ activeFilterCount }}
           </span>
@@ -252,9 +259,14 @@ onUnmounted(() => {
       />
       <div class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]">
         <MapView :pins="mapPins" :cooperative-gestures="true" />
+        <MapFilterInfobox
+          :count="filteredItems.length"
+          @show-list="scrollDesktopListIntoView"
+        />
       </div>
       <!-- Margin matches FilterSidebar: left-4 (16px) + panel(s) 300px each + gap-3 (12px) when sub-panel open -->
       <div
+        ref="desktopListRef"
         class="transition-[margin] duration-200"
         :class="
           filterOpen
