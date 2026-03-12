@@ -285,7 +285,7 @@ onUnmounted(() => {
     <template v-else>
       <div class="h-[100dvh] max-h-[100dvh] overflow-hidden relative">
         <!-- Layer 1: Map (always mounted, full viewport, z-10) -->
-        <div class="absolute inset-0 z-[10]">
+        <div class="fixed inset-0 z-[10]">
           <MapView
             ref="mapViewRef"
             :pins="mapPins"
@@ -308,8 +308,8 @@ onUnmounted(() => {
             ref="resultsPanelRef"
             class="fixed left-0 right-0 bottom-0 z-[20] rounded-[24px_24px_24px_0] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
             :style="{
-              top: 'calc(env(safe-area-inset-top, 0px) + 56px)',
-              paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+              top: '56px',
+              paddingBottom: '80px',
             }"
           >
             <FilterChips
@@ -338,8 +338,7 @@ onUnmounted(() => {
         />
         <!-- Layer 4: Fit-bounds (left) + ViewSwitcher (center) + Locate me (right) -->
         <div
-          class="pointer-events-none fixed left-2 right-2 z-40 flex items-center justify-between"
-          style="bottom: calc(8px + env(safe-area-inset-bottom, 0px))"
+          class="pointer-events-none fixed left-2 right-2 bottom-0 z-40 flex items-center justify-between pt-2 pb-2"
         >
           <Button
             type="button"
@@ -372,7 +371,7 @@ onUnmounted(() => {
         :items="filteredItems"
         :query="searchQuery"
         :mobile="true"
-        position-class="fixed left-2 right-2 z-30 top-[calc(env(safe-area-inset-top,0px)+56px)] md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
+        position-class="fixed left-2 right-2 z-30 top-[56px] md:left-1/2 md:right-auto md:top-[72px] md:w-[480px] md:-translate-x-1/2"
       />
       <Sheet
         :open="filterOpen"

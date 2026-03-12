@@ -18,8 +18,7 @@ const emit = defineEmits<{
 
 <template>
   <header
-    class="fixed left-2 right-2 z-30 flex items-center gap-3"
-    style="top: calc(env(safe-area-inset-top, 0px) + 8px)"
+    class="fixed left-2 right-2 top-0 z-30 flex items-center gap-3 pt-3"
     aria-label="Explore actions"
   >
     <Button
