@@ -50,7 +50,7 @@ function seek(seconds: number) {
         class="flex min-h-0 flex-1 flex-col"
         :class="item.hasTranscript && transcriptVisible ? '' : 'min-h-0'"
       >
-        <div class="flex min-h-[200px] flex-1 items-center justify-center bg-[#1c273b]">
+        <div class="flex min-h-[200px] flex-1 items-center justify-center bg-neutral-900">
           <span class="text-neutral-500">Video viewer placeholder</span>
         </div>
         <PlaybackControls

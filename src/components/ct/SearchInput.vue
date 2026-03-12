@@ -29,14 +29,14 @@ function onKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="relative flex w-full gap-1">
-    <PhMagnifyingGlass class="absolute left-3 top-1/2 z-10 h-6 w-6 -translate-y-1/2 text-[#A3A3A3]" aria-hidden />
+    <PhMagnifyingGlass class="absolute left-3 top-1/2 z-10 h-6 w-6 -translate-y-1/2 text-muted-foreground" aria-hidden />
     <!-- When placeholderBrand is set, show "Search **brand**" as overlay when empty -->
     <div
       v-if="placeholderBrand && !modelValue"
-      class="pointer-events-none absolute left-11 top-1/2 z-10 -translate-y-1/2 text-[14px] text-[#A3A3A3]"
+      class="pointer-events-none absolute left-11 top-1/2 z-10 -translate-y-1/2 text-[14px] text-muted-foreground"
       aria-hidden
     >
-      Search <strong class="font-bold text-ct-neutral-700">{{ placeholderBrand }}</strong>
+      Search <strong class="font-bold text-foreground">{{ placeholderBrand }}</strong>
     </div>
     <Input
       :model-value="modelValue"

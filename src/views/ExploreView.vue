@@ -306,7 +306,7 @@ onUnmounted(() => {
           <div
             v-show="mobileExploreTab === 'list'"
             ref="resultsPanelRef"
-            class="fixed left-0 right-0 bottom-0 z-[20] rounded-[24px_24px_24px_0] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
+            class="fixed left-0 right-0 bottom-0 z-[20] rounded-[24px_24px_24px_0] bg-muted overflow-y-auto overscroll-contain touch-manipulation"
             :style="{
               top: '56px',
               paddingBottom: '80px',

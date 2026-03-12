@@ -45,20 +45,20 @@ function getSelectedCount(key: string): number {
               v-for="filter in FILTER_CATEGORIES[catKey].filters"
               :key="filter.key"
               type="button"
-              class="flex h-10 [@media(max-height:900px)]:h-8 w-full cursor-pointer items-center justify-between rounded-md border px-3 py-2 transition-colors focus-visible:border-2 focus-visible:border-primary-500 focus-visible:bg-white focus-visible:outline-none"
+              class="flex h-10 [@media(max-height:900px)]:h-8 w-full cursor-pointer items-center justify-between rounded-md border px-3 py-2 transition-colors focus-visible:border-2 focus-visible:border-primary-500 focus-visible:bg-card focus-visible:outline-none"
               :class="[
                 activeKey === filter.key
                   ? 'border-2 border-primary-600 bg-primary-100 text-primary-600'
                   : getSelectedCount(filter.key) > 0
                     ? 'border-2 border-primary-600 bg-primary-100 text-primary-600'
-                    : 'border-[#E5E5E5] bg-white text-[#171717] hover:border-transparent hover:bg-primary-100',
+                  : 'border-border bg-card text-foreground hover:border-transparent hover:bg-primary-100',
               ]"
               @click.stop="emit('select', filter.key)"
             >
               <div class="flex min-w-0 items-center gap-2">
                 <span
                   class="truncate text-sm font-medium tracking-[-0.01em]"
-                  :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-[#171717]'"
+                  :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-foreground'"
                 >
                   {{ filter.label }}
                 </span>
@@ -71,7 +71,7 @@ function getSelectedCount(key: string): number {
               </div>
               <PhCaretRight
                 class="h-4 w-4 shrink-0"
-                :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-[#171717]'"
+                :class="activeKey === filter.key || getSelectedCount(filter.key) > 0 ? 'text-primary-600' : 'text-foreground'"
               />
             </button>
           </div>
