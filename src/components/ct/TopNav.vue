@@ -50,17 +50,10 @@ const mobileHeaderTitle = computed(() => {
   <!-- Desktop nav: single row with Explore / Collections toggles -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6 focus-within:outline-none"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 focus-within:outline-none"
     aria-label="Main navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
-      <div class="h-10 w-10 rounded-full bg-neutral-300" aria-hidden />
-      <RouterLink
-        to="/"
-        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-      >
-        Etno Explorer SAV
-      </RouterLink>
       <Button
         :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
@@ -91,8 +84,10 @@ const mobileHeaderTitle = computed(() => {
 
     <div class="flex flex-1 justify-center px-4">
       <SearchInput
-        class="w-full max-w-lg"
+        class="w-full max-w-2xl md:max-w-3xl"
         :model-value="props.searchQuery ?? ''"
+        placeholder-brand="EtnoExplorer"
+        input-class="h-11 w-full rounded-xl text-[15px]"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="emit('searchSubmit', $event)"
       />

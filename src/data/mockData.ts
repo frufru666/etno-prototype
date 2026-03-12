@@ -1434,19 +1434,46 @@ export interface MapPin {
   documentType: DocumentType;
   /** For map tooltip (wireframe): author line */
   authorDisplay?: string;
+  /** Optional thumbnail URL for expanded pin (96x96) */
+  thumbnailUrl?: string;
+  /** Location for tooltip: "obec, okres" */
+  locationDisplay?: string;
+  /** Year for tooltip (from studyPeriodStart) */
+  yearDisplay?: string;
+}
+
+/** Deterministic hash to assign placeholder thumbnails to ~80% of pins */
+function pinThumbnailHash(id: string): number {
+  return id.split("").reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+}
+
+function yearFromStudyPeriodStart(start?: string): string | undefined {
+  if (!start?.trim()) return undefined;
+  const y = start.trim().slice(0, 4);
+  return /^\d{4}$/.test(y) ? y : undefined;
 }
 
 export function getMapPins(items: EtnoItem[]): MapPin[] {
   return items
     .filter((d) => d.lat != null && d.lng != null)
-    .map((d) => ({
-      id: d.id,
-      lat: d.lat!,
-      lng: d.lng!,
-      title: d.title,
-      documentType: d.documentType,
-      authorDisplay: d.authors?.[0]?.name ?? undefined,
-    }));
+    .map((d) => {
+      const hash = Math.abs(pinThumbnailHash(d.id));
+      const hasPlaceholder = hash % 10 < 8;
+      const locationParts = [d.obec, d.okres].filter(Boolean) as string[];
+      return {
+        id: d.id,
+        lat: d.lat!,
+        lng: d.lng!,
+        title: d.title,
+        documentType: d.documentType,
+        authorDisplay: d.authors?.[0]?.name ?? undefined,
+        thumbnailUrl: hasPlaceholder
+          ? `https://picsum.photos/seed/${encodeURIComponent(d.id)}/144/144`
+          : undefined,
+        locationDisplay: locationParts.length > 0 ? locationParts.join(", ") : undefined,
+        yearDisplay: yearFromStudyPeriodStart(d.studyPeriodStart),
+      };
+    });
 }
 
 // ─── Metadata display configuration ─────────────────────────────────────────
