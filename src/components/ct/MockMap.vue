@@ -33,8 +33,16 @@ const props = withDefaults(
     clusterStyle?: "secondary" | "dark";
     /** When false, zoom/fit controls are hidden (e.g. on mobile) */
     showZoomControls?: boolean;
+    /** When true, requires ctrl+scroll to zoom (desktop scroll protection) */
+    cooperativeGestures?: boolean;
   }>(),
-  { compact: false, pinStyle: "secondary", clusterStyle: "secondary", showZoomControls: true },
+  {
+    compact: false,
+    pinStyle: "secondary",
+    clusterStyle: "secondary",
+    showZoomControls: true,
+    cooperativeGestures: false,
+  },
 );
 
 const router = useRouter();
@@ -168,6 +176,22 @@ function fitBounds() {
   m.fitBounds([sw, ne], { padding: 48, maxZoom: 14 });
 }
 
+function locate() {
+  if (!map.value || typeof navigator?.geolocation?.getCurrentPosition !== "function") return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const m = map.value;
+      if (!m) return;
+      m.flyTo({
+        center: [pos.coords.longitude, pos.coords.latitude],
+        zoom: 14,
+      });
+    },
+    () => {},
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+  );
+}
+
 function focusCluster(lng: number, lat: number) {
   map.value?.flyTo({
     center: [lng, lat],
@@ -183,11 +207,14 @@ function createPinElement(pin: MapPin): HTMLButtonElement {
   el.type = "button";
   const isError = props.pinStyle === "error";
   const isCoral = props.pinStyle === "secondary";
-  const pinBg = isError ? "bg-error" : isCoral ? "bg-secondary-700" : "bg-primary-500";
-  el.className =
-    isError
-      ? "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-full cursor-pointer items-center justify-center rounded-[19px] border border-white bg-error shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin text-white"
-      : `absolute z-10 h-7 w-7 -translate-x-1/2 -translate-y-full cursor-pointer rounded-full border-2 border-white ${pinBg} shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin`;
+  const pinBg = isError
+    ? "bg-error"
+    : isCoral
+      ? "bg-secondary-700"
+      : "bg-primary-500";
+  el.className = isError
+    ? "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-full cursor-pointer items-center justify-center rounded-[19px] border border-white bg-error shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin text-white"
+    : `absolute z-10 h-7 w-7 -translate-x-1/2 -translate-y-full cursor-pointer rounded-full border-2 border-white ${pinBg} shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 mapboxgl-marker-pin`;
   if (isError) {
     el.innerHTML = MAP_PIN_SVG;
   }
@@ -208,10 +235,9 @@ function createClusterElement(
   const el = document.createElement("button");
   el.type = "button";
   const isDark = props.clusterStyle === "dark";
-  el.className =
-    isDark
-      ? "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-[20px] border border-white text-base font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster"
-      : "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-secondary-500 text-xs font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster";
+  el.className = isDark
+    ? "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-[20px] border border-white text-base font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster"
+    : "absolute z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-secondary-500 text-xs font-bold text-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-cluster";
   if (isDark) {
     el.style.backgroundColor = "rgba(23, 23, 23, 0.4)";
   }
@@ -263,6 +289,7 @@ function initMap() {
     style: MAPBOX_STYLE,
     center: DEFAULT_CENTER,
     zoom: DEFAULT_ZOOM,
+    cooperativeGestures: props.cooperativeGestures,
   });
   map.value = mapInstance;
   mapInstance.on("load", () => {
@@ -299,6 +326,8 @@ watch(
 watch(displayItems, () => {
   if (map.value?.isStyleLoaded()) syncMarkers();
 });
+
+defineExpose({ fitBounds, locate });
 
 onMounted(() => {
   initMap();

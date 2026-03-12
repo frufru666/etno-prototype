@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import SearchInput from '@/components/ct/SearchInput.vue'
-import MobileMenu from '@/components/ct/MobileMenu.vue'
-import { PhList, PhPlus } from '@phosphor-icons/vue'
+import { Button } from "@/components/ui/button";
+import SearchInput from "@/components/ct/SearchInput.vue";
+import MobileMenu from "@/components/ct/MobileMenu.vue";
+import { PhList, PhPlus } from "@phosphor-icons/vue";
 
 defineProps<{
-  searchQuery: string
-  activeFilterCount: number
-}>()
+  searchQuery: string;
+  activeFilterCount: number;
+}>();
 
 const emit = defineEmits<{
-  (e: 'toggle-filter'): void
-  (e: 'update:searchQuery', value: string): void
-  (e: 'searchSubmit', value: string): void
-}>()
+  (e: "toggle-filter"): void;
+  (e: "update:searchQuery", value: string): void;
+  (e: "searchSubmit", value: string): void;
+}>();
 </script>
 
 <template>
@@ -25,7 +25,7 @@ const emit = defineEmits<{
     <Button
       type="button"
       variant="primary"
-      class="h-10 shrink-0 gap-2 rounded-full px-4 font-semibold"
+      class="h-10 shrink-0 gap-2 rounded-xl px-4 font-semibold"
       aria-label="Filter"
       @click="emit('toggle-filter')"
     >
@@ -42,7 +42,7 @@ const emit = defineEmits<{
       <SearchInput
         :model-value="searchQuery"
         placeholder-brand="EtnoExplorer"
-        input-class="h-10 w-full rounded-full bg-white border-0 text-base"
+        input-class="h-10 w-full rounded-xl bg-white border-0 text-base"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="emit('searchSubmit', $event)"
       />
@@ -51,9 +51,9 @@ const emit = defineEmits<{
       <template #trigger>
         <Button
           type="button"
-          variant="primary"
+          variant="secondary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-full"
+          class="h-10 w-10 shrink-0 rounded-xl border-0"
           aria-label="Open menu"
         >
           <PhList class="size-6" weight="bold" />

@@ -22,7 +22,12 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/composables/useIsMobile";
 import { sortEtnoItems, type ItemSortKey } from "@/lib/itemPresentation";
 import { pushExploreSearch } from "@/lib/navigation";
-import { PhSlidersHorizontal, PhX } from "@phosphor-icons/vue";
+import {
+  PhCompass,
+  PhCrosshair,
+  PhSlidersHorizontal,
+  PhX,
+} from "@phosphor-icons/vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +37,7 @@ const mobileExploreTab = ref<"map" | "list">("map");
 /** Mobile: restore scroll position when returning to list view */
 const resultsScrollY = ref(0);
 const resultsPanelRef = ref<HTMLElement | null>(null);
+const mapViewRef = ref<InstanceType<typeof MapView> | null>(null);
 const filterOpen = ref(false);
 const openSubPanelKey = ref<string | null>(null);
 const activeFilters = ref<Record<string, string[]>>({});
@@ -245,15 +251,16 @@ onUnmounted(() => {
         :mobile="false"
       />
       <div class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]">
-        <MapView :pins="mapPins" />
+        <MapView :pins="mapPins" :cooperative-gestures="true" />
       </div>
+      <!-- Margin matches FilterSidebar: left-4 (16px) + panel(s) 300px each + gap-3 (12px) when sub-panel open -->
       <div
         class="transition-[margin] duration-200"
         :class="
           filterOpen
             ? openSubPanelKey
-              ? 'md:ml-[236px] lg:ml-[548px] xl:ml-[628px]'
-              : 'md:ml-[236px] lg:ml-[256px] xl:ml-[296px]'
+              ? 'md:ml-[628px]'
+              : 'md:ml-[316px]'
             : ''
         "
       >
@@ -280,6 +287,7 @@ onUnmounted(() => {
         <!-- Layer 1: Map (always mounted, full viewport, z-10) -->
         <div class="absolute inset-0 z-[10]">
           <MapView
+            ref="mapViewRef"
             :pins="mapPins"
             pin-style="secondary"
             cluster-style="dark"
@@ -328,11 +336,37 @@ onUnmounted(() => {
           @update:search-query="onSearchQueryChange"
           @search-submit="onSearchSubmit"
         />
-        <!-- Layer 4: ViewSwitcher (Map | Item List) -->
-        <ViewSwitcher
-          :model-value="mobileExploreTab"
-          @update:model-value="setMobileExploreTab"
-        />
+        <!-- Layer 4: Fit-bounds (left) + ViewSwitcher (center) + Locate me (right) -->
+        <div
+          class="pointer-events-none fixed left-2 right-2 z-40 flex items-center justify-between"
+          style="bottom: calc(8px + env(safe-area-inset-bottom, 0px))"
+        >
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            class="pointer-events-auto h-10 w-10 shrink-0 rounded-xl border-0"
+            aria-label="Center map on all pins"
+            @click="mapViewRef?.fitBounds?.()"
+          >
+            <PhCrosshair class="size-6" weight="bold" />
+          </Button>
+          <ViewSwitcher
+            class="pointer-events-auto"
+            :model-value="mobileExploreTab"
+            @update:model-value="setMobileExploreTab"
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            class="pointer-events-auto h-10 w-10 shrink-0 rounded-xl border-0"
+            aria-label="Locate me"
+            @click="mapViewRef?.locate?.()"
+          >
+            <PhCompass class="size-6" weight="bold" />
+          </Button>
+        </div>
       </div>
       <SearchOverlayPanel
         :items="filteredItems"
