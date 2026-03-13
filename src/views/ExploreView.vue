@@ -102,9 +102,15 @@ watch(
   },
   { deep: true },
 );
+const mapSelectionIds = ref<string[] | null>(null);
+
 const filteredItems = computed(() => {
   let list = ITEMS.filter((item) => matchesFilters(item, activeFilters.value));
   list = list.filter((item) => matchesSearch(item, searchQuery.value));
+  if (mapSelectionIds.value && mapSelectionIds.value.length) {
+    const selected = new Set(mapSelectionIds.value);
+    list = list.filter((item) => selected.has(item.id));
+  }
   return sortEtnoItems(list, sortKey.value, sortOrder.value);
 });
 
@@ -161,6 +167,21 @@ function setMobileExploreTab(tab: "map" | "list") {
 function scrollDesktopListIntoView() {
   if (!desktopListRef.value) return;
   desktopListRef.value.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function clearMapSelection() {
+  mapSelectionIds.value = null;
+}
+
+function onShowAllInGrid(ids?: string[]) {
+  if (ids && ids.length) {
+    mapSelectionIds.value = ids;
+  }
+  if (isMobile.value) {
+    mobileExploreTab.value = "list";
+  } else {
+    scrollDesktopListIntoView();
+  }
 }
 
 // Desktop: close sub-panel when clicking outside the filter aside
@@ -258,7 +279,12 @@ onUnmounted(() => {
         :mobile="false"
       />
       <div class="relative h-[50vh] min-h-[200px] md:h-[calc(100vh-61px)]">
-        <MapView :pins="mapPins" :cooperative-gestures="true" />
+        <MapView
+          :pins="mapPins"
+          :items="filteredItems"
+          :cooperative-gestures="true"
+          @show-all-in-grid="onShowAllInGrid"
+        />
         <MapFilterInfobox
           :count="filteredItems.length"
           @show-list="scrollDesktopListIntoView"
@@ -281,6 +307,19 @@ onUnmounted(() => {
           @remove="removeFilter"
           @clear="clearFilters"
         />
+        <div
+          v-if="mapSelectionIds && mapSelectionIds.length"
+          class="px-4 pb-2"
+        >
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            @click="clearMapSelection"
+          >
+            <span>Výber z mapy ({{ mapSelectionIds.length }})</span>
+            <PhX class="h-3 w-3" />
+          </button>
+        </div>
         <ResultsGrid
           :items="filteredItems"
           :sort-key="sortKey"
@@ -301,9 +340,11 @@ onUnmounted(() => {
           <MapView
             ref="mapViewRef"
             :pins="mapPins"
+            :items="filteredItems"
             pin-style="secondary"
             cluster-style="dark"
             :show-zoom-controls="false"
+            @show-all-in-grid="onShowAllInGrid"
           />
         </div>
         <!-- Layer 2: Results panel (slides up over map, z-20) -->
@@ -329,6 +370,19 @@ onUnmounted(() => {
               @remove="removeFilter"
               @clear="clearFilters"
             />
+            <div
+              v-if="mapSelectionIds && mapSelectionIds.length"
+              class="px-4 pb-2"
+            >
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                @click="clearMapSelection"
+              >
+                <span>Výber z mapy ({{ mapSelectionIds.length }})</span>
+                <PhX class="h-3 w-3" />
+              </button>
+            </div>
             <ResultsGrid
               :items="filteredItems"
               :sort-key="sortKey"
