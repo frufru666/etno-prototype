@@ -62,13 +62,6 @@ function onSearchSubmit(value: string) {
     aria-label="Detail navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
-      <div class="h-10 w-10 rounded-full bg-neutral-300" aria-hidden />
-      <RouterLink
-        to="/"
-        class="truncate text-lg font-semibold text-primary-500 hover:text-primary-600"
-      >
-        Etno Explorer SAV
-      </RouterLink>
       <Button
         :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
@@ -100,7 +93,9 @@ function onSearchSubmit(value: string) {
     <div class="flex flex-1 items-center justify-center px-4">
       <SearchInput
         :model-value="searchQuery ?? ''"
-        class="w-full max-w-md"
+        class="w-full max-w-2xl md:max-w-3xl"
+        placeholder-brand="EtnoExplorer"
+        input-class="h-11 w-full rounded-xl text-[15px]"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="onSearchSubmit"
       />

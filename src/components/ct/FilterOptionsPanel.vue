@@ -46,7 +46,7 @@ const filteredOptions = computed(() => {
           :key="opt.value"
           type="button"
           class="flex min-h-10 [@media(max-height:900px)]:min-h-8 cursor-pointer items-start justify-between gap-2 px-4 py-2 text-left transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
-          :class="isSelected(opt.value) ? 'border border-primary-500 bg-primary-100' : 'border-b border-[#E5E5E5]'"
+          :class="isSelected(opt.value) ? 'bg-primary-100' : 'border-b border-[#E5E5E5]'"
           @click="emit('toggle', opt.value, !isSelected(opt.value))"
         >
           <div class="flex min-w-0 flex-1 items-start gap-3">

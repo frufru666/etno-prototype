@@ -1432,21 +1432,55 @@ export interface MapPin {
   lng: number;
   title: string;
   documentType: DocumentType;
+  /** For map tooltip: research collection name */
+  researchCollection?: string;
   /** For map tooltip (wireframe): author line */
   authorDisplay?: string;
+  /** Optional thumbnail URL for expanded pin (96x96) */
+  thumbnailUrl?: string;
+  /** Location for tooltip: "obec, okres" */
+  locationDisplay?: string;
+  /** Year for tooltip (from studyPeriodStart) */
+  yearDisplay?: string;
+}
+
+/** Deterministic hash to assign placeholder thumbnails to ~80% of pins */
+function pinThumbnailHash(id: string): number {
+  return id.split("").reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+}
+
+export function yearFromStudyPeriodStart(start?: string): string | undefined {
+  if (!start?.trim()) return undefined;
+  const y = start.trim().slice(0, 4);
+  return /^\d{4}$/.test(y) ? y : undefined;
 }
 
 export function getMapPins(items: EtnoItem[]): MapPin[] {
   return items
     .filter((d) => d.lat != null && d.lng != null)
-    .map((d) => ({
-      id: d.id,
-      lat: d.lat!,
-      lng: d.lng!,
-      title: d.title,
-      documentType: d.documentType,
-      authorDisplay: d.authors?.[0]?.name ?? undefined,
-    }));
+    .map((d) => {
+      const hash = Math.abs(pinThumbnailHash(d.id));
+      const hasPlaceholder = hash % 10 < 8;
+      const rawLocationParts = [d.obec, d.okres].filter(Boolean) as string[];
+      const locationParts =
+        rawLocationParts.length === 2 && rawLocationParts[0] === rawLocationParts[1]
+          ? [rawLocationParts[0]]
+          : rawLocationParts;
+      return {
+        id: d.id,
+        lat: d.lat!,
+        lng: d.lng!,
+        title: d.title,
+        documentType: d.documentType,
+        researchCollection: d.researchCollection ?? undefined,
+        authorDisplay: d.authors?.[0]?.name ?? undefined,
+        thumbnailUrl: hasPlaceholder
+          ? `https://picsum.photos/seed/${encodeURIComponent(d.id)}/144/144`
+          : undefined,
+        locationDisplay: locationParts.length > 0 ? locationParts.join(", ") : undefined,
+        yearDisplay: yearFromStudyPeriodStart(d.studyPeriodStart),
+      };
+    });
 }
 
 // ─── Metadata display configuration ─────────────────────────────────────────

@@ -32,7 +32,7 @@ const emit = defineEmits<{
       Filter
       <span
         v-if="activeFilterCount > 0"
-        class="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-semibold"
+        class="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-semibold text-white"
       >
         {{ activeFilterCount }}
       </span>

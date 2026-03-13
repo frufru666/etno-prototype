@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { EtnoItem } from '@/data/mockData'
-import { getCollectionsForItem, getDocumentsForItem, getMediaType } from '@/data/mockData'
+import type { MediaType } from '@/data/mockData'
+import { getCollectionsForItem, getDocumentsForItem, getMediaType, yearFromStudyPeriodStart } from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
+import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -24,6 +25,29 @@ const mediaType = getMediaType(props.item.documentType)
 const isMultiImage = mediaType === 'image' && props.item.hasTranscript
 const collections = getCollectionsForItem(props.item.id)
 const documents = getDocumentsForItem(props.item.id)
+
+const locationDisplay = computed(() => {
+  const raw = [props.item.obec, props.item.okres].filter(Boolean) as string[]
+  const parts =
+    raw.length === 2 && raw[0] === raw[1] ? [raw[0]] : raw
+  return parts.length > 0 ? parts.join(', ') : undefined
+})
+const yearDisplay = computed(() => yearFromStudyPeriodStart(props.item.studyPeriodStart))
+
+function typeChipClass(mediaType: MediaType): string {
+  switch (mediaType) {
+    case 'image':
+      return 'border-primary-200 bg-primary-50 text-primary-700'
+    case 'video':
+      return 'border-secondary-300 bg-secondary-100 text-secondary-800'
+    case 'audio':
+      return 'border-green-200 bg-green-50 text-green-800'
+    case 'pdf':
+      return 'border-amber-200 bg-amber-50 text-amber-800'
+    default:
+      return 'border-muted-foreground/30 bg-muted/50 text-muted-foreground'
+  }
+}
 </script>
 
 <template>
@@ -66,36 +90,36 @@ const documents = getDocumentsForItem(props.item.id)
           </span>
         </div>
       </div>
+      <!-- 1. Document type + collection/document meta – shared component -->
+      <MediaMetaRow
+        :document-type="item.documentType"
+        :media-type="mediaType"
+        :collection-count="collections.length"
+        :document-count="documents.length"
+        size="md"
+      />
+      <!-- 2. Location and year -->
+      <div
+        v-if="locationDisplay || yearDisplay"
+        class="line-clamp-1 flex flex-wrap items-baseline gap-x-1.5 text-xs text-muted-foreground"
+      >
+        <span v-if="locationDisplay">{{ locationDisplay }}</span>
+        <span v-if="locationDisplay && yearDisplay" class="shrink-0" aria-hidden>·</span>
+        <span v-if="yearDisplay">{{ yearDisplay }}</span>
+      </div>
+      <!-- 3. Title -->
       <h3 class="line-clamp-2 text-base font-semibold leading-tight text-foreground">
         {{ item.title }}
       </h3>
+      <!-- 4. Author / participants (same text style as location) -->
       <div class="space-y-0.5 text-sm text-muted-foreground">
         <p
           v-for="line in participantLines(item)"
           :key="line.label"
-          class="line-clamp-1 text-sm"
+          class="line-clamp-1 text-xs"
         >
           {{ line.label }} {{ line.names }}
         </p>
-      </div>
-      <div class="flex flex-wrap gap-1 pt-1">
-        <Badge variant="secondary" class="text-xs">
-          {{ item.documentType }}
-        </Badge>
-        <Badge
-          v-if="collections.length"
-          variant="outline"
-          class="text-xs border-primary-200 text-primary-600"
-        >
-          Kolekcia
-        </Badge>
-        <Badge
-          v-if="documents.length"
-          variant="outline"
-          class="text-xs border-muted-foreground/40 text-muted-foreground"
-        >
-          Dokument
-        </Badge>
       </div>
     </CardContent>
   </Card>

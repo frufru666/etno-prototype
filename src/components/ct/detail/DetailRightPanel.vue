@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   METADATA_SECTIONS,
@@ -15,6 +14,7 @@ import { participantLines } from '@/lib/itemPresentation'
 import { PhArrowSquareOut, PhCaretRight } from '@phosphor-icons/vue'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
+import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -97,6 +97,13 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         <h2 class="text-2xl font-bold tracking-tight text-foreground">
           {{ item.title }}
         </h2>
+        <MediaMetaRow
+          :document-type="item.documentType"
+          :media-type="item.mediaType"
+          :collection-count="getCollectionsForItem(item.id).length"
+          :document-count="getDocumentsForItem(item.id).length"
+          size="md"
+        />
         <p
           v-for="line in participantLines(item)"
           :key="line.label"
@@ -104,12 +111,6 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         >
           {{ line.label }} {{ line.names }}
         </p>
-        <Badge
-          variant="outline"
-          class="text-muted-foreground"
-        >
-          {{ item.documentType }}
-        </Badge>
       </div>
 
       <!-- 2. Abstract (inline, like keywords) -->

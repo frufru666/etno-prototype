@@ -47,7 +47,9 @@ const mobileBackTargetParams = computed(() =>
   fromCollectionSlug.value ? { slug: fromCollectionSlug.value } : undefined,
 );
 
-function labelForRouteName(name: string | symbol | null | undefined): string | null {
+function labelForRouteName(
+  name: string | symbol | null | undefined,
+): string | null {
   if (name === "explore") return "Explore";
   if (name === "collections") return "Collections";
   if (name === "collection-detail") return "Collection Detail";
@@ -214,11 +216,7 @@ watch(
       />
       <div
         class="md:flex md:flex-1 md:overflow-hidden"
-        :class="
-          isMobile && item
-            ? 'pt-[49px]'
-            : 'pt-[96px] md:pt-[57px]'
-        "
+        :class="isMobile && item ? 'pt-[49px]' : 'pt-[96px] md:pt-[57px]'"
       >
         <div
           class="relative min-w-0 md:flex-1 flex flex-col"
@@ -272,7 +270,9 @@ watch(
                   :image-count="imageCount"
                   desktop-transcript-in-layout
                   :transcript-visible="
-                    isMobile || mobileViewerFullscreen ? transcriptVisible : false
+                    isMobile || mobileViewerFullscreen
+                      ? transcriptVisible
+                      : false
                   "
                   @toggle-transcript="transcriptVisible = !transcriptVisible"
                 />
