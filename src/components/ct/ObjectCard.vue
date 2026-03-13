@@ -5,9 +5,7 @@ import type { MediaType } from '@/data/mockData'
 import { getCollectionsForItem, getDocumentsForItem, getMediaType, yearFromStudyPeriodStart } from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
-import { PhFolder, PhFileText } from '@phosphor-icons/vue'
+import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -29,7 +27,9 @@ const collections = getCollectionsForItem(props.item.id)
 const documents = getDocumentsForItem(props.item.id)
 
 const locationDisplay = computed(() => {
-  const parts = [props.item.obec, props.item.okres].filter(Boolean) as string[]
+  const raw = [props.item.obec, props.item.okres].filter(Boolean) as string[]
+  const parts =
+    raw.length === 2 && raw[0] === raw[1] ? [raw[0]] : raw
   return parts.length > 0 ? parts.join(', ') : undefined
 })
 const yearDisplay = computed(() => yearFromStudyPeriodStart(props.item.studyPeriodStart))
@@ -90,42 +90,14 @@ function typeChipClass(mediaType: MediaType): string {
           </span>
         </div>
       </div>
-      <!-- 1. Document type (left) + collection/document icons (right) – same as tooltip -->
-      <div class="flex flex-wrap items-center justify-between gap-1.5 text-xs text-muted-foreground">
-        <Badge
-          variant="outline"
-          :class="['flex items-center gap-1 text-xs border', typeChipClass(mediaType)]"
-        >
-          <MediaTypeIcon
-            :media-type="mediaType"
-            :has-transcript="item.hasTranscript"
-            class="h-3.5 w-3.5 shrink-0"
-          />
-          {{ item.documentType }}
-        </Badge>
-        <span class="flex shrink-0 items-center gap-2">
-          <span
-            v-if="collections.length"
-            class="flex items-center gap-1 text-muted-foreground"
-          >
-            <PhFolder class="h-4 w-4 shrink-0" aria-hidden />
-            <span class="font-medium">
-              Zbierka
-              <span class="opacity-80">({{ collections.length }})</span>
-            </span>
-          </span>
-          <span
-            v-if="documents.length"
-            class="flex items-center gap-1 text-muted-foreground"
-          >
-            <PhFileText class="h-4 w-4 shrink-0" aria-hidden />
-            <span class="font-medium">
-              Dokument
-              <span class="opacity-80">({{ documents.length }})</span>
-            </span>
-          </span>
-        </span>
-      </div>
+      <!-- 1. Document type + collection/document meta – shared component -->
+      <MediaMetaRow
+        :document-type="item.documentType"
+        :media-type="mediaType"
+        :collection-count="collections.length"
+        :document-count="documents.length"
+        size="md"
+      />
       <!-- 2. Location and year -->
       <div
         v-if="locationDisplay || yearDisplay"
@@ -139,12 +111,12 @@ function typeChipClass(mediaType: MediaType): string {
       <h3 class="line-clamp-2 text-base font-semibold leading-tight text-foreground">
         {{ item.title }}
       </h3>
-      <!-- 4. Author / participants -->
+      <!-- 4. Author / participants (same text style as location) -->
       <div class="space-y-0.5 text-sm text-muted-foreground">
         <p
           v-for="line in participantLines(item)"
           :key="line.label"
-          class="line-clamp-1 text-sm"
+          class="line-clamp-1 text-xs"
         >
           {{ line.label }} {{ line.names }}
         </p>

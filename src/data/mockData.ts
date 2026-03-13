@@ -1461,7 +1461,11 @@ export function getMapPins(items: EtnoItem[]): MapPin[] {
     .map((d) => {
       const hash = Math.abs(pinThumbnailHash(d.id));
       const hasPlaceholder = hash % 10 < 8;
-      const locationParts = [d.obec, d.okres].filter(Boolean) as string[];
+      const rawLocationParts = [d.obec, d.okres].filter(Boolean) as string[];
+      const locationParts =
+        rawLocationParts.length === 2 && rawLocationParts[0] === rawLocationParts[1]
+          ? [rawLocationParts[0]]
+          : rawLocationParts;
       return {
         id: d.id,
         lat: d.lat!,

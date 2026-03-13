@@ -21,6 +21,7 @@ import {
 } from "@/data/mockData";
 import type { MapPin } from "@/data/mockData";
 import type { MediaType } from "@/data/mockData";
+import MediaMetaRow from "@/components/ct/MediaMetaRow.vue";
 import { useIsMobile } from "@/composables/useIsMobile";
 
 const MAPBOX_STYLE = "mapbox://styles/metafori/cmmm7nqgh009r01sb26yj1pkk";
@@ -272,10 +273,14 @@ const tooltipPositionStyle = computed(() => ({
   transform: "translate(-50%, 0)",
 }));
 
-const tooltipMediaIcon = computed(() => {
+const tooltipMediaType = computed<MediaType>(() => {
   const pin = tooltipPin.value;
-  if (!pin) return PhFileText;
-  const mediaType = getMediaType(pin.documentType);
+  if (!pin) return "document";
+  return getMediaType(pin.documentType);
+});
+
+const tooltipMediaIcon = computed(() => {
+  const mediaType = tooltipMediaType.value;
   switch (mediaType) {
     case "image":
       return PhImage;
@@ -615,11 +620,44 @@ onUnmounted(() => {
             />
           </div>
           <div class="px-3 pt-3 pb-2">
-            <!-- Document type (left) + collection / document counts (right) -->
-            <div class="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span class="flex min-w-0 items-center gap-1">
-                <component :is="tooltipMediaIcon" class="h-3.5 w-3.5 shrink-0" />
-                <span class="truncate">{{ tooltipPin.documentType }}</span>
+            <!-- Shared media meta row (type chip only) -->
+            <MediaMetaRow
+              :document-type="tooltipPin.documentType"
+              :media-type="tooltipMediaType"
+              size="sm"
+            />
+            <!-- Location and year above title -->
+            <div
+              v-if="tooltipPin.locationDisplay || tooltipPin.yearDisplay"
+              class="mt-1 mb-1.5 line-clamp-1 text-xs text-muted-foreground"
+            >
+              <span class="truncate">
+                {{
+                  [tooltipPin.locationDisplay, tooltipPin.yearDisplay]
+                    .filter(Boolean)
+                    .join(", ")
+                }}
+              </span>
+            </div>
+            <h3
+              class="mb-1.5 line-clamp-3 text-sm font-semibold leading-tight text-foreground"
+            >
+              {{ tooltipPin.title }}
+            </h3>
+            <!-- Author (left) + collection/document counts (right) -->
+            <div
+              v-if="
+                tooltipPin.authorDisplay ||
+                tooltipCollectionsCount > 0 ||
+                tooltipDocumentsCount > 0
+              "
+              class="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted-foreground"
+            >
+              <span
+                v-if="tooltipPin.authorDisplay"
+                class="min-w-0 truncate"
+              >
+                {{ tooltipPin.authorDisplay }}
               </span>
               <span class="flex shrink-0 items-center gap-2 text-foreground/80">
                 <span
@@ -637,35 +675,6 @@ onUnmounted(() => {
                   <span>{{ tooltipDocumentsCount }}</span>
                 </span>
               </span>
-            </div>
-            <!-- Location and year above title -->
-            <div
-              v-if="tooltipPin.locationDisplay || tooltipPin.yearDisplay"
-              class="mb-1.5 line-clamp-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground"
-            >
-              <span v-if="tooltipPin.locationDisplay">{{ tooltipPin.locationDisplay }}</span>
-              <span
-                v-if="tooltipPin.locationDisplay && tooltipPin.yearDisplay"
-                class="shrink-0 text-muted-foreground/60"
-                aria-hidden
-              >
-                ·
-              </span>
-              <span v-if="tooltipPin.yearDisplay" class="text-muted-foreground/80">
-                {{ tooltipPin.yearDisplay }}
-              </span>
-            </div>
-            <h3
-              class="mb-1.5 line-clamp-3 text-sm font-semibold leading-tight text-foreground"
-            >
-              {{ tooltipPin.title }}
-            </h3>
-            <!-- Author below title (plain text) -->
-            <div
-              v-if="tooltipPin.authorDisplay"
-              class="mb-1.5 line-clamp-1 text-xs text-muted-foreground"
-            >
-              {{ tooltipPin.authorDisplay }}
             </div>
             <!-- Mobile: CTA to open detail -->
             <Button
