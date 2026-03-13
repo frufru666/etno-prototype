@@ -1432,6 +1432,8 @@ export interface MapPin {
   lng: number;
   title: string;
   documentType: DocumentType;
+  /** For map tooltip: research collection name */
+  researchCollection?: string;
   /** For map tooltip (wireframe): author line */
   authorDisplay?: string;
   /** Optional thumbnail URL for expanded pin (96x96) */
@@ -1447,7 +1449,7 @@ function pinThumbnailHash(id: string): number {
   return id.split("").reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
 }
 
-function yearFromStudyPeriodStart(start?: string): string | undefined {
+export function yearFromStudyPeriodStart(start?: string): string | undefined {
   if (!start?.trim()) return undefined;
   const y = start.trim().slice(0, 4);
   return /^\d{4}$/.test(y) ? y : undefined;
@@ -1466,6 +1468,7 @@ export function getMapPins(items: EtnoItem[]): MapPin[] {
         lng: d.lng!,
         title: d.title,
         documentType: d.documentType,
+        researchCollection: d.researchCollection ?? undefined,
         authorDisplay: d.authors?.[0]?.name ?? undefined,
         thumbnailUrl: hasPlaceholder
           ? `https://picsum.photos/seed/${encodeURIComponent(d.id)}/144/144`

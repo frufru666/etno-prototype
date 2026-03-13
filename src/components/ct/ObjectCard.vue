@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { EtnoItem } from '@/data/mockData'
-import { getCollectionsForItem, getDocumentsForItem, getMediaType } from '@/data/mockData'
+import type { MediaType } from '@/data/mockData'
+import { getCollectionsForItem, getDocumentsForItem, getMediaType, yearFromStudyPeriodStart } from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
+import { PhFolder, PhFileText } from '@phosphor-icons/vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -24,6 +27,27 @@ const mediaType = getMediaType(props.item.documentType)
 const isMultiImage = mediaType === 'image' && props.item.hasTranscript
 const collections = getCollectionsForItem(props.item.id)
 const documents = getDocumentsForItem(props.item.id)
+
+const locationDisplay = computed(() => {
+  const parts = [props.item.obec, props.item.okres].filter(Boolean) as string[]
+  return parts.length > 0 ? parts.join(', ') : undefined
+})
+const yearDisplay = computed(() => yearFromStudyPeriodStart(props.item.studyPeriodStart))
+
+function typeChipClass(mediaType: MediaType): string {
+  switch (mediaType) {
+    case 'image':
+      return 'border-primary-200 bg-primary-50 text-primary-700'
+    case 'video':
+      return 'border-secondary-300 bg-secondary-100 text-secondary-800'
+    case 'audio':
+      return 'border-green-200 bg-green-50 text-green-800'
+    case 'pdf':
+      return 'border-amber-200 bg-amber-50 text-amber-800'
+    default:
+      return 'border-muted-foreground/30 bg-muted/50 text-muted-foreground'
+  }
+}
 </script>
 
 <template>
@@ -66,9 +90,50 @@ const documents = getDocumentsForItem(props.item.id)
           </span>
         </div>
       </div>
+      <!-- 1. Document type (left) + collection/document icons (right) – same as tooltip -->
+      <div class="flex flex-wrap items-center justify-between gap-1.5 text-xs text-muted-foreground">
+        <Badge
+          variant="outline"
+          :class="['flex items-center gap-1 text-xs border', typeChipClass(mediaType)]"
+        >
+          <MediaTypeIcon
+            :media-type="mediaType"
+            :has-transcript="item.hasTranscript"
+            class="h-3.5 w-3.5 shrink-0"
+          />
+          {{ item.documentType }}
+        </Badge>
+        <span class="flex shrink-0 items-center gap-2">
+          <span
+            v-if="collections.length"
+            class="flex items-center gap-1 text-primary-600"
+          >
+            <PhFolder class="h-4 w-4 shrink-0" aria-hidden />
+            <span class="font-medium">Zbierka</span>
+          </span>
+          <span
+            v-if="documents.length"
+            class="flex items-center gap-1 text-muted-foreground"
+          >
+            <PhFileText class="h-4 w-4 shrink-0" aria-hidden />
+            <span class="font-medium">Dokument</span>
+          </span>
+        </span>
+      </div>
+      <!-- 2. Location and year -->
+      <div
+        v-if="locationDisplay || yearDisplay"
+        class="line-clamp-1 flex flex-wrap items-baseline gap-x-1.5 text-xs text-muted-foreground"
+      >
+        <span v-if="locationDisplay">{{ locationDisplay }}</span>
+        <span v-if="locationDisplay && yearDisplay" class="shrink-0" aria-hidden>·</span>
+        <span v-if="yearDisplay">{{ yearDisplay }}</span>
+      </div>
+      <!-- 3. Title -->
       <h3 class="line-clamp-2 text-base font-semibold leading-tight text-foreground">
         {{ item.title }}
       </h3>
+      <!-- 4. Author / participants -->
       <div class="space-y-0.5 text-sm text-muted-foreground">
         <p
           v-for="line in participantLines(item)"
@@ -77,25 +142,6 @@ const documents = getDocumentsForItem(props.item.id)
         >
           {{ line.label }} {{ line.names }}
         </p>
-      </div>
-      <div class="flex flex-wrap gap-1 pt-1">
-        <Badge variant="secondary" class="text-xs">
-          {{ item.documentType }}
-        </Badge>
-        <Badge
-          v-if="collections.length"
-          variant="outline"
-          class="text-xs border-primary-200 text-primary-600"
-        >
-          Kolekcia
-        </Badge>
-        <Badge
-          v-if="documents.length"
-          variant="outline"
-          class="text-xs border-muted-foreground/40 text-muted-foreground"
-        >
-          Dokument
-        </Badge>
       </div>
     </CardContent>
   </Card>

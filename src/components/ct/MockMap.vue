@@ -12,10 +12,12 @@ import {
   PhPlay,
   PhMusicNotes,
   PhFileText,
+  PhFolder,
 } from "@phosphor-icons/vue";
 import { getMediaType } from "@/data/mockData";
 import type { MapPin } from "@/data/mockData";
 import type { MediaType } from "@/data/mockData";
+import { useIsMobile } from "@/composables/useIsMobile";
 
 const MAPBOX_STYLE = "mapbox://styles/metafori/cmmm7nqgh009r01sb26yj1pkk";
 const TOOLTIP_WIDTH = 280;
@@ -23,7 +25,7 @@ const TOOLTIP_HEIGHT_APPROX = 180;
 const TOOLTIP_MARGIN = 16;
 const TOOLTIP_GAP_FROM_PIN = 16;
 const PIN_SIZE_NORMAL = 28;
-const PIN_SIZE_EXPANDED = 90;
+const PIN_SIZE_EXPANDED = 40;
 const PIN_OFFSET_NORMAL = -14;
 /** Expanded pin: center 16px above map point */
 const PIN_OFFSET_EXPANDED = -16;
@@ -65,6 +67,11 @@ const tooltipPin = ref<MapPin | null>(null);
 const tooltipPos = ref({ x: 0, y: 0 });
 /** When set, tooltip stays open until map click or second pin click (open detail) */
 const pinnedPinId = ref<string | null>(null);
+/** Desktop: when tooltip shows, pin turns blue (40px); click opens detail */
+const showOpenDetailHint = ref(false);
+const isMobile = useIsMobile();
+/** Element that currently has desktop active style (blue 40px) for cleanup */
+const desktopActivePinElRef = ref<HTMLElement | null>(null);
 
 // Token from runtime env.js only (never inlined in bundle; env.js is generated from .env)
 const token =
@@ -147,63 +154,50 @@ function updateTooltipPosition() {
   tooltipPos.value = { x: pt.x, y };
 }
 
-function expandPinEl(el: HTMLElement, pin: MapPin) {
+function expandPinEl(el: HTMLElement, _pin: MapPin) {
   el.classList.remove("h-7", "w-7", "h-8", "w-8");
-  el.classList.add("h-[90px]", "w-[90px]");
+  el.classList.add("h-10", "w-10");
   const iconWrap = el.querySelector(".pin-type-icon") as HTMLElement | null;
   if (iconWrap) {
-    iconWrap.classList.add("transition-opacity", "duration-100", "ease-out");
-  }
-  if (pin.thumbnailUrl) {
-    const existing = el.querySelector(".pin-expanded-content");
-    if (existing) existing.remove();
-    const wrap = document.createElement("span");
-    wrap.className =
-      "pin-expanded-content absolute inset-0 flex items-center justify-center overflow-hidden rounded-full bg-muted opacity-0 transition-opacity duration-100 ease-out";
-    const img = document.createElement("img");
-    img.src = pin.thumbnailUrl;
-    img.alt = pin.title;
-    img.className = "h-full w-full object-cover";
-    wrap.appendChild(img);
-    el.appendChild(wrap);
-    if (iconWrap) iconWrap.classList.add("opacity-0");
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        wrap.classList.add("opacity-100");
-      });
-    });
-  } else {
-    const existing = el.querySelector(".pin-expanded-content");
-    if (existing) existing.remove();
-    if (iconWrap) {
-      iconWrap.classList.remove("opacity-0", "[&_svg]:h-3.5", "[&_svg]:w-3.5");
-      iconWrap.classList.add("pin-expanded-icon", "[&_svg]:h-8", "[&_svg]:w-8");
-    }
+    iconWrap.classList.remove("[&_svg]:h-3.5", "[&_svg]:w-3.5");
+    iconWrap.classList.add("pin-expanded-icon", "[&_svg]:h-5", "[&_svg]:w-5");
   }
 }
 
+function applyDesktopActivePinStyle(el: HTMLElement) {
+  el.classList.add("!bg-primary-500");
+  desktopActivePinElRef.value = el;
+}
+
+function removeDesktopActivePinStyle(
+  el: HTMLElement | null,
+  onAfter?: () => void,
+) {
+  if (!el) {
+    onAfter?.();
+    return;
+  }
+  el.classList.remove("!bg-primary-500");
+  if (desktopActivePinElRef.value === el) desktopActivePinElRef.value = null;
+  onAfter?.();
+}
+
 function collapsePinEl(el: HTMLElement) {
-  el.classList.remove("h-[90px]", "w-[90px]");
+  removeDesktopActivePinStyle(el, () => {
+    el.classList.remove("h-10", "w-10");
   const isError = el.dataset.pinError === "true";
   if (isError) {
     el.classList.add("h-8", "w-8");
     el.innerHTML = MAP_PIN_SVG;
   } else {
     el.classList.add("h-7", "w-7");
-    const existing = el.querySelector(".pin-expanded-content") as HTMLElement | null;
     const iconWrap = el.querySelector(".pin-type-icon") as HTMLElement | null;
-    if (existing) {
-      existing.classList.add("opacity-0");
-      if (iconWrap) {
-        iconWrap.classList.remove("opacity-0", "pin-expanded-icon", "[&_svg]:h-8", "[&_svg]:w-8");
-        iconWrap.classList.add("[&_svg]:h-3.5", "[&_svg]:w-3.5");
-      }
-      setTimeout(() => existing.remove(), PIN_ANIMATION_MS);
-    } else if (iconWrap) {
-      iconWrap.classList.remove("pin-expanded-icon", "[&_svg]:h-8", "[&_svg]:w-8");
+    if (iconWrap) {
+      iconWrap.classList.remove("pin-expanded-icon", "[&_svg]:h-5", "[&_svg]:w-5");
       iconWrap.classList.add("[&_svg]:h-3.5", "[&_svg]:w-3.5");
     }
   }
+  });
 }
 
 function applyActiveState() {
@@ -243,10 +237,30 @@ function restoreTooltipToPinned() {
 }
 
 function hideTooltip() {
+  removeDesktopActivePinStyle(desktopActivePinElRef.value);
+  showOpenDetailHint.value = false;
   tooltipPin.value = null;
   pinnedPinId.value = null;
   nextTick(applyActiveState);
 }
+
+watch(tooltipPin, (pin) => {
+  removeDesktopActivePinStyle(desktopActivePinElRef.value);
+  showOpenDetailHint.value = false;
+  if (pin && !props.compact) {
+    showOpenDetailHint.value = true;
+  }
+});
+
+watch(showOpenDetailHint, (visible) => {
+  if (visible && !isMobile.value && tooltipPin.value) {
+    const pinId = tooltipPin.value.id;
+    const marker = markersRef.value.find((m) => (m.getElement() as HTMLElement).dataset.pinId === pinId);
+    if (marker) applyDesktopActivePinStyle(marker.getElement() as HTMLElement);
+  } else if (!visible) {
+    removeDesktopActivePinStyle(desktopActivePinElRef.value);
+  }
+});
 
 const tooltipPositionStyle = computed(() => ({
   left: tooltipPos.value.x + "px",
@@ -387,7 +401,11 @@ function createPinElement(pin: MapPin): HTMLButtonElement {
   });
   el.addEventListener("click", (e) => {
     e.stopPropagation();
-    if (pinnedPinId.value === pin.id && tooltipPin.value?.id === pin.id) {
+    const isPinnedAndThisPin = pinnedPinId.value === pin.id && tooltipPin.value?.id === pin.id;
+    const isHintVisibleAndThisPin = tooltipPin.value?.id === pin.id && showOpenDetailHint.value;
+    // Mobile: only CTA in tooltip opens detail. Desktop: second tap or hover-then-click on pill opens detail.
+    const shouldOpenDetail = !isMobile.value && (isPinnedAndThisPin || isHintVisibleAndThisPin);
+    if (shouldOpenDetail) {
       goToPin(pin);
       hideTooltip();
       pinnedPinId.value = null;
@@ -569,64 +587,71 @@ onUnmounted(() => {
             class="absolute left-1/2 bottom-full h-0 w-0 -translate-x-1/2 border-8 border-transparent"
             style="border-bottom-color: hsl(var(--background))"
           />
-          <div class="p-4">
-            <!-- File type icon + doc type, then title, then one row: author · location · year -->
+          <!-- Thumbnail at top of tooltip – image fills the area (no type label) -->
+          <div
+            v-if="tooltipPin.thumbnailUrl"
+            class="h-28 w-full overflow-hidden rounded-t-xl bg-muted"
+          >
+            <img
+              :src="tooltipPin.thumbnailUrl"
+              :alt="tooltipPin.title"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="px-3 pt-3 pb-2">
+            <!-- Document type (left) + collection icon (right) -->
+            <div class="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+              <span class="flex min-w-0 items-center gap-1">
+                <component :is="tooltipMediaIcon" class="h-3.5 w-3.5 shrink-0" />
+                <span class="truncate">{{ tooltipPin.documentType }}</span>
+              </span>
+              <span class="flex shrink-0 items-center gap-1.5 text-foreground/80">
+                <PhFolder
+                  v-if="tooltipPin.researchCollection"
+                  class="h-4 w-4 shrink-0"
+                  aria-label="Zbierka"
+                />
+              </span>
+            </div>
+            <!-- Location and year above title -->
             <div
-              class="mb-2 flex items-center gap-1.5 text-muted-foreground"
-              aria-hidden
+              v-if="tooltipPin.locationDisplay || tooltipPin.yearDisplay"
+              class="mb-1.5 line-clamp-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground"
             >
-              <component :is="tooltipMediaIcon" class="h-4 w-4 shrink-0" />
-              <span class="text-xs font-medium uppercase tracking-wide">
-                {{ tooltipPin.documentType }}
+              <span v-if="tooltipPin.locationDisplay">{{ tooltipPin.locationDisplay }}</span>
+              <span
+                v-if="tooltipPin.locationDisplay && tooltipPin.yearDisplay"
+                class="shrink-0 text-muted-foreground/60"
+                aria-hidden
+              >
+                ·
+              </span>
+              <span v-if="tooltipPin.yearDisplay" class="text-muted-foreground/80">
+                {{ tooltipPin.yearDisplay }}
               </span>
             </div>
             <h3
-              class="mb-2 line-clamp-3 text-sm font-semibold leading-tight text-foreground"
+              class="mb-1.5 line-clamp-3 text-sm font-semibold leading-tight text-foreground"
             >
               {{ tooltipPin.title }}
             </h3>
-            <div class="line-clamp-1 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs">
-              <button
-                v-if="tooltipPin.authorDisplay"
-                type="button"
-                class="cursor-pointer font-medium text-primary-500 underline-offset-2 hover:underline hover:text-primary-600 focus:outline-none focus:underline focus:ring-0"
-                @click="goToPin(tooltipPin)"
-              >
-                {{ tooltipPin.authorDisplay }}
-              </button>
-              <span
-                v-if="tooltipPin.authorDisplay && (tooltipPin.locationDisplay || tooltipPin.yearDisplay)"
-                class="shrink-0 text-muted-foreground/60"
-                aria-hidden
-              >
-                ·
-              </span>
-              <span
-                v-if="tooltipPin.locationDisplay"
-                class="text-muted-foreground"
-              >
-                {{ tooltipPin.locationDisplay }}
-              </span>
-              <span
-                v-if="tooltipPin.yearDisplay && (tooltipPin.authorDisplay || tooltipPin.locationDisplay)"
-                class="shrink-0 text-muted-foreground/60"
-                aria-hidden
-              >
-                ·
-              </span>
-              <span
-                v-if="tooltipPin.yearDisplay"
-                class="text-muted-foreground/80"
-              >
-                {{ tooltipPin.yearDisplay }}
-              </span>
-              <span
-                v-if="!tooltipPin.authorDisplay && !tooltipPin.locationDisplay && !tooltipPin.yearDisplay"
-                class="text-muted-foreground"
-              >
-                —
-              </span>
+            <!-- Author below title (plain text) -->
+            <div
+              v-if="tooltipPin.authorDisplay"
+              class="mb-1.5 line-clamp-1 text-xs text-muted-foreground"
+            >
+              {{ tooltipPin.authorDisplay }}
             </div>
+            <!-- Mobile: CTA to open detail -->
+            <Button
+              v-if="isMobile"
+              variant="default"
+              size="sm"
+              class="mt-1.5 w-full"
+              @click="goToPin(tooltipPin)"
+            >
+              Open detail
+            </Button>
           </div>
         </div>
       </Transition>
