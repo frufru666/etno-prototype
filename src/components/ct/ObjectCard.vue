@@ -106,17 +106,23 @@ function typeChipClass(mediaType: MediaType): string {
         <span class="flex shrink-0 items-center gap-2">
           <span
             v-if="collections.length"
-            class="flex items-center gap-1 text-primary-600"
+            class="flex items-center gap-1 text-muted-foreground"
           >
             <PhFolder class="h-4 w-4 shrink-0" aria-hidden />
-            <span class="font-medium">Zbierka</span>
+            <span class="font-medium">
+              Zbierka
+              <span class="opacity-80">({{ collections.length }})</span>
+            </span>
           </span>
           <span
             v-if="documents.length"
             class="flex items-center gap-1 text-muted-foreground"
           >
             <PhFileText class="h-4 w-4 shrink-0" aria-hidden />
-            <span class="font-medium">Dokument</span>
+            <span class="font-medium">
+              Dokument
+              <span class="opacity-80">({{ documents.length }})</span>
+            </span>
           </span>
         </span>
       </div>

@@ -14,7 +14,11 @@ import {
   PhFileText,
   PhFolder,
 } from "@phosphor-icons/vue";
-import { getMediaType } from "@/data/mockData";
+import {
+  getMediaType,
+  getCollectionsForItem,
+  getDocumentsForItem,
+} from "@/data/mockData";
 import type { MapPin } from "@/data/mockData";
 import type { MediaType } from "@/data/mockData";
 import { useIsMobile } from "@/composables/useIsMobile";
@@ -282,6 +286,18 @@ const tooltipMediaIcon = computed(() => {
     default:
       return PhFileText;
   }
+});
+
+const tooltipCollectionsCount = computed(() => {
+  const pin = tooltipPin.value;
+  if (!pin) return 0;
+  return getCollectionsForItem(pin.id).length;
+});
+
+const tooltipDocumentsCount = computed(() => {
+  const pin = tooltipPin.value;
+  if (!pin) return 0;
+  return getDocumentsForItem(pin.id).length;
 });
 
 function zoomIn() {
@@ -599,18 +615,27 @@ onUnmounted(() => {
             />
           </div>
           <div class="px-3 pt-3 pb-2">
-            <!-- Document type (left) + collection icon (right) -->
+            <!-- Document type (left) + collection / document counts (right) -->
             <div class="mb-1.5 flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span class="flex min-w-0 items-center gap-1">
                 <component :is="tooltipMediaIcon" class="h-3.5 w-3.5 shrink-0" />
                 <span class="truncate">{{ tooltipPin.documentType }}</span>
               </span>
-              <span class="flex shrink-0 items-center gap-1.5 text-foreground/80">
-                <PhFolder
-                  v-if="tooltipPin.researchCollection"
-                  class="h-4 w-4 shrink-0"
-                  aria-label="Zbierka"
-                />
+              <span class="flex shrink-0 items-center gap-2 text-foreground/80">
+                <span
+                  v-if="tooltipCollectionsCount > 0"
+                  class="flex items-center gap-1"
+                >
+                  <PhFolder class="h-4 w-4 shrink-0" aria-hidden />
+                  <span>{{ tooltipCollectionsCount }}</span>
+                </span>
+                <span
+                  v-if="tooltipDocumentsCount > 0"
+                  class="flex items-center gap-1"
+                >
+                  <PhFileText class="h-4 w-4 shrink-0" aria-hidden />
+                  <span>{{ tooltipDocumentsCount }}</span>
+                </span>
               </span>
             </div>
             <!-- Location and year above title -->
