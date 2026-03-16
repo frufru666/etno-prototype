@@ -13,7 +13,6 @@ const props = withDefaults(
     rightPanelOpen: boolean
     searchQuery?: string
     mobileContextLabel?: string
-    mobileContextId?: string
     mobileBackToName?: string
     mobileBackToParams?: Record<string, string | number>
     mobileBackAriaLabel?: string
@@ -126,12 +125,6 @@ function onSearchSubmit(value: string) {
         <div class="flex min-w-0 flex-1 items-center justify-start gap-3">
           <span class="truncate text-lg font-bold tracking-tight text-foreground">
             {{ props.mobileContextLabel ?? 'Detail' }}
-          </span>
-          <span
-            v-if="props.mobileContextId"
-            class="shrink-0 rounded-md border border-primary-300 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
-          >
-            ID {{ props.mobileContextId }}
           </span>
         </div>
         <MobileMenu />

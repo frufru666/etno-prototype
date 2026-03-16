@@ -10,11 +10,12 @@ import {
   getDocumentItems,
   type EtnoItem,
 } from '@/data/mockData'
-import { participantLines } from '@/lib/itemPresentation'
-import { PhArrowSquareOut, PhCaretRight } from '@phosphor-icons/vue'
+import { PhCaretRight } from '@phosphor-icons/vue'
+import { Badge } from '@/components/ui/badge'
 import DetailMap from '@/components/ct/detail/DetailMap.vue'
 import CollectionCard from '@/components/ct/CollectionCard.vue'
 import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
+import IdPill from '@/components/ct/IdPill.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -83,17 +84,14 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </Button>
       </div>
 
-      <!-- 1. Header (hidden on mobile when shown in hero block above) -->
+      <!-- 1. Header: Identifikátor, Názov, Autorstvo, Typ dokumentu, Výskumná zbierka, DOI -->
       <div
         v-if="!hideHeader"
         class="mb-5 space-y-1"
       >
-        <span
-          v-if="!showPanelHeader"
-          class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
-        >
-          {{ item.id }}
-        </span>
+        <div v-if="!showPanelHeader">
+          <IdPill :id="item.id" />
+        </div>
         <h2 class="text-2xl font-bold tracking-tight text-foreground">
           {{ item.title }}
         </h2>
@@ -103,50 +101,51 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
           :collection-count="getCollectionsForItem(item.id).length"
           :document-count="getDocumentsForItem(item.id).length"
           size="md"
+          class="border-b border-border pb-3"
         />
-        <p
-          v-for="line in participantLines(item)"
-          :key="line.label"
-          class="text-sm text-muted-foreground"
-        >
-          {{ line.label }} {{ line.names }}
-        </p>
-      </div>
-
-      <!-- 2. Abstract (inline, like keywords) -->
-      <div class="mb-7">
-        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
-          ABSTRAKT
-        </h4>
-        <p class="text-sm text-foreground">
-          {{ abstractDisplay(item) }}
-        </p>
-      </div>
-
-      <!-- 3. Kľúčové slová -->
-      <div class="mb-7">
-        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
-          KĽÚČOVÉ SLOVÁ
-        </h4>
-        <div class="flex flex-wrap gap-1.5">
-          <Badge
-            v-for="kw in item.keywords"
-            :key="kw"
-            variant="outline"
-            class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
-            @click="openExploreWithFilter('keywords', kw)"
-          >
-            {{ kw }}
-          </Badge>
+        <div class="flex flex-col gap-0.5">
+          <div class="flex items-baseline gap-2">
+            <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Autorstvo</span>
+            <span class="text-sm text-foreground">
+              {{ item.authors?.length ? item.authors.map((a) => a.name).join(', ') : '—' }}
+            </span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Výskumná zbierka</span>
+            <button
+              v-if="item.researchCollection"
+              type="button"
+              class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+              @click="openExploreWithFilter('researchCollection', item.researchCollection)"
+            >
+              {{ item.researchCollection }}
+            </button>
+            <span v-else class="text-sm text-foreground">—</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">DOI</span>
+            <span class="text-sm text-foreground">{{ item.doi ?? '—' }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- 4. Údaje (DataRow structure from Archeo) -->
-      <div class="mb-4">
-        <h3 class="mb-5 border-b-2 border-foreground pb-3 text-base font-bold tracking-tight text-foreground">
-          Údaje
-        </h3>
+      <!-- 2. PREPIS (Transcript) -->
+      <div v-if="item.hasTranscript" class="mb-6">
+        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          PREPIS
+        </h4>
+        <Button
+          variant="outline"
+          size="sm"
+          class="w-full justify-start"
+          @click="emit('show-transcript')"
+        >
+          Zobraziť prepis
+        </Button>
+      </div>
 
+      <!-- 3. Metadata sections (order per detailMetadataOrder.md) -->
+      <div class="mb-4">
         <template
           v-for="section in METADATA_SECTIONS"
           :key="section.title"
@@ -155,52 +154,104 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
             {{ section.title }}
           </h4>
           <div class="mb-6 flex flex-col">
-            <div
-              v-for="field in section.fields.filter((f) => f.getValue(item) != null)"
-              :key="field.key"
-              class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
-            >
-              <span
-                class="shrink-0 text-label-small text-muted-foreground"
-                :class="labelWidthClass"
+            <template v-for="field in section.fields" :key="field.key">
+              <!-- Abstract: always show with abstractDisplay fallback -->
+              <div
+                v-if="field.key === 'abstract'"
+                class="border-b border-border py-2.5 last:border-b-0"
               >
-                {{ field.label }}
-              </span>
-              <span class="min-w-0 flex-1 pl-2">
-                <template v-if="field.isLink && field.filterKey">
-                  <button
-                    type="button"
+                <p class="text-sm text-foreground">
+                  {{ abstractDisplay(item) }}
+                </p>
+              </div>
+              <!-- Keywords: badges -->
+              <div
+                v-else-if="field.key === 'keywords' && item.keywords?.length"
+                class="flex flex-wrap gap-1.5 border-b border-border py-2.5 last:border-b-0"
+              >
+                <Badge
+                  v-for="kw in item.keywords"
+                  :key="kw"
+                  variant="outline"
+                  class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+                  @click="openExploreWithFilter('keywords', kw)"
+                >
+                  {{ kw }}
+                </Badge>
+              </div>
+              <!-- Standard row (skip abstract/keywords when no value for standard display) -->
+              <div
+                v-else-if="field.key !== 'abstract' && field.key !== 'keywords' && field.getValue(item) != null"
+                class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
+              >
+                <span
+                  class="shrink-0 text-label-small text-muted-foreground"
+                  :class="labelWidthClass"
+                >
+                  {{ field.label }}
+                </span>
+                <span class="min-w-0 flex-1 pl-2">
+                  <template v-if="field.isLink && field.filterKey">
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                      @click="
+                        openExploreWithFilter(
+                          field.filterKey,
+                          field.getValue(item)
+                        )
+                      "
+                    >
+                      {{ field.getValue(item) }}
+                    </button>
+                  </template>
+                  <a
+                    v-else-if="field.key === 'license' && item.license"
+                    :href="item.license"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                    @click="
-                      openExploreWithFilter(
-                        field.filterKey,
-                        field.getValue(item)
-                      )
-                    "
                   >
                     {{ field.getValue(item) }}
-                    <PhArrowSquareOut class="h-3 w-3 shrink-0" />
-                  </button>
-                </template>
-                <a
-                  v-else-if="field.key === 'license' && item.license"
-                  :href="item.license"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                >
-                  {{ field.getValue(item) }}
-                  <PhArrowSquareOut class="h-3 w-3 shrink-0" />
-                </a>
-                <span
-                  v-else
-                  class="text-sm font-medium text-foreground"
-                >
-                  {{ field.getValue(item) }}
+                  </a>
+                  <span
+                    v-else
+                    class="text-sm font-medium text-foreground"
+                  >
+                    {{ field.getValue(item) }}
+                  </span>
                 </span>
-              </span>
-            </div>
+              </div>
+            </template>
           </div>
+
+          <!-- MAPA block after Geografické údaje -->
+          <template v-if="section.title === 'Geografické údaje' && item.hasMap && item.lat != null && item.lng != null">
+            <h4 class="mb-2 mt-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+              MAPA
+            </h4>
+            <div class="relative mb-6 w-full max-h-[160px] overflow-hidden rounded-md border border-border bg-primary-50" style="aspect-ratio: 2/1;">
+              <DetailMap
+                :lat="item.lat"
+                :lng="item.lng"
+                compact
+              />
+              <div
+                v-if="formatCoords(item)"
+                class="absolute bottom-2 left-2 z-10 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
+              >
+                {{ formatCoords(item) }}
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                class="absolute bottom-2 right-2 z-10"
+                @click="emit('open-map-fullscreen')"
+              >
+                Fullscreen →
+              </Button>
+            </div>
+          </template>
         </template>
       </div>
 
@@ -264,36 +315,6 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
         </div>
       </div>
 
-      <!-- 6. Lokalita -->
-      <div
-        v-if="item.hasMap && item.lat != null && item.lng != null"
-        class="space-y-2"
-      >
-        <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
-          LOKALITA
-        </h4>
-        <div class="relative w-full max-h-[160px] overflow-hidden rounded-md border border-border bg-primary-50" style="aspect-ratio: 2/1;">
-          <DetailMap
-            :lat="item.lat"
-            :lng="item.lng"
-            compact
-          />
-          <div
-            v-if="formatCoords(item)"
-            class="absolute bottom-2 left-2 z-10 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
-          >
-            {{ formatCoords(item) }}
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            class="absolute bottom-2 right-2 z-10"
-            @click="emit('open-map-fullscreen')"
-          >
-            Fullscreen →
-          </Button>
-        </div>
-      </div>
     </div>
   </component>
 </template>
