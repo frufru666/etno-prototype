@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import type { EtnoItem } from '@/data/mockData'
-import {
-  getCollectionsForItem,
-  getDocumentsForItem,
-} from '@/data/mockData'
 import { participantLines } from '@/lib/itemPresentation'
 import { Button } from '@/components/ui/button'
-import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
-import IdPill from '@/components/ct/IdPill.vue'
+import { Badge } from '@/components/ui/badge'
 
-const props = defineProps<{
+defineProps<{
   item: EtnoItem
   ctaLabel: string
 }>()
@@ -17,9 +12,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'open-viewer'): void
 }>()
-
-const collectionsForItem = () => getCollectionsForItem(props.item.id)
-const documentsForItem = () => getDocumentsForItem(props.item.id)
 </script>
 
 <template>
@@ -35,24 +27,22 @@ const documentsForItem = () => getDocumentsForItem(props.item.id)
     <span class="text-muted-foreground text-sm">Náhľad obsahu</span>
   </div>
   <div class="px-4 py-4 bg-background border-b border-border space-y-2">
-    <IdPill :id="item.id" />
+    <span class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded">
+      {{ item.id }}
+    </span>
     <h2 class="text-xl font-bold tracking-tight text-foreground">
-      {{ props.item.title }}
+      {{ item.title }}
     </h2>
     <p
-      v-for="line in participantLines(props.item)"
+      v-for="line in participantLines(item)"
       :key="line.label"
       class="text-sm text-muted-foreground"
     >
       {{ line.label }} {{ line.names }}
     </p>
-    <MediaMetaRow
-      :document-type="props.item.documentType"
-      :media-type="props.item.mediaType"
-      :collection-count="collectionsForItem().length"
-      :document-count="documentsForItem().length"
-      size="md"
-    />
+    <Badge variant="outline" class="text-muted-foreground">
+      {{ item.documentType }}
+    </Badge>
     <Button class="w-full mt-2" @click="emit('open-viewer')">
       {{ ctaLabel }}
     </Button>

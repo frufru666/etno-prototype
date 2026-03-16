@@ -1499,57 +1499,32 @@ export interface MetadataSection {
   fields: MetadataField[];
 }
 
-// Order and grouping per detailMetadataOrder.md (Detail Polozky pravý panel)
 export const METADATA_SECTIONS: MetadataSection[] = [
   {
-    title: "Popisné údaje",
-    fields: [
-      { key: "subtitle", label: "Podtitul", getValue: (d) => d.subtitle },
-      { key: "abstract", label: "Abstrakt", getValue: (d) => d.abstract },
-      { key: "keywords", label: "Kľúčové slová", getValue: (d) => d.keywords?.length ? d.keywords.join(", ") : undefined },
-      { key: "language", label: "Jazyk", getValue: (d) => d.language },
-      { key: "contentNote", label: "Poznámka k obsahu", getValue: (d) => d.note },
-    ],
-  },
-  {
-    title: "Autorstvo a pôvod",
+    title: "TEMATICKÉ A AUTORSKÉ ÚDAJE",
     fields: [
       {
         key: "authors",
-        label: "Autorstvo",
-        getValue: (d) => (d.authors?.length ? d.authors.map((a) => a.name).join(", ") : undefined),
+        label: "Autor",
+        getValue: (d) => d.authors?.length ? d.authors.map((a) => a.name).join(", ") : undefined,
         isLink: true,
         filterKey: "author",
       },
       {
-        key: "authorsOrcid",
-        label: "Autorstvo (ORCID)",
-        getValue: (d) => d.authors?.map((a) => a.orcid).filter(Boolean).join(", ") || undefined,
-      },
-      {
         key: "researchers",
-        label: "Výskum",
-        getValue: (d) => (d.researchers?.length ? d.researchers.map((a) => a.name).join(", ") : undefined),
-      },
-      {
-        key: "researchersOrcid",
-        label: "Výskum (ORCID)",
-        getValue: (d) => d.researchers?.map((a) => a.orcid).filter(Boolean).join(", ") || undefined,
+        label: "Výskumník",
+        getValue: (d) => d.researchers?.length ? d.researchers.map((a) => a.name).join(", ") : undefined,
       },
       {
         key: "originators",
-        label: "Pôvod",
-        getValue: (d) => (d.originators?.length ? d.originators.map((a) => a.name).join(", ") : undefined),
+        label: "Pôvodca",
+        getValue: (d) => d.originators?.length ? d.originators.map((a) => a.name).join(", ") : undefined,
       },
-      {
-        key: "originatorsOrcid",
-        label: "Pôvod (ORCID)",
-        getValue: (d) => d.originators?.map((a) => a.orcid).filter(Boolean).join(", ") || undefined,
-      },
+      { key: "doi", label: "DOI", getValue: (d) => d.doi },
     ],
   },
   {
-    title: "Geografické údaje",
+    title: "GEOGRAFICKÉ ÚDAJE",
     fields: [
       { key: "obec", label: "Obec", getValue: (d) => d.obec, isLink: true, filterKey: "obec" },
       { key: "castObce", label: "Časť obce", getValue: (d) => d.castObce },
@@ -1557,41 +1532,18 @@ export const METADATA_SECTIONS: MetadataSection[] = [
       { key: "kraj", label: "Kraj", getValue: (d) => d.kraj, isLink: true, filterKey: "kraj" },
       { key: "stat", label: "Štát", getValue: (d) => d.stat, isLink: true, filterKey: "stat" },
       { key: "lokalita", label: "Lokalita", getValue: (d) => d.lokalita },
-      { key: "locationNote", label: "Poznámka k lokalite", getValue: () => undefined },
     ],
   },
   {
-    title: "Technické a formálne údaje",
+    title: "FORMÁLNE ÚDAJE",
     fields: [
       {
-        key: "size",
-        label: "Veľkosť",
-        getValue: (d) => d.size,
-      },
-      { key: "sizeType", label: "Jednotka veľkosti", getValue: (d) => d.sizeType },
-      { key: "notation", label: "Spôsob záznamu", getValue: (d) => d.notation },
-      { key: "technicalNote", label: "Technická poznámka", getValue: () => undefined },
-    ],
-  },
-  {
-    title: "Pôvod a kontext výskumu",
-    fields: [
-      { key: "institution", label: "Inštitúcia", getValue: (d) => d.institution },
-      {
-        key: "institutionRor",
-        label: "Inštitúcia (ROR)",
-        getValue: (d) => d.institutionRor,
+        key: "documentType",
+        label: "Typ dokumentu",
+        getValue: (d) => d.documentType,
         isLink: true,
+        filterKey: "documentType",
       },
-      { key: "project", label: "Projekt", getValue: (d) => d.project },
-      {
-        key: "collectionMethod",
-        label: "Spôsob zberu",
-        getValue: (d) => d.collectionMethod,
-        isLink: true,
-        filterKey: "collectionMethod",
-      },
-      { key: "acquisitionMethod", label: "Spôsob získania", getValue: (d) => d.acquisitionMethod },
       {
         key: "studyPeriod",
         label: "Čas realizácie",
@@ -1602,31 +1554,57 @@ export const METADATA_SECTIONS: MetadataSection[] = [
         },
       },
       { key: "submissionDate", label: "Dátum odovzdania", getValue: (d) => d.submissionDate },
-      { key: "datePublished", label: "Dátum publikovania", getValue: () => undefined },
+      {
+        key: "collectionMethod",
+        label: "Spôsob zberu",
+        getValue: (d) => d.collectionMethod,
+        isLink: true,
+        filterKey: "collectionMethod",
+      },
+      { key: "acquisitionMethod", label: "Spôsob nadobudnutia", getValue: (d) => d.acquisitionMethod },
+      {
+        key: "size",
+        label: "Veľkosť",
+        getValue: (d) => {
+          if (!d.size) return undefined;
+          if (d.sizeType) return `${d.size} ${d.sizeType}`;
+          return d.size;
+        },
+      },
+      { key: "format", label: "Formát", getValue: (d) => d.format },
+      { key: "notation", label: "Zápis", getValue: (d) => d.notation },
+      { key: "language", label: "Jazyk", getValue: (d) => d.language },
     ],
   },
   {
-    title: "Práva a prístup",
+    title: "ADMINISTRATÍVNE ÚDAJE",
     fields: [
-      { key: "accessRight", label: "Prístupové práva", getValue: (d) => d.accessRight },
+      { key: "project", label: "Projekt", getValue: (d) => d.project },
+      {
+        key: "researchCollection",
+        label: "Výskumná zbierka",
+        getValue: (d) => d.researchCollection,
+        isLink: true,
+        filterKey: "researchCollection",
+      },
+      { key: "institution", label: "Inštitúcia", getValue: (d) => d.institution },
+      {
+        key: "institutionRor",
+        label: "ROR",
+        getValue: (d) => d.institutionRor,
+        isLink: true,
+      },
+      { key: "accessRight", label: "Prístup", getValue: (d) => d.accessRight },
       {
         key: "license",
         label: "Licencia",
         getValue: (d) => {
-          if (d.license?.includes("by-nc-nd")) return "CC BY-NC-ND 4.0";
-          if (d.license?.includes("by-nc-sa")) return "CC BY-NC-SA";
+          if (d.license.includes("by-nc-nd")) return "CC BY-NC-ND 4.0";
+          if (d.license.includes("by-nc-sa")) return "CC BY-NC-SA";
           return d.license;
         },
         isLink: true,
       },
-      { key: "termsOfUse", label: "Podmienky použitia", getValue: () => undefined },
-    ],
-  },
-  {
-    title: "Doplňujúce údaje",
-    fields: [
-      { key: "generalNote", label: "Všeobecná poznámka", getValue: () => undefined },
-      { key: "howToCite", label: "Ako citovať", getValue: () => undefined },
     ],
   },
 ];

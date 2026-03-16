@@ -35,15 +35,17 @@ const TOOLTIP_MARGIN = 16;
 const TOOLTIP_GAP_FROM_PIN = 16;
 const PIN_SIZE_NORMAL = 32;
 const PIN_SIZE_EXPANDED = 40;
-/** Multi-pin: 40px, blue with count */
+/** Multi-pin: 40px default, 48px when hover/open */
 const PIN_SIZE_MULTI = 40;
+const PIN_SIZE_MULTI_EXPANDED = 48;
 const PIN_OFFSET_NORMAL = -16;
 /** Expanded pin: center 16px above map point */
 const PIN_OFFSET_EXPANDED = -16;
-/** Multi-pin offset (half of 40px) */
-const PIN_OFFSET_MULTI = -20;
+/** Multi-pin: anchor at center so circle and number don't jump when scaling */
+const PIN_OFFSET_MULTI = 0;
+const PIN_OFFSET_MULTI_EXPANDED = 0;
 const PIN_ANIMATION_MS = 100;
-const ZOOM_ANIMATION_MS = 100;
+const ZOOM_ANIMATION_MS = 300;
 
 // Slovakia default
 const DEFAULT_CENTER: [number, number] = [19.5, 48.7];
@@ -64,8 +66,6 @@ const props = withDefaults(
     showZoomControls?: boolean;
     /** When true, requires ctrl+scroll to zoom (desktop scroll protection) */
     cooperativeGestures?: boolean;
-    /** When true (default), show mobile CTA in tooltip to open detail */
-    showDetailCta?: boolean;
   }>(),
   {
     compact: false,
@@ -73,7 +73,6 @@ const props = withDefaults(
     clusterStyle: "secondary",
     showZoomControls: true,
     cooperativeGestures: false,
-    showDetailCta: true,
   },
 );
 
@@ -95,6 +94,8 @@ const tooltipPos = ref({ x: 0, y: 0 });
 const pinnedPinId = ref<string | null>(null);
 /** When set, multi-pin tooltip is pinned */
 const pinnedMultiKey = ref<string | null>(null);
+/** When set, this multi-pin is hovered (scale only, no tooltip) */
+const hoveredMultiKey = ref<string | null>(null);
 /** Desktop: when tooltip shows, pin turns blue (40px); click opens detail */
 const showOpenDetailHint = ref(false);
 const isMobile = useIsMobile();
@@ -177,8 +178,8 @@ function updateTooltipPosition() {
 
   const pt = m.project(lngLat as [number, number]);
   const gap = TOOLTIP_GAP_FROM_PIN;
-  // Single: 40px pin; multi: 36px pin. Card top = bottom of circle + gap.
-  const pinHalf = multi ? PIN_SIZE_MULTI / 2 : PIN_SIZE_EXPANDED / 2;
+  // Single: 40px pin; multi: 48px when tooltip open. Card top = bottom of circle + gap.
+  const pinHalf = multi ? PIN_SIZE_MULTI_EXPANDED / 2 : PIN_SIZE_EXPANDED / 2;
   const y = pt.y + pinHalf + gap;
 
   tooltipPos.value = { x: pt.x, y };
@@ -238,6 +239,22 @@ function collapsePinEl(el: HTMLElement) {
   });
 }
 
+const MULTI_PIN_SCALE = 48 / 40; // h-12/h-10 so number scales with circle
+
+function expandMultiPinEl(el: HTMLElement) {
+  el.classList.remove("h-10", "w-10");
+  el.classList.add("h-12", "w-12");
+  const num = el.querySelector("span");
+  if (num) num.style.transform = `scale(${MULTI_PIN_SCALE})`;
+}
+
+function collapseMultiPinEl(el: HTMLElement) {
+  el.classList.remove("h-12", "w-12");
+  el.classList.add("h-10", "w-10");
+  const num = el.querySelector("span");
+  if (num) num.style.transform = "scale(1)";
+}
+
 function applyActiveState() {
   const activePin = tooltipPin.value;
   const activeMulti = tooltipMulti.value;
@@ -249,7 +266,13 @@ function applyActiveState() {
     const pinId = el.dataset.pinId;
     const multiKey = el.dataset.multiKey;
     if (multiKey) {
+      const isExpanded = multiKey === activeMultiKey || multiKey === hoveredMultiKey.value;
       marker.setOffset([0, PIN_OFFSET_MULTI]);
+      if (isExpanded) {
+        expandMultiPinEl(el);
+      } else {
+        collapseMultiPinEl(el);
+      }
       continue;
     }
     if (!pinId) continue;
@@ -315,6 +338,14 @@ function hideTooltip() {
   pinnedPinId.value = null;
   pinnedMultiKey.value = null;
   nextTick(applyActiveState);
+}
+
+function onShowInListClick() {
+  const multi = tooltipMulti.value;
+  if (!multi?.pins?.length) return;
+  const ids = multi.pins.map((p) => p.id);
+  hideTooltip();
+  emit("showAllInGrid", ids);
 }
 
 watch(
@@ -398,11 +429,17 @@ function getThumbnailClassForMediaType(mediaType: MediaType): string {
 }
 
 function zoomIn() {
-  map.value?.zoomIn({ duration: ZOOM_ANIMATION_MS });
+  const m = map.value;
+  if (!m) return;
+  const zoom = m.getZoom();
+  m.easeTo({ zoom: zoom + 1, duration: ZOOM_ANIMATION_MS });
 }
 
 function zoomOut() {
-  map.value?.zoomOut({ duration: ZOOM_ANIMATION_MS });
+  const m = map.value;
+  if (!m) return;
+  const zoom = m.getZoom();
+  m.easeTo({ zoom: zoom - 1, duration: ZOOM_ANIMATION_MS });
 }
 
 function fitBounds() {
@@ -550,14 +587,25 @@ function createMultiPinElement(
   el.type = "button";
   const key = getLocationKey(lng, lat);
   el.dataset.multiKey = key;
-  // Multi-pin: fixed 40px blue pill with count; no scale animation.
+  // Same style as cluster (rounded circle, border, shadow, text-base count) but blue and clickable. Grows to 48px on hover/open (same animation as single pins).
   el.className =
     "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-primary-500 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-multi";
-  const countSpan = document.createElement("span");
-  countSpan.className = "multi-count text-xs font-bold leading-none";
-  countSpan.textContent = String(pins.length);
-  el.appendChild(countSpan);
+  el.style.setProperty("--pin-duration", `${PIN_ANIMATION_MS}ms`);
+  el.style.transition = "width var(--pin-duration) ease-out, height var(--pin-duration) ease-out";
+  const numberSpan = document.createElement("span");
+  numberSpan.className =
+    "inline-flex origin-center items-center justify-center text-base font-bold transition-[transform] duration-[var(--pin-duration)] ease-out";
+  numberSpan.textContent = String(pins.length);
+  el.appendChild(numberSpan);
   el.setAttribute("aria-label", `${pins.length} položiek na rovnakom mieste`);
+  el.addEventListener("mouseenter", () => {
+    hoveredMultiKey.value = key;
+    nextTick(applyActiveState);
+  });
+  el.addEventListener("mouseleave", () => {
+    hoveredMultiKey.value = null;
+    nextTick(applyActiveState);
+  });
   el.addEventListener("click", (e) => {
     e.stopPropagation();
     pinnedPinId.value = null;
@@ -594,7 +642,7 @@ function syncMarkers() {
       newMarkers.push(marker);
     } else {
       const el = createMultiPinElement(item.lng, item.lat, item.pins);
-      const marker = new mapboxgl.Marker({ element: el })
+      const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
         .setLngLat([item.lng, item.lat])
         .setOffset([0, PIN_OFFSET_MULTI])
         .addTo(m);
@@ -634,15 +682,6 @@ function initMap() {
     } else if (props.pins.length > 1) {
       fitBounds();
     }
-    // Right-panel compact map: no pan/zoom; user must open fullscreen to interact
-    if (props.compact) {
-      mapInstance.dragPan.disable();
-      mapInstance.scrollZoom.disable();
-      mapInstance.doubleClickZoom.disable();
-      mapInstance.touchZoomRotate.disable();
-      // Also remove grab/hand cursor in compact (detail right panel) map
-      mapInstance.getCanvas().style.cursor = "default";
-    }
   });
   mapInstance.on("move", updateTooltipPosition);
   mapInstance.on("zoom", updateTooltipPosition);
@@ -670,27 +709,6 @@ watch(
     syncMarkers();
   },
   { deep: true },
-);
-
-watch(
-  () => props.compact,
-  (isCompact) => {
-    const m = map.value;
-    if (!m || !m.isStyleLoaded()) return;
-    if (isCompact) {
-      m.dragPan.disable();
-      m.scrollZoom.disable();
-      m.doubleClickZoom.disable();
-      m.touchZoomRotate.disable();
-      m.getCanvas().style.cursor = "default";
-    } else {
-      m.dragPan.enable();
-      m.scrollZoom.enable();
-      m.doubleClickZoom.enable();
-      m.touchZoomRotate.enable();
-      m.getCanvas().style.cursor = "";
-    }
-  },
 );
 
 defineExpose({ fitBounds, locate });
@@ -828,9 +846,9 @@ onUnmounted(() => {
                 </span>
               </span>
             </div>
-            <!-- Mobile: CTA to open detail (disabled when showDetailCta is false, e.g. fullscreen detail map) -->
+            <!-- Mobile: CTA to open detail -->
             <Button
-              v-if="isMobile && showDetailCta"
+              v-if="isMobile"
               variant="default"
               size="sm"
               class="mt-1.5 w-full"
@@ -879,25 +897,14 @@ onUnmounted(() => {
               </template>
             </div>
           </ScrollArea>
-          <div
-            v-if="tooltipMulti.pins.length >= 3"
-            class="border-t border-border p-2"
-          >
+          <div class="border-t border-border p-2">
             <Button
               variant="default"
               size="sm"
               class="w-full"
-              @click="
-                () => {
-                  hideTooltip();
-                  emit(
-                    'showAllInGrid',
-                    tooltipMulti.pins.map((p) => p.id),
-                  );
-                }
-              "
+              @click="onShowInListClick"
             >
-              Zobraziť iba tieto ({{ tooltipMulti.pins.length }})
+              Show in List
             </Button>
           </div>
         </div>

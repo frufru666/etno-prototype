@@ -81,22 +81,24 @@ function goToDetail() {
     class="flex w-full cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset"
     @click="goToDetail"
   >
-    <!-- Thumbnail (wireframe: small image or icon) -->
+    <!-- Thumbnail: 64×64px in compact (map multi-pin tooltip), else 96×96 -->
     <div
-      class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md"
-      :class="thumbnailClass()"
+      class="relative flex shrink-0 items-center justify-center overflow-hidden rounded-md"
+      :class="[
+        thumbnailClass(),
+        compact ? 'h-16 w-16' : 'h-24 w-24',
+      ]"
     >
       <img
         v-if="thumbnailUrl"
         :src="thumbnailUrl"
         :alt="item.title"
-        class="h-full w-full object-cover"
+        class="absolute inset-0 h-full w-full object-cover"
       />
       <MediaTypeIcon
-        v-else
         :media-type="mediaType"
         :has-transcript="item.hasTranscript"
-        class="h-6 w-6"
+        :class="compact ? 'h-6 w-6 shrink-0' : 'h-24 w-24 shrink-0'"
       />
     </div>
     <!-- Content: title, ID · type chip (wireframe), optional location/year, author, counts -->
