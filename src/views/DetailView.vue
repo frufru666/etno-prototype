@@ -183,7 +183,6 @@ watch(
       :right-panel-open="metadataPanelOpen"
       :search-query="searchQuery"
       :mobile-context-label="mobileContextLabel"
-      :mobile-context-id="fromCollectionSlug ? undefined : item?.id"
       :mobile-back-to-name="mobileBackTargetName"
       :mobile-back-to-params="mobileBackTargetParams"
       :mobile-back-aria-label="`Späť do ${detailBackLabel}`"
@@ -282,7 +281,7 @@ watch(
                 class="relative z-30 flex h-full flex-col bg-background"
               >
                 <template v-if="item.lat != null && item.lng != null">
-                  <DetailMap :lat="item.lat" :lng="item.lng" />
+                  <DetailMap :lat="item.lat" :lng="item.lng" :show-detail-cta="false" />
                   <div
                     class="absolute left-2 right-2 top-2 z-10 flex items-center justify-between"
                   >
@@ -387,7 +386,7 @@ watch(
           @action="openInMaps"
         />
         <div class="relative flex-1 min-h-0">
-          <DetailMap :lat="item.lat" :lng="item.lng" />
+          <DetailMap :lat="item.lat" :lng="item.lng" :show-detail-cta="false" />
         </div>
         <div
           class="absolute bottom-6 left-1/2 z-10 flex w-[calc(100%-32px)] max-w-[361px] -translate-x-1/2 items-center justify-between gap-2 rounded-lg border border-border bg-background px-2 py-1 shadow-sm"
