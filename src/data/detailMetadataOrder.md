@@ -19,7 +19,7 @@
 | Jazyk                            | Language                              |
 | Poznámka k obsahu                | Content note                          |
 |                                  |                                       |
-| **#Autorstvo a pôvod**           | **#Authors and Creators**             |
+| **#Autori a pôvodcovia**         | **#Authors and Creators**             |
 | Autorstvo                        | Author                                |
 | Autorstvo (ORCID)                | Author (ORCID)                        |
 | VyskumVýskum                     | Researcher                            |
