@@ -547,13 +547,10 @@ function createMultiPinElement(
   el.type = "button";
   const key = getLocationKey(lng, lat);
   el.dataset.multiKey = key;
-  // Multi-pin: fixed 40px blue pill with count; no scale animation.
+  // Same style as cluster (rounded circle, border, shadow, text-base count) but blue and clickable.
   el.className =
-    "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-primary-500 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-multi";
-  const countSpan = document.createElement("span");
-  countSpan.className = "multi-count text-xs font-bold leading-none";
-  countSpan.textContent = String(pins.length);
-  el.appendChild(countSpan);
+    "absolute z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-primary-500 text-base font-bold text-white shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 mapboxgl-marker-multi";
+  el.textContent = String(pins.length);
   el.setAttribute("aria-label", `${pins.length} položiek na rovnakom mieste`);
   el.addEventListener("click", (e) => {
     e.stopPropagation();
