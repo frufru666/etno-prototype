@@ -113,6 +113,16 @@ function toggleMetadataPanel() {
 
 function showTranscriptPanel() {
   transcriptPanelOpen.value = true;
+  leftPanelView.value = "media";
+}
+
+function onShowTranscriptFromPanel() {
+  if (isMobile.value) {
+    transcriptVisible.value = true;
+    mobileViewerFullscreen.value = true;
+  } else {
+    showTranscriptPanel();
+  }
 }
 
 function hideTranscriptPanel() {
@@ -323,12 +333,13 @@ watch(
               @open-viewer="mobileViewerFullscreen = true"
             />
             <div class="border-t border-border bg-background">
-              <DetailRightPanel
-                :item="item"
-                :mobile="true"
-                :hide-header="true"
-                @open-map-fullscreen="openMapFullscreen"
-              />
+            <DetailRightPanel
+              :item="item"
+              :mobile="true"
+              :hide-header="true"
+              @open-map-fullscreen="openMapFullscreen"
+              @show-transcript="onShowTranscriptFromPanel"
+            />
             </div>
           </template>
         </div>
@@ -349,6 +360,7 @@ watch(
             show-panel-header
             @hide-panel="hideMetadataPanel"
             @open-map-fullscreen="openMapFullscreen"
+            @show-transcript="onShowTranscriptFromPanel"
           />
         </aside>
       </div>

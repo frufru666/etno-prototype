@@ -7,6 +7,7 @@ import {
   yearFromStudyPeriodStart,
 } from "@/data/mockData";
 import MediaMetaRow from "@/components/ct/MediaMetaRow.vue";
+import MediaTypeIcon from "@/components/ct/MediaTypeIcon.vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{

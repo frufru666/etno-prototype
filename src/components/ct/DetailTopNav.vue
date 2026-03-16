@@ -117,7 +117,7 @@ function onSearchSubmit(value: string) {
         <Button
           variant="primary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-xl p-2 [&_svg]:size-6"
+          class="h-10 w-10 shrink-0 rounded-lg p-2 [&_svg]:size-6"
           :aria-label="props.mobileBackAriaLabel ?? 'Späť do Explore'"
           @click="goBackToExplore"
         >

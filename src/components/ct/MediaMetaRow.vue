@@ -4,16 +4,21 @@ import type { MediaType } from "@/data/mockData";
 import MediaTypeIcon from "@/components/ct/MediaTypeIcon.vue";
 import { PhFolder, PhFileText } from "@phosphor-icons/vue";
 
-const props = defineProps<{
-  documentType: string;
-  mediaType: MediaType;
-  collectionCount?: number;
-  documentCount?: number;
-  /** When true, show only [icon] [number] for counts (used in tooltips). */
-  compactCounts?: boolean;
-  /** Reserved for future tweaks; currently both sizes render at 12px. */
-  size?: "sm" | "md";
-}>();
+const props = withDefaults(
+  defineProps<{
+    documentType: string;
+    mediaType: MediaType;
+    collectionCount?: number;
+    documentCount?: number;
+    /** When true, show only [icon] [number] for counts (used in tooltips). */
+    compactCounts?: boolean;
+    /** When false, hide Zbierka/Dokument counts (e.g. in detail right panel). */
+    showCounts?: boolean;
+    /** Reserved for future tweaks; currently both sizes render at 12px. */
+    size?: "sm" | "md";
+  }>(),
+  { showCounts: true }
+);
 
 const sizeClass = computed(() => "text-xs");
 
@@ -50,7 +55,7 @@ function typeChipClass(mediaType: MediaType): string {
         <span class="truncate">{{ documentType }}</span>
       </span>
     </span>
-    <span class="flex shrink-0 items-center gap-2 text-foreground/80">
+    <span v-if="showCounts" class="flex shrink-0 items-center gap-2 text-foreground/80">
       <span
         v-if="collectionCount && collectionCount > 0"
         class="flex items-center gap-1 text-muted-foreground"
