@@ -9,6 +9,8 @@ const props = withDefaults(
     items: EtnoItem[];
     query: string;
     mobile?: boolean;
+    /** When set (e.g. from visual viewport when keyboard open), overrides mobile height */
+    heightPx?: number;
   }>(),
   { mobile: false },
 );
@@ -16,26 +18,44 @@ const props = withDefaults(
 
 <template>
   <div
-    class="flex flex-col overflow-hidden bg-background"
+    class="flex flex-col overflow-hidden bg-background rounded-2xl border border-border shadow-lg"
     :class="
       mobile
-        ? 'w-full max-h-[calc(100dvh-112px)] rounded-xl border border-border shadow-lg'
-        : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-border shadow-lg'
+        ? 'w-full'
+        : 'h-[calc(100vh-180px)] w-full max-w-[600px]'
+    "
+    :style="
+      mobile && heightPx != null
+        ? { height: `${heightPx}px` }
+        : mobile
+          ? { height: 'calc(100dvh - 120px)' }
+          : undefined
     "
   >
-    <div class="shrink-0 px-4 pb-2 pt-4">
+    <div class="shrink-0 px-4 py-3">
       <h2 class="text-base font-bold tracking-tight text-foreground">
         {{ searchResultCountLabel(items.length) }}
       </h2>
     </div>
-    <ScrollArea class="flex-1 min-h-0">
-      <div class="flex flex-col">
-        <ItemHorizontalCard
-          v-for="item in items"
-          :key="item.id"
-          :item="item"
-          :compact="false"
-        />
+    <ScrollArea
+      class="touch-pan-y min-h-0 flex-1"
+      type="always"
+    >
+      <div class="flex flex-col pb-3">
+        <template v-if="items.length">
+          <ItemHorizontalCard
+            v-for="item in items"
+            :key="item.id"
+            :item="item"
+            :compact="false"
+          />
+        </template>
+        <p
+          v-else
+          class="px-4 py-6 text-sm text-muted-foreground"
+        >
+          Žiadne výsledky pre zadaný výraz.
+        </p>
       </div>
     </ScrollArea>
   </div>

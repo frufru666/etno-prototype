@@ -6,13 +6,12 @@ import {
   getDocumentsForItem,
   yearFromStudyPeriodStart,
 } from "@/data/mockData";
-import MediaTypeIcon from "@/components/ct/MediaTypeIcon.vue";
-import { PhFolder, PhFileText } from "@phosphor-icons/vue";
+import MediaMetaRow from "@/components/ct/MediaMetaRow.vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{
   item: EtnoItem;
-  /** When true, show compact meta (e.g. in map multi-pin tooltip). */
+  /** When true, hide some secondary lines (location/author). */
   compact?: boolean;
 }>();
 
@@ -105,30 +104,14 @@ function goToDetail() {
       <p class="line-clamp-2 text-sm font-medium leading-tight text-foreground">
         {{ item.title }}
       </p>
-      <div class="mt-1 flex flex-wrap items-center gap-2 text-xs">
-        <span class="font-mono text-muted-foreground">ID {{ item.id }}</span>
-        <span class="text-muted-foreground">·</span>
-        <span
-          class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5"
-          :class="typeChipClass()"
-        >
-          <MediaTypeIcon :media-type="mediaType" class="h-3.5 w-3.5 shrink-0" />
-          <span class="truncate">{{ item.documentType }}</span>
-        </span>
-      </div>
-      <div
-        v-if="!compact && (collections.length > 0 || documents.length > 0)"
-        class="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground"
-      >
-        <span v-if="collections.length > 0" class="flex items-center gap-1">
-          <PhFolder class="h-4 w-4 shrink-0" aria-hidden />
-          <span>{{ collections.length }}</span>
-        </span>
-        <span v-if="documents.length > 0" class="flex items-center gap-1">
-          <PhFileText class="h-4 w-4 shrink-0" aria-hidden />
-          <span>{{ documents.length }}</span>
-        </span>
-      </div>
+      <MediaMetaRow
+        class="mt-1"
+        :document-type="item.documentType"
+        :media-type="mediaType"
+        :collection-count="collections.length"
+        :document-count="documents.length"
+        :compact-counts="true"
+      />
       <div
         v-if="(locationDisplay || yearDisplay) && !compact"
         class="mt-0.5 line-clamp-1 text-xs text-muted-foreground"
