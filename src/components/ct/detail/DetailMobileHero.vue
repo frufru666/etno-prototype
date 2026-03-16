@@ -7,6 +7,7 @@ import {
 import { participantLines } from '@/lib/itemPresentation'
 import { Button } from '@/components/ui/button'
 import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
+import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 import IdPill from '@/components/ct/IdPill.vue'
 
 const props = defineProps<{
@@ -24,7 +25,7 @@ const documentsForItem = () => getDocumentsForItem(props.item.id)
 
 <template>
   <div
-    class="relative w-full min-h-[280px] h-[280px] bg-muted flex items-center justify-center cursor-pointer"
+    class="relative w-full min-h-[280px] h-[280px] bg-muted flex flex-col items-center justify-center gap-2 cursor-pointer"
     role="button"
     tabindex="0"
     aria-label="Otvoriť prehliadač médií"
@@ -32,6 +33,11 @@ const documentsForItem = () => getDocumentsForItem(props.item.id)
     @keydown.enter.prevent="emit('open-viewer')"
     @keydown.space.prevent="emit('open-viewer')"
   >
+    <MediaTypeIcon
+      :media-type="props.item.mediaType"
+      :has-transcript="props.item.hasTranscript"
+      class="h-24 w-24 shrink-0 text-muted-foreground"
+    />
     <span class="text-muted-foreground text-sm">Náhľad obsahu</span>
   </div>
   <div class="px-4 py-4 bg-background border-b border-border space-y-2">
@@ -52,6 +58,7 @@ const documentsForItem = () => getDocumentsForItem(props.item.id)
       :collection-count="collectionsForItem().length"
       :document-count="documentsForItem().length"
       size="md"
+      :show-counts="false"
     />
     <Button class="w-full mt-2" @click="emit('open-viewer')">
       {{ ctaLabel }}
