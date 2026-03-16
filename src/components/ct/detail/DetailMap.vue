@@ -7,8 +7,10 @@ const props = withDefaults(
     lat: number
     lng: number
     compact?: boolean
+    /** When false, hide mobile CTA in tooltip (used in fullscreen detail map) */
+    showDetailCta?: boolean
   }>(),
-  { compact: false }
+  { compact: false, showDetailCta: true }
 )
 
 const pins = computed(() => [
@@ -24,6 +26,6 @@ const pins = computed(() => [
 
 <template>
   <div class="relative h-full w-full min-h-[200px]">
-    <MockMap :pins="pins" :compact="compact" />
+    <MockMap :pins="pins" :compact="compact" :show-detail-cta="showDetailCta" />
   </div>
 </template>

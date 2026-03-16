@@ -64,6 +64,8 @@ const props = withDefaults(
     showZoomControls?: boolean;
     /** When true, requires ctrl+scroll to zoom (desktop scroll protection) */
     cooperativeGestures?: boolean;
+    /** When true (default), show mobile CTA in tooltip to open detail */
+    showDetailCta?: boolean;
   }>(),
   {
     compact: false,
@@ -71,6 +73,7 @@ const props = withDefaults(
     clusterStyle: "secondary",
     showZoomControls: true,
     cooperativeGestures: false,
+    showDetailCta: true,
   },
 );
 
@@ -631,6 +634,15 @@ function initMap() {
     } else if (props.pins.length > 1) {
       fitBounds();
     }
+    // Right-panel compact map: no pan/zoom; user must open fullscreen to interact
+    if (props.compact) {
+      mapInstance.dragPan.disable();
+      mapInstance.scrollZoom.disable();
+      mapInstance.doubleClickZoom.disable();
+      mapInstance.touchZoomRotate.disable();
+      // Also remove grab/hand cursor in compact (detail right panel) map
+      mapInstance.getCanvas().style.cursor = "default";
+    }
   });
   mapInstance.on("move", updateTooltipPosition);
   mapInstance.on("zoom", updateTooltipPosition);
@@ -658,6 +670,27 @@ watch(
     syncMarkers();
   },
   { deep: true },
+);
+
+watch(
+  () => props.compact,
+  (isCompact) => {
+    const m = map.value;
+    if (!m || !m.isStyleLoaded()) return;
+    if (isCompact) {
+      m.dragPan.disable();
+      m.scrollZoom.disable();
+      m.doubleClickZoom.disable();
+      m.touchZoomRotate.disable();
+      m.getCanvas().style.cursor = "default";
+    } else {
+      m.dragPan.enable();
+      m.scrollZoom.enable();
+      m.doubleClickZoom.enable();
+      m.touchZoomRotate.enable();
+      m.getCanvas().style.cursor = "";
+    }
+  },
 );
 
 defineExpose({ fitBounds, locate });
@@ -795,9 +828,9 @@ onUnmounted(() => {
                 </span>
               </span>
             </div>
-            <!-- Mobile: CTA to open detail -->
+            <!-- Mobile: CTA to open detail (disabled when showDetailCta is false, e.g. fullscreen detail map) -->
             <Button
-              v-if="isMobile"
+              v-if="isMobile && showDetailCta"
               variant="default"
               size="sm"
               class="mt-1.5 w-full"

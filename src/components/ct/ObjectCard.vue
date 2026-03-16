@@ -6,6 +6,7 @@ import { getCollectionsForItem, getDocumentsForItem, getMediaType, yearFromStudy
 import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
+import IdPill from '@/components/ct/IdPill.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -74,9 +75,7 @@ function thumbnailClass(mediaType: MediaType): string {
     @keydown.space.prevent="goToDetail"
   >
     <CardHeader class="flex flex-row items-center justify-between gap-2 p-3 pb-0">
-      <Badge variant="outline" class="font-mono text-xs text-primary-500 border-primary-200">
-        {{ item.id }}
-      </Badge>
+      <IdPill :id="item.id" />
       <span
         v-if="!item.hasMap"
         class="text-xs text-destructive"
