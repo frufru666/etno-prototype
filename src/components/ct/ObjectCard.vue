@@ -37,7 +37,7 @@ const yearDisplay = computed(() => yearFromStudyPeriodStart(props.item.studyPeri
 function typeChipClass(mediaType: MediaType): string {
   switch (mediaType) {
     case 'image':
-      return 'border-primary-200 bg-primary-50 text-primary-700'
+      return 'border-purple-200 bg-purple-50 text-purple-700'
     case 'video':
       return 'border-secondary-300 bg-secondary-100 text-secondary-800'
     case 'audio':
@@ -46,6 +46,21 @@ function typeChipClass(mediaType: MediaType): string {
       return 'border-amber-200 bg-amber-50 text-amber-800'
     default:
       return 'border-muted-foreground/30 bg-muted/50 text-muted-foreground'
+  }
+}
+
+function thumbnailClass(mediaType: MediaType): string {
+  switch (mediaType) {
+    case 'image':
+      return 'bg-purple-50 text-purple-700'
+    case 'video':
+      return 'bg-secondary-100 text-secondary-800'
+    case 'audio':
+      return 'bg-green-50 text-green-800'
+    case 'pdf':
+      return 'bg-amber-50 text-amber-800'
+    default:
+      return 'bg-muted text-muted-foreground'
   }
 }
 </script>
@@ -70,12 +85,13 @@ function typeChipClass(mediaType: MediaType): string {
       </span>
     </CardHeader>
     <CardContent class="space-y-2 p-3 pt-2">
-      <!-- Thumbnail 4:3: single image = one icon, multi image = gallery icon + label -->
+      <!-- Thumbnail 4:3: colored by media type, always shows icon -->
       <div
-        class="relative aspect-[4/3] w-full overflow-hidden rounded-md bg-muted"
+        class="relative aspect-[4/3] w-full overflow-hidden rounded-md"
+        :class="thumbnailClass(mediaType)"
       >
         <div
-          class="absolute inset-0 flex flex-col items-center justify-center gap-1 text-muted-foreground"
+          class="absolute inset-0 flex flex-col items-center justify-center gap-1"
         >
           <MediaTypeIcon
             :media-type="mediaType"
@@ -84,7 +100,7 @@ function typeChipClass(mediaType: MediaType): string {
           />
           <span
             v-if="isMultiImage"
-            class="text-xs font-medium uppercase tracking-wider text-muted-foreground/90"
+            class="text-xs font-medium uppercase tracking-wider opacity-90"
           >
             Galéria
           </span>

@@ -11,7 +11,7 @@ const hasItems = computed(() => props.count > 0);
 
 <template>
   <div
-    class="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center pb-6"
+    class="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center pb-6"
   >
     <div
       class="pointer-events-auto inline-flex items-center gap-10 rounded-xl border border-border bg-background/95 w-fit px-2 py-2 shadow-lg backdrop-blur"

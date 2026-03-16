@@ -20,7 +20,7 @@ const sizeClass = computed(() => "text-xs");
 function typeChipClass(mediaType: MediaType): string {
   switch (mediaType) {
     case "image":
-      return "border-primary-200 bg-primary-50 text-primary-700";
+      return "border-purple-200 bg-purple-50 text-purple-700";
     case "video":
       return "border-secondary-300 bg-secondary-100 text-secondary-800";
     case "audio":

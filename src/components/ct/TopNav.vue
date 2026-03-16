@@ -84,7 +84,7 @@ const mobileHeaderTitle = computed(() => {
 
     <div class="flex flex-1 justify-center px-4">
       <SearchInput
-        class="w-full max-w-2xl md:max-w-3xl"
+        class="w-full max-w-[600px]"
         :model-value="props.searchQuery ?? ''"
         placeholder-brand="EtnoExplorer"
         input-class="h-11 w-full rounded-xl text-[15px]"

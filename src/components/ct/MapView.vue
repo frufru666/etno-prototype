@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import type { MapPin } from "@/data/mockData";
+import type { MapPin, EtnoItem } from "@/data/mockData";
 import MockMap from "@/components/ct/MockMap.vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     pins: MapPin[];
+    /** Full items for multi-pin tooltip horizontal cards and "show all" */
+    items?: EtnoItem[];
     enabled?: boolean;
     /** Pin marker style: primary (blue), secondary (coral), or error (red) */
     pinStyle?: "primary" | "secondary" | "error";
@@ -24,6 +26,10 @@ withDefaults(
     cooperativeGestures: false,
   },
 );
+
+const emit = defineEmits<{
+  (e: "showAllInGrid", ids: string[]): void;
+}>();
 
 const mockMapRef = ref<InstanceType<typeof MockMap> | null>(null);
 
@@ -44,10 +50,12 @@ defineExpose({ fitBounds, locate });
       v-if="enabled"
       ref="mockMapRef"
       :pins="pins"
+      :items="items"
       :pin-style="pinStyle"
       :cluster-style="clusterStyle"
       :show-zoom-controls="showZoomControls"
       :cooperative-gestures="cooperativeGestures"
+      @show-all-in-grid="(ids) => emit('showAllInGrid', ids)"
     />
     <div
       v-else

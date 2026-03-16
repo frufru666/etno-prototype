@@ -1,71 +1,61 @@
 <script setup lang="ts">
-import type { EtnoItem } from '@/data/mockData'
-import { getMediaType } from '@/data/mockData'
-import { searchResultCountLabel } from '@/lib/itemPresentation'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
-import { useRouter } from 'vue-router'
+import type { EtnoItem } from "@/data/mockData";
+import { searchResultCountLabel } from "@/lib/itemPresentation";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ItemHorizontalCard from "@/components/ct/ItemHorizontalCard.vue";
 
 const props = withDefaults(
   defineProps<{
-    items: EtnoItem[]
-    query: string
-    mobile?: boolean
+    items: EtnoItem[];
+    query: string;
+    mobile?: boolean;
+    /** When set (e.g. from visual viewport when keyboard open), overrides mobile height */
+    heightPx?: number;
   }>(),
-  { mobile: false }
-)
-
-const router = useRouter()
-
-function goToDetail(id: string) {
-  router.push({ name: 'detail', params: { id } })
-}
-
-function getItemMediaType(item: EtnoItem) {
-  return getMediaType(item.documentType)
-}
-
+  { mobile: false },
+);
 </script>
 
 <template>
   <div
-    class="flex flex-col overflow-hidden bg-background"
-    :class="mobile
-      ? 'w-full max-h-[calc(100dvh-112px)] rounded-xl border border-border shadow-lg'
-      : 'h-[calc(100vh-90px)] w-[480px] rounded-xl border border-border shadow-lg'"
+    class="flex flex-col overflow-hidden bg-background rounded-2xl border border-border shadow-lg"
+    :class="
+      mobile
+        ? 'w-full'
+        : 'h-[calc(100vh-180px)] w-full max-w-[600px]'
+    "
+    :style="
+      mobile && heightPx != null
+        ? { height: `${heightPx}px` }
+        : mobile
+          ? { height: 'calc(100dvh - 120px)' }
+          : undefined
+    "
   >
-    <div class="shrink-0 px-4 pb-2 pt-4">
+    <div class="shrink-0 px-4 py-3">
       <h2 class="text-base font-bold tracking-tight text-foreground">
         {{ searchResultCountLabel(items.length) }}
       </h2>
     </div>
-    <ScrollArea class="flex-1 min-h-0">
-      <div class="flex flex-col">
-        <button
-          v-for="item in items"
-          :key="item.id"
-          type="button"
-          class="flex cursor-pointer items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-accent"
-          @click="goToDetail(item.id)"
+    <ScrollArea
+      class="touch-pan-y min-h-0 flex-1"
+      type="always"
+    >
+      <div class="flex flex-col pb-3">
+        <template v-if="items.length">
+          <ItemHorizontalCard
+            v-for="item in items"
+            :key="item.id"
+            :item="item"
+            :compact="false"
+          />
+        </template>
+        <p
+          v-else
+          class="px-4 py-6 text-sm text-muted-foreground"
         >
-          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-            <MediaTypeIcon
-              :media-type="getItemMediaType(item)"
-              :has-transcript="item.hasTranscript"
-              class="h-6 w-6"
-            />
-          </div>
-          <div class="min-w-0 flex-1">
-            <p class="line-clamp-2 text-sm font-medium leading-tight text-foreground">
-              {{ item.title }}
-            </p>
-            <p class="mt-1 text-xs text-muted-foreground">
-              <span class="font-mono">ID {{ item.id }}</span>
-              <span class="mx-1.5">·</span>
-              <span class="capitalize">{{ item.documentType }}</span>
-            </p>
-          </div>
-        </button>
+          Žiadne výsledky pre zadaný výraz.
+        </p>
       </div>
     </ScrollArea>
   </div>
