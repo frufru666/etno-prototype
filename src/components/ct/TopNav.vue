@@ -57,7 +57,7 @@ const mobileHeaderTitle = computed(() => {
       <Button
         :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink
@@ -70,7 +70,7 @@ const mobileHeaderTitle = computed(() => {
       <Button
         :variant="isCollectionsActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink

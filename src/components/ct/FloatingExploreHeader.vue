@@ -24,7 +24,7 @@ const emit = defineEmits<{
     <Button
       type="button"
       variant="primary"
-      class="h-10 shrink-0 gap-2 rounded-xl px-4 font-semibold"
+      class="h-10 shrink-0 gap-2 px-4 font-semibold"
       aria-label="Filter"
       @click="emit('toggle-filter')"
     >
@@ -41,7 +41,7 @@ const emit = defineEmits<{
       <SearchInput
         :model-value="searchQuery"
         placeholder-brand="EtnoExplorer"
-        input-class="h-10 w-full rounded-xl bg-white border-0 text-base"
+        input-class="h-10 w-full bg-white border-0 text-base"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="emit('searchSubmit', $event)"
       />
@@ -52,7 +52,7 @@ const emit = defineEmits<{
           type="button"
           variant="secondary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-xl border-0"
+          class="h-10 w-10 shrink-0 border-0"
           aria-label="Open menu"
         >
           <PhList class="size-6" weight="bold" />

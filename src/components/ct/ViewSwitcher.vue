@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="fixed left-1/2 bottom-2 z-40 flex h-10 w-[264px] -translate-x-1/2 items-center justify-center rounded-xl border-0 bg-primary-500 px-2 py-1.5"
+    class="fixed left-1/2 bottom-2 z-40 flex h-10 w-[264px] -translate-x-1/2 items-center justify-center rounded-control border-0 bg-primary-500 px-2 py-1.5"
     role="tablist"
     aria-label="Map or list view"
   >

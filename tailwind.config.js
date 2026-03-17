@@ -102,7 +102,15 @@ module.exports = {
   			lg: 'var(--radius-lg)',
   			xl: 'var(--radius-xl)',
   			'2xl': 'var(--radius-2xl)',
-  			full: 'var(--radius-full)'
+  			full: 'var(--radius-full)',
+
+        // Semantic radii
+        control: 'var(--radius-control)',
+        surface: 'var(--radius-surface)',
+        card: 'var(--radius-card)',
+        panel: 'var(--radius-panel)',
+        pill: 'var(--radius-pill)',
+        sheet: 'var(--radius-sheet)',
   		},
   		fontSize: {
   			// Tailwind default scale (min 12px, all even)

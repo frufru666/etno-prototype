@@ -14,7 +14,7 @@ import {
   getMediaType,
   type EtnoItem,
 } from "@/data/mockData";
-import { PhCaretRight } from "@phosphor-icons/vue";
+import { PhArrowSquareOut, PhCaretRight } from "@phosphor-icons/vue";
 import DetailMap from "@/components/ct/detail/DetailMap.vue";
 import CollectionCard from "@/components/ct/CollectionCard.vue";
 
@@ -89,6 +89,31 @@ function sectionHasContent(section: MetadataSection): boolean {
     if (field.getValue(props.item) != null) return true;
   }
   return false;
+}
+
+function isPoznamkaField(field: { label: string; key: string }): boolean {
+  // Covers: "Poznámka k obsahu", "Poznámka k lokalite", etc.
+  return field.key.toLowerCase().includes("note") || field.label.includes("Poznámka");
+}
+
+function shouldShowRowDivider(fields: { label: string; key: string }[], idx: number): boolean {
+  const isLast = idx === fields.length - 1;
+  if (isLast) return false;
+  const next = fields[idx + 1];
+  // If a Poznámka callout follows, don't draw a divider above it.
+  if (next && isPoznamkaField(next)) return false;
+  return true;
+}
+
+function isExternalUrl(value: string | undefined): boolean {
+  if (!value) return false;
+  if (!/^https?:\/\//i.test(value)) return false;
+  try {
+    const u = new URL(value);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 </script>
 
@@ -183,7 +208,7 @@ function sectionHasContent(section: MetadataSection): boolean {
               <span class="min-w-0 flex-1 pl-2">
                 <button
                   type="button"
-                  class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                  class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
                   @click="
                     openExploreWithFilter(
                       'researchCollection',
@@ -272,45 +297,63 @@ function sectionHasContent(section: MetadataSection): boolean {
               {{ section.title }}
             </h4>
             <div class="mb-6 flex flex-col">
-              <template v-for="field in section.fields" :key="field.key">
+              <template v-for="(field, idx) in section.fields" :key="field.key">
                 <div
                   v-if="field.getValue(item) != null"
-                  class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
+                  :class="
+                    isPoznamkaField(field)
+                      ? 'flex flex-col gap-1 rounded-md border border-border bg-muted/40 px-3 py-2.5 text-foreground'
+                      : [
+                          'flex items-baseline py-2.5',
+                          shouldShowRowDivider(section.fields, idx) ? 'border-b border-border' : '',
+                        ].join(' ')
+                  "
                 >
-                  <span
-                    class="shrink-0 text-label-small text-muted-foreground"
-                    :class="labelWidthClass"
-                  >
-                    {{ field.label }}
-                  </span>
-                  <span class="min-w-0 flex-1 pl-2">
-                    <template v-if="field.isLink && field.filterKey">
-                      <button
-                        type="button"
-                        class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                        @click="
-                          openExploreWithFilter(
-                            field.filterKey,
-                            field.getValue(item),
-                          )
-                        "
-                      >
-                        {{ field.getValue(item) }}
-                      </button>
-                    </template>
-                    <a
-                      v-else-if="field.key === 'license' && item.license"
-                      :href="item.license"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                    >
-                      {{ field.getValue(item) }}
-                    </a>
-                    <span v-else class="text-sm font-medium text-foreground">
-                      {{ field.getValue(item) }}
+                  <template v-if="isPoznamkaField(field)">
+                    <span class="text-label-small font-bold text-ct-neutral-500">
+                      {{ field.label }}
                     </span>
-                  </span>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      {{ field.getValue(item) }}
+                    </p>
+                  </template>
+                  <template v-else>
+                    <span
+                      class="shrink-0 text-label-small text-muted-foreground"
+                      :class="labelWidthClass"
+                    >
+                      {{ field.label }}
+                    </span>
+                    <span class="min-w-0 flex-1 pl-2">
+                      <template v-if="field.isLink && field.filterKey">
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                          @click="
+                            openExploreWithFilter(
+                              field.filterKey,
+                              field.getValue(item),
+                            )
+                          "
+                        >
+                          {{ field.getValue(item) }}
+                        </button>
+                      </template>
+                      <a
+                        v-else-if="isExternalUrl(field.getValue(item))"
+                        :href="field.getValue(item)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                      >
+                        <span class="truncate">{{ field.getValue(item) }}</span>
+                        <PhArrowSquareOut class="h-4 w-4 shrink-0" aria-hidden="true" />
+                      </a>
+                      <span v-else class="text-sm font-medium text-foreground">
+                        {{ field.getValue(item) }}
+                      </span>
+                    </span>
+                  </template>
                 </div>
               </template>
             </div>

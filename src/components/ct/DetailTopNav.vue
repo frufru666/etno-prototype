@@ -68,7 +68,7 @@ function onSearchSubmit(value: string) {
       <Button
         :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink
@@ -81,7 +81,7 @@ function onSearchSubmit(value: string) {
       <Button
         :variant="isCollectionsActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink
@@ -98,7 +98,7 @@ function onSearchSubmit(value: string) {
         :model-value="searchQuery ?? ''"
         class="w-full max-w-2xl md:max-w-3xl"
         placeholder-brand="EtnoExplorer"
-        input-class="h-11 w-full rounded-xl text-[15px]"
+        input-class="h-11 w-full text-[15px]"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="onSearchSubmit"
       />
@@ -120,7 +120,7 @@ function onSearchSubmit(value: string) {
         <Button
           variant="primary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-lg p-2 [&_svg]:size-6"
+          class="h-10 w-10 shrink-0 p-2 [&_svg]:size-6"
           :aria-label="props.mobileBackAriaLabel ?? 'Späť do Explore'"
           @click="goBackToExplore"
         >
@@ -142,7 +142,7 @@ function onSearchSubmit(value: string) {
             v-if="props.mobileShowTranscriptButton"
             variant="nav"
             size="sm"
-            class="h-10 rounded-lg px-3 text-sm font-semibold md:hidden"
+            class="h-10 px-3 text-sm font-semibold md:hidden"
             aria-label="Zobraziť prepis"
             @click="emit('show-transcript')"
           >
