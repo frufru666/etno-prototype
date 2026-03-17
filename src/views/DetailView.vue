@@ -196,9 +196,11 @@ watch(
       :mobile-back-to-params="mobileBackTargetParams"
       :mobile-back-aria-label="`Späť do ${detailBackLabel}`"
       :mobile-show-search="false"
+      :mobile-show-transcript-button="!!item?.hasTranscript"
       @toggle-right-panel="toggleMetadataPanel"
       @update:search-query="updateSearchQuery"
       @search-submit="onSearchSubmit"
+      @show-transcript="onShowTranscriptFromPanel"
     />
 
     <template v-if="!item">

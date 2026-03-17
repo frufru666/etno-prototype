@@ -19,14 +19,17 @@ const props = withDefaults(
     mobileBackAriaLabel?: string
     /** When false, mobile nav is single row (no search bar). Use for object viewers. */
     mobileShowSearch?: boolean
+    /** When true, show transcript button in mobile nav. */
+    mobileShowTranscriptButton?: boolean
   }>(),
-  { mobileShowSearch: true }
+  { mobileShowSearch: true, mobileShowTranscriptButton: false }
 )
 
 const emit = defineEmits<{
   (e: 'toggle-right-panel'): void
   (e: 'update:searchQuery', value: string): void
   (e: 'searchSubmit', value: string): void
+  (e: 'show-transcript'): void
 }>()
 
 const route = useRoute()
@@ -134,7 +137,19 @@ function onSearchSubmit(value: string) {
             {{ props.mobileContextId }}
           </span>
         </div>
-        <MobileMenu />
+        <div class="flex items-center gap-2">
+          <Button
+            v-if="props.mobileShowTranscriptButton"
+            variant="nav"
+            size="sm"
+            class="h-10 rounded-lg px-3 text-sm font-semibold md:hidden"
+            aria-label="Zobraziť prepis"
+            @click="emit('show-transcript')"
+          >
+            Prepis
+          </Button>
+          <MobileMenu />
+        </div>
       </div>
     </div>
     <div

@@ -49,7 +49,18 @@ export interface EtnoItem {
   title: string;
   subtitle?: string;
   abstract?: string;
+  /** Poznámka k obsahu (content note) */
   note?: string;
+  /** Poznámka k lokalite (location note) */
+  locationNote?: string;
+  /** Technická poznámka */
+  technicalNote?: string;
+  /** Podmienky použitia */
+  termsOfUse?: string;
+  /** Ako citovať */
+  howToCite?: string;
+  /** Všeobecná poznámka */
+  generalNote?: string;
   keywords: string[];
   language?: string;
 
@@ -74,6 +85,7 @@ export interface EtnoItem {
   studyPeriodStart?: string; // ISO date or year: "1950-05-01" or "1950"
   studyPeriodEnd?: string; // ISO date or year (if range)
   submissionDate?: string;
+  publishedDate?: string;
 
   // Classification
   documentType: DocumentType;
@@ -1501,30 +1513,65 @@ export interface MetadataSection {
 
 export const METADATA_SECTIONS: MetadataSection[] = [
   {
-    title: "TEMATICKÉ A AUTORSKÉ ÚDAJE",
+    title: "Popisné údaje",
+    fields: [
+      {
+        key: "subtitle",
+        label: "Podtitul",
+        getValue: (d) => d.subtitle,
+      },
+      { key: "language", label: "Jazyk", getValue: (d) => d.language },
+      { key: "note", label: "Poznámka k obsahu", getValue: (d) => d.note },
+    ],
+  },
+  {
+    title: "Autori a pôvodcovia",
     fields: [
       {
         key: "authors",
-        label: "Autor",
-        getValue: (d) => d.authors?.length ? d.authors.map((a) => a.name).join(", ") : undefined,
+        label: "Autorstvo",
+        getValue: (d) => (d.authors?.length ? d.authors.map((a) => a.name).join(", ") : undefined),
         isLink: true,
         filterKey: "author",
       },
       {
+        key: "authorsOrcid",
+        label: "Autorstvo (ORCID)",
+        getValue: (d) => {
+          const orcids = d.authors?.map((a) => a.orcid).filter(Boolean) as string[] | undefined;
+          return orcids && orcids.length ? orcids.join(", ") : undefined;
+        },
+      },
+      {
         key: "researchers",
-        label: "Výskumník",
-        getValue: (d) => d.researchers?.length ? d.researchers.map((a) => a.name).join(", ") : undefined,
+        label: "Výskum",
+        getValue: (d) => (d.researchers?.length ? d.researchers.map((a) => a.name).join(", ") : undefined),
+      },
+      {
+        key: "researchersOrcid",
+        label: "Výskum (ORCID)",
+        getValue: (d) => {
+          const orcids = d.researchers?.map((a) => a.orcid).filter(Boolean) as string[] | undefined;
+          return orcids && orcids.length ? orcids.join(", ") : undefined;
+        },
       },
       {
         key: "originators",
-        label: "Pôvodca",
-        getValue: (d) => d.originators?.length ? d.originators.map((a) => a.name).join(", ") : undefined,
+        label: "Pôvod",
+        getValue: (d) => (d.originators?.length ? d.originators.map((a) => a.name).join(", ") : undefined),
       },
-      { key: "doi", label: "DOI", getValue: (d) => d.doi },
+      {
+        key: "originatorsOrcid",
+        label: "Pôvod (ORCID)",
+        getValue: (d) => {
+          const orcids = d.originators?.map((a) => a.orcid).filter(Boolean) as string[] | undefined;
+          return orcids && orcids.length ? orcids.join(", ") : undefined;
+        },
+      },
     ],
   },
   {
-    title: "GEOGRAFICKÉ ÚDAJE",
+    title: "Geografické údaje",
     fields: [
       { key: "obec", label: "Obec", getValue: (d) => d.obec, isLink: true, filterKey: "obec" },
       { key: "castObce", label: "Časť obce", getValue: (d) => d.castObce },
@@ -1532,18 +1579,57 @@ export const METADATA_SECTIONS: MetadataSection[] = [
       { key: "kraj", label: "Kraj", getValue: (d) => d.kraj, isLink: true, filterKey: "kraj" },
       { key: "stat", label: "Štát", getValue: (d) => d.stat, isLink: true, filterKey: "stat" },
       { key: "lokalita", label: "Lokalita", getValue: (d) => d.lokalita },
+      { key: "locationNote", label: "Poznámka k lokalite", getValue: (d) => d.locationNote },
     ],
   },
   {
-    title: "FORMÁLNE ÚDAJE",
+    title: "Technické a formálne údaje",
     fields: [
       {
-        key: "documentType",
-        label: "Typ dokumentu",
-        getValue: (d) => d.documentType,
-        isLink: true,
-        filterKey: "documentType",
+        key: "size",
+        label: "Veľkosť",
+        getValue: (d) => d.size,
       },
+      {
+        key: "sizeType",
+        label: "Jednotka veľkosti",
+        getValue: (d) => d.sizeType,
+      },
+      {
+        key: "notation",
+        label: "Spôsob záznamu",
+        getValue: (d) => d.notation,
+      },
+      {
+        key: "technicalNote",
+        label: "Technická poznámka",
+        getValue: (d) => d.technicalNote,
+      },
+    ],
+  },
+  {
+    title: "Pôvod a kontext výskumu",
+    fields: [
+      {
+        key: "institution",
+        label: "Inštitúcia",
+        getValue: (d) => d.institution,
+      },
+      {
+        key: "institutionRor",
+        label: "Inštitúcia (ROR)",
+        getValue: (d) => d.institutionRor,
+        isLink: true,
+      },
+      { key: "project", label: "Projekt", getValue: (d) => d.project },
+      {
+        key: "collectionMethod",
+        label: "Spôsob zberu",
+        getValue: (d) => d.collectionMethod,
+        isLink: true,
+        filterKey: "collectionMethod",
+      },
+      { key: "acquisitionMethod", label: "Spôsob získania", getValue: (d) => d.acquisitionMethod },
       {
         key: "studyPeriod",
         label: "Čas realizácie",
@@ -1554,57 +1640,32 @@ export const METADATA_SECTIONS: MetadataSection[] = [
         },
       },
       { key: "submissionDate", label: "Dátum odovzdania", getValue: (d) => d.submissionDate },
-      {
-        key: "collectionMethod",
-        label: "Spôsob zberu",
-        getValue: (d) => d.collectionMethod,
-        isLink: true,
-        filterKey: "collectionMethod",
-      },
-      { key: "acquisitionMethod", label: "Spôsob nadobudnutia", getValue: (d) => d.acquisitionMethod },
-      {
-        key: "size",
-        label: "Veľkosť",
-        getValue: (d) => {
-          if (!d.size) return undefined;
-          if (d.sizeType) return `${d.size} ${d.sizeType}`;
-          return d.size;
-        },
-      },
-      { key: "format", label: "Formát", getValue: (d) => d.format },
-      { key: "notation", label: "Zápis", getValue: (d) => d.notation },
-      { key: "language", label: "Jazyk", getValue: (d) => d.language },
+      { key: "publishedDate", label: "Dátum publikovania", getValue: (d) => d.publishedDate },
     ],
   },
   {
-    title: "ADMINISTRATÍVNE ÚDAJE",
+    title: "Práva a prístup",
     fields: [
-      { key: "project", label: "Projekt", getValue: (d) => d.project },
-      {
-        key: "researchCollection",
-        label: "Výskumná zbierka",
-        getValue: (d) => d.researchCollection,
-        isLink: true,
-        filterKey: "researchCollection",
-      },
-      { key: "institution", label: "Inštitúcia", getValue: (d) => d.institution },
-      {
-        key: "institutionRor",
-        label: "ROR",
-        getValue: (d) => d.institutionRor,
-        isLink: true,
-      },
-      { key: "accessRight", label: "Prístup", getValue: (d) => d.accessRight },
+      { key: "accessRight", label: "Prístupové práva", getValue: (d) => d.accessRight },
       {
         key: "license",
         label: "Licencia",
         getValue: (d) => {
+          if (!d.license) return undefined;
           if (d.license.includes("by-nc-nd")) return "CC BY-NC-ND 4.0";
           if (d.license.includes("by-nc-sa")) return "CC BY-NC-SA";
           return d.license;
         },
         isLink: true,
       },
+      { key: "termsOfUse", label: "Podmienky použitia", getValue: (d) => d.termsOfUse },
+    ],
+  },
+  {
+    title: "Doplňujúce údaje",
+    fields: [
+      { key: "generalNote", label: "Všeobecná poznámka", getValue: (d) => d.generalNote },
+      { key: "howToCite", label: "Ako citovať", getValue: (d) => d.howToCite },
     ],
   },
 ];

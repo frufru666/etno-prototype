@@ -75,14 +75,14 @@ function thumbnailClass(mediaType: MediaType): string {
     @keydown.space.prevent="goToDetail"
   >
     <CardHeader class="flex flex-row items-center justify-between gap-2 p-3 pb-0">
-      <Badge variant="outline" class="font-mono text-xs text-primary-500 border-primary-200">
+      <span class="shrink-0 rounded-full bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-500">
         {{ item.id }}
-      </Badge>
+      </span>
       <span
         v-if="!item.hasMap"
-        class="text-xs text-destructive"
+        class="shrink-0 rounded-full bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive"
       >
-        Nie je v mape
+        Bez GPS
       </span>
     </CardHeader>
     <CardContent class="space-y-2 p-3 pt-2">
