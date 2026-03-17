@@ -22,7 +22,7 @@ import {
 const route = useRoute()
 const isInfoActive = computed(() => route.name === 'info')
 const btnClass =
-  'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+  'focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 const userMenuOpen = ref(false)
 const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
@@ -49,7 +49,7 @@ function handleLogout() {
 <template>
   <!-- Info as text button (no icon-only) -->
   <Button
-    :variant="isInfoActive ? 'primary' : 'nav'"
+    :variant="isInfoActive ? 'navActive' : 'nav'"
     size="lg"
     :class="['gap-2', btnClass]"
     aria-label="Info"
@@ -57,11 +57,7 @@ function handleLogout() {
   >
     <RouterLink
       to="/info"
-      :class="
-        isInfoActive
-          ? 'flex items-center gap-2 text-white'
-          : 'flex items-center gap-2 text-primary-500'
-      "
+      class="flex items-center gap-2"
     >
       Info
     </RouterLink>
@@ -71,7 +67,7 @@ function handleLogout() {
   <DropdownMenuRoot v-model:open="userMenuOpen">
     <DropdownMenuTrigger as-child>
       <Button
-        variant="nav"
+        :variant="userMenuOpen ? 'navActive' : 'nav'"
         size="icon-lg"
         :class="btnClass"
         aria-label="Používateľ – možnosti"
