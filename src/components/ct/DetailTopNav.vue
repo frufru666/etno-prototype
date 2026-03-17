@@ -117,7 +117,7 @@ function onSearchSubmit(value: string) {
         <Button
           variant="primary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-xl p-2 [&_svg]:size-6"
+          class="h-10 w-10 shrink-0 rounded-lg p-2 [&_svg]:size-6"
           :aria-label="props.mobileBackAriaLabel ?? 'Späť do Explore'"
           @click="goBackToExplore"
         >
@@ -129,9 +129,9 @@ function onSearchSubmit(value: string) {
           </span>
           <span
             v-if="props.mobileContextId"
-            class="shrink-0 rounded-md border border-primary-300 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
+            class="shrink-0 rounded-full bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
           >
-            ID {{ props.mobileContextId }}
+            {{ props.mobileContextId }}
           </span>
         </div>
         <MobileMenu />

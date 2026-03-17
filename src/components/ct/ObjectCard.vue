@@ -6,6 +6,7 @@ import { getCollectionsForItem, getDocumentsForItem, getMediaType, yearFromStudy
 import { participantLines } from '@/lib/itemPresentation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import MediaMetaRow from '@/components/ct/MediaMetaRow.vue'
+import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -85,7 +86,7 @@ function thumbnailClass(mediaType: MediaType): string {
       </span>
     </CardHeader>
     <CardContent class="space-y-2 p-3 pt-2">
-      <!-- Thumbnail 4:3: colored by media type, always shows icon -->
+      <!-- Thumbnail 4:3: colored by media type, always shows icon 96x96 centered -->
       <div
         class="relative aspect-[4/3] w-full overflow-hidden rounded-md"
         :class="thumbnailClass(mediaType)"
@@ -96,7 +97,7 @@ function thumbnailClass(mediaType: MediaType): string {
           <MediaTypeIcon
             :media-type="mediaType"
             :has-transcript="item.hasTranscript"
-            class="h-10 w-10"
+            class="h-24 w-24 shrink-0"
           />
           <span
             v-if="isMultiImage"
