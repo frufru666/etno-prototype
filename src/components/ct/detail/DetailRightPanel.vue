@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
-import type { MetadataSection } from '@/data/mockData'
-import type { MediaType } from '@/data/mockData'
+import { useRouter } from "vue-router";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import type { MetadataSection } from "@/data/mockData";
+import type { MediaType } from "@/data/mockData";
 import {
   METADATA_SECTIONS,
   abstractDisplay,
@@ -13,76 +13,107 @@ import {
   getDocumentItems,
   getMediaType,
   type EtnoItem,
-} from '@/data/mockData'
-import { PhCaretRight } from '@phosphor-icons/vue'
-import DetailMap from '@/components/ct/detail/DetailMap.vue'
-import CollectionCard from '@/components/ct/CollectionCard.vue'
+} from "@/data/mockData";
+import { PhArrowSquareOut, PhCaretRight } from "@phosphor-icons/vue";
+import DetailMap from "@/components/ct/detail/DetailMap.vue";
+import CollectionCard from "@/components/ct/CollectionCard.vue";
 
 const props = withDefaults(
   defineProps<{
-    item: EtnoItem
-    mobile?: boolean
+    item: EtnoItem;
+    mobile?: boolean;
     /** When true, hide ID/title/author (e.g. when shown in mobile hero block above) */
-    hideHeader?: boolean
+    hideHeader?: boolean;
     /** Controls header visibility and ID rendering. */
-    headerMode?: 'full' | 'noId' | 'hidden'
+    headerMode?: "full" | "noId" | "hidden";
     /** When true, show desktop panel controls in the header row. */
-    showPanelHeader?: boolean
+    showPanelHeader?: boolean;
   }>(),
-  { hideHeader: false, showPanelHeader: false, headerMode: 'full' }
-)
+  { hideHeader: false, showPanelHeader: false, headerMode: "full" },
+);
 
 const emit = defineEmits<{
-  (e: 'open-map-fullscreen'): void
-  (e: 'show-transcript'): void
-  (e: 'hide-panel'): void
-}>()
+  (e: "open-map-fullscreen"): void;
+  (e: "show-transcript"): void;
+  (e: "hide-panel"): void;
+}>();
 
-const router = useRouter()
+const router = useRouter();
 
-const collectionsForItem = () => getCollectionsForItem(props.item.id)
-const documentsForItem = () => getDocumentsForItem(props.item.id)
+const collectionsForItem = () => getCollectionsForItem(props.item.id);
+const documentsForItem = () => getDocumentsForItem(props.item.id);
 
 function openExploreWithFilter(filterKey: string, value: string) {
-  router.push({ name: 'explore', query: { [filterKey]: value } })
+  router.push({ name: "explore", query: { [filterKey]: value } });
 }
 
 function formatCoords(item: EtnoItem): string {
   if (item.lat != null && item.lng != null) {
-    return `${item.lat.toFixed(4)}° N, ${item.lng.toFixed(4)}° E`
+    return `${item.lat.toFixed(4)}° N, ${item.lng.toFixed(4)}° E`;
   }
-  return ''
+  return "";
 }
 
-const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
+const labelWidthClass = props.mobile ? "w-[130px]" : "w-[152px]";
 
 const effectiveHeaderMode = (() => {
-  if (props.hideHeader) return 'hidden'
-  return props.headerMode ?? 'full'
-})()
+  if (props.hideHeader) return "hidden";
+  return props.headerMode ?? "full";
+})();
 
 function typeChipClass(mediaType: MediaType): string {
   switch (mediaType) {
-    case 'image':
-      return 'border-purple-200 bg-purple-50 text-purple-700'
-    case 'video':
-      return 'border-secondary-300 bg-secondary-100 text-secondary-800'
-    case 'audio':
-      return 'border-green-200 bg-green-50 text-green-800'
-    case 'pdf':
-      return 'border-amber-200 bg-amber-50 text-amber-800'
+    case "image":
+      return "border-purple-200 bg-purple-50 text-purple-700";
+    case "video":
+      return "border-secondary-300 bg-secondary-100 text-secondary-800";
+    case "audio":
+      return "border-green-200 bg-green-50 text-green-800";
+    case "pdf":
+      return "border-amber-200 bg-amber-50 text-amber-800";
     default:
-      return 'border-muted-foreground/30 bg-muted/50 text-muted-foreground'
+      return "border-muted-foreground/30 bg-muted/50 text-muted-foreground";
   }
 }
 
 /** True if section has at least one visible field (or is Geografické with map). */
 function sectionHasContent(section: MetadataSection): boolean {
-  if (section.title === 'Geografické údaje' && props.item.hasMap && props.item.lat != null && props.item.lng != null) return true
+  if (
+    section.title === "Geografické údaje" &&
+    props.item.hasMap &&
+    props.item.lat != null &&
+    props.item.lng != null
+  )
+    return true;
   for (const field of section.fields) {
-    if (field.getValue(props.item) != null) return true
+    if (field.getValue(props.item) != null) return true;
   }
-  return false
+  return false;
+}
+
+function isPoznamkaField(field: { label: string; key: string }): boolean {
+  // Covers: "Poznámka k obsahu", "Poznámka k lokalite", etc.
+  return field.key.toLowerCase().includes("note") || field.label.includes("Poznámka");
+}
+
+function shouldShowRowDivider(fields: { label: string; key: string }[], idx: number): boolean {
+  const isLast = idx === fields.length - 1;
+  if (isLast) return false;
+  const next = fields[idx + 1];
+  // If a Poznámka callout follows, don't draw a divider above it.
+  if (next && isPoznamkaField(next)) return false;
+  return true;
+}
+
+function isExternalUrl(value: string | undefined): boolean {
+  if (!value) return false;
+  if (!/^https?:\/\//i.test(value)) return false;
+  try {
+    const u = new URL(value);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 </script>
 
@@ -98,7 +129,9 @@ function sectionHasContent(section: MetadataSection): boolean {
       >
         <div class="flex min-w-0 items-center gap-2">
           <h3 class="truncate text-lg font-bold text-foreground">Detail</h3>
-          <span class="shrink-0 rounded-full bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-500">
+          <span
+            class="shrink-0 rounded-full bg-primary-100 px-2 py-1 font-mono text-xs font-semibold text-primary-500"
+          >
             {{ item.id }}
           </span>
         </div>
@@ -127,7 +160,9 @@ function sectionHasContent(section: MetadataSection): boolean {
         </h2>
 
         <div class="mb-4 mt-3">
-          <h4 class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          <h4
+            class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+          >
             Základné údaje
           </h4>
           <div class="flex flex-col">
@@ -135,13 +170,25 @@ function sectionHasContent(section: MetadataSection): boolean {
               v-if="item.authors?.length"
               class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
             >
-              <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Autorstvo</span>
-              <span class="min-w-0 flex-1 pl-2 text-sm font-medium text-foreground">
-                {{ item.authors.map((a) => a.name).join(', ') }}
+              <span
+                class="shrink-0 text-label-small text-muted-foreground"
+                :class="labelWidthClass"
+                >Autorstvo</span
+              >
+              <span
+                class="min-w-0 flex-1 pl-2 text-sm font-medium text-foreground"
+              >
+                {{ item.authors.map((a) => a.name).join(", ") }}
               </span>
             </div>
-            <div class="flex items-baseline border-b border-border py-2.5 last:border-b-0">
-              <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Typ dokumentu</span>
+            <div
+              class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
+            >
+              <span
+                class="shrink-0 text-label-small text-muted-foreground"
+                :class="labelWidthClass"
+                >Typ dokumentu</span
+              >
               <span
                 class="inline-flex max-w-full items-center gap-1 truncate rounded-full border px-2 py-0.5 text-sm font-medium"
                 :class="typeChipClass(getMediaType(item.documentType))"
@@ -153,12 +200,21 @@ function sectionHasContent(section: MetadataSection): boolean {
               v-if="item.researchCollection"
               class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
             >
-              <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Výskumná zbierka</span>
+              <span
+                class="shrink-0 text-label-small text-muted-foreground"
+                :class="labelWidthClass"
+                >Výskumná zbierka</span
+              >
               <span class="min-w-0 flex-1 pl-2">
                 <button
                   type="button"
-                  class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                  @click="openExploreWithFilter('researchCollection', item.researchCollection)"
+                  class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                  @click="
+                    openExploreWithFilter(
+                      'researchCollection',
+                      item.researchCollection,
+                    )
+                  "
                 >
                   {{ item.researchCollection }}
                 </button>
@@ -168,16 +224,25 @@ function sectionHasContent(section: MetadataSection): boolean {
               v-if="item.doi"
               class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
             >
-              <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">DOI</span>
-              <span class="min-w-0 flex-1 pl-2 text-sm font-medium text-foreground">{{ item.doi }}</span>
+              <span
+                class="shrink-0 text-label-small text-muted-foreground"
+                :class="labelWidthClass"
+                >DOI</span
+              >
+              <span
+                class="min-w-0 flex-1 pl-2 text-sm font-medium text-foreground"
+                >{{ item.doi }}</span
+              >
             </div>
           </div>
         </div>
       </div>
 
       <!-- 2. PREPIS (Transcript) -->
-      <div v-if="item.hasTranscript" class="mb-6">
-        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+      <div v-if="item.hasTranscript && mobile" class="mb-6">
+        <h4
+          class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+        >
           PREPIS
         </h4>
         <Button
@@ -192,7 +257,9 @@ function sectionHasContent(section: MetadataSection): boolean {
 
       <!-- 3. Abstrakt -->
       <div class="mb-7">
-        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+        <h4
+          class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+        >
           ABSTRAKT
         </h4>
         <p class="text-sm text-foreground">
@@ -202,7 +269,9 @@ function sectionHasContent(section: MetadataSection): boolean {
 
       <!-- 4. Kľúčové slová -->
       <div v-if="item.keywords?.length" class="mb-7">
-        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+        <h4
+          class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+        >
           KĽÚČOVÉ SLOVÁ
         </h4>
         <div class="flex flex-wrap gap-1.5">
@@ -210,7 +279,7 @@ function sectionHasContent(section: MetadataSection): boolean {
             v-for="kw in item.keywords"
             :key="kw"
             variant="outline"
-            class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+            class="cursor-pointer border-transparent bg-primary-100 text-primary-700 hover:bg-primary-200 hover:text-primary-800"
             @click="openExploreWithFilter('keywords', kw)"
           >
             {{ kw }}
@@ -220,72 +289,94 @@ function sectionHasContent(section: MetadataSection): boolean {
 
       <!-- 5. Metadata sections -->
       <div class="mb-4">
-        <template
-          v-for="section in METADATA_SECTIONS"
-          :key="section.title"
-        >
+        <template v-for="section in METADATA_SECTIONS" :key="section.title">
           <template v-if="sectionHasContent(section)">
-            <h4 class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+            <h4
+              class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+            >
               {{ section.title }}
             </h4>
             <div class="mb-6 flex flex-col">
-              <template v-for="field in section.fields" :key="field.key">
+              <template v-for="(field, idx) in section.fields" :key="field.key">
                 <div
                   v-if="field.getValue(item) != null"
-                  class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
+                  :class="
+                    isPoznamkaField(field)
+                      ? 'flex flex-col gap-1 rounded-md border border-border bg-muted/40 px-3 py-2.5 text-foreground'
+                      : [
+                          'flex items-baseline py-2.5',
+                          shouldShowRowDivider(section.fields, idx) ? 'border-b border-border' : '',
+                        ].join(' ')
+                  "
                 >
-                  <span
-                    class="shrink-0 text-label-small text-muted-foreground"
-                    :class="labelWidthClass"
-                  >
-                    {{ field.label }}
-                  </span>
-                  <span class="min-w-0 flex-1 pl-2">
-                    <template v-if="field.isLink && field.filterKey">
-                      <button
-                        type="button"
-                        class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                        @click="
-                          openExploreWithFilter(
-                            field.filterKey,
-                            field.getValue(item)
-                          )
-                        "
-                      >
-                        {{ field.getValue(item) }}
-                      </button>
-                    </template>
-                    <a
-                      v-else-if="field.key === 'license' && item.license"
-                      :href="item.license"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
-                    >
-                      {{ field.getValue(item) }}
-                    </a>
-                    <span
-                      v-else
-                      class="text-sm font-medium text-foreground"
-                    >
-                      {{ field.getValue(item) }}
+                  <template v-if="isPoznamkaField(field)">
+                    <span class="text-label-small font-bold text-ct-neutral-500">
+                      {{ field.label }}
                     </span>
-                  </span>
+                    <p class="text-sm font-medium text-muted-foreground">
+                      {{ field.getValue(item) }}
+                    </p>
+                  </template>
+                  <template v-else>
+                    <span
+                      class="shrink-0 text-label-small text-muted-foreground"
+                      :class="labelWidthClass"
+                    >
+                      {{ field.label }}
+                    </span>
+                    <span class="min-w-0 flex-1 pl-2">
+                      <template v-if="field.isLink && field.filterKey">
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                          @click="
+                            openExploreWithFilter(
+                              field.filterKey,
+                              field.getValue(item),
+                            )
+                          "
+                        >
+                          {{ field.getValue(item) }}
+                        </button>
+                      </template>
+                      <a
+                        v-else-if="isExternalUrl(field.getValue(item))"
+                        :href="field.getValue(item)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1 text-left text-sm font-medium text-primary-500 hover:text-primary-600 hover:underline"
+                      >
+                        <span class="truncate">{{ field.getValue(item) }}</span>
+                        <PhArrowSquareOut class="h-4 w-4 shrink-0" aria-hidden="true" />
+                      </a>
+                      <span v-else class="text-sm font-medium text-foreground">
+                        {{ field.getValue(item) }}
+                      </span>
+                    </span>
+                  </template>
                 </div>
               </template>
             </div>
 
             <!-- MAPA block after Geografické údaje -->
-            <template v-if="section.title === 'Geografické údaje' && item.hasMap && item.lat != null && item.lng != null">
-              <h4 class="mb-2 mt-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+            <template
+              v-if="
+                section.title === 'Geografické údaje' &&
+                item.hasMap &&
+                item.lat != null &&
+                item.lng != null
+              "
+            >
+              <h4
+                class="mb-2 mt-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+              >
                 MAPA
               </h4>
-              <div class="relative mb-6 w-full max-h-[160px] overflow-hidden rounded-md border border-border bg-primary-50" style="aspect-ratio: 2/1;">
-                <DetailMap
-                  :lat="item.lat"
-                  :lng="item.lng"
-                  compact
-                />
+              <div
+                class="relative mb-6 w-full max-h-[160px] overflow-hidden rounded-md border border-border bg-primary-50"
+                style="aspect-ratio: 2/1"
+              >
+                <DetailMap :lat="item.lat" :lng="item.lng" compact />
                 <div
                   v-if="formatCoords(item)"
                   class="absolute bottom-2 left-2 z-10 rounded bg-white/90 px-2 py-1 font-mono text-xs text-foreground"
@@ -311,18 +402,15 @@ function sectionHasContent(section: MetadataSection): boolean {
         v-if="collectionsForItem().length > 0 || documentsForItem().length > 0"
         class="mb-7 space-y-4"
       >
-        <h4 class="text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+        <h4
+          class="text-label-small font-bold uppercase tracking-wide text-muted-foreground"
+        >
           SÚČASŤ
         </h4>
         <div class="space-y-4">
           <div>
-            <p class="mb-2 text-sm text-muted-foreground">
-              Súčasť kolekcie
-            </p>
-            <div
-              v-if="collectionsForItem().length"
-              class="flex flex-col gap-3"
-            >
+            <p class="mb-2 text-sm text-muted-foreground">Súčasť kolekcie</p>
+            <div v-if="collectionsForItem().length" class="flex flex-col gap-3">
               <CollectionCard
                 v-for="c in collectionsForItem()"
                 :key="c.id"
@@ -332,21 +420,11 @@ function sectionHasContent(section: MetadataSection): boolean {
                 :show-badges="false"
               />
             </div>
-            <p
-              v-else
-              class="text-sm text-muted-foreground"
-            >
-              —
-            </p>
+            <p v-else class="text-sm text-muted-foreground">—</p>
           </div>
           <div>
-            <p class="mb-2 text-sm text-muted-foreground">
-              Súčasť dokumentu
-            </p>
-            <div
-              v-if="documentsForItem().length"
-              class="flex flex-col gap-2"
-            >
+            <p class="mb-2 text-sm text-muted-foreground">Súčasť dokumentu</p>
+            <div v-if="documentsForItem().length" class="flex flex-col gap-2">
               <CollectionCard
                 v-for="d in documentsForItem()"
                 :key="d.id"
@@ -356,16 +434,10 @@ function sectionHasContent(section: MetadataSection): boolean {
                 @click="openExploreWithFilter('document', d.slug)"
               />
             </div>
-            <p
-              v-else
-              class="text-sm text-muted-foreground"
-            >
-              —
-            </p>
+            <p v-else class="text-sm text-muted-foreground">—</p>
           </div>
         </div>
       </div>
     </div>
   </component>
 </template>
-

@@ -1,3 +1,4 @@
+
 | **Detail Polozky (pravy panel)** |                                       |
 | -------------------------------- | ------------------------------------- |
 |                                  |                                       |
@@ -62,3 +63,5 @@
 | **#Doplňujúce údaje**            | **#Additional Notes**                 |
 | Všeobecná poznámka               | General note                          |
 | Ako citovať                      | How to cite                           |
+
+

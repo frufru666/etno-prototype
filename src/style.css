@@ -43,6 +43,14 @@
     --radius-2xl: 24px;
     --radius-full: 999px;
 
+    /* Semantic radii (map to base radii by default) */
+    --radius-control: var(--radius-lg);
+    --radius-surface: var(--radius-lg);
+    --radius-card: var(--radius-xl);
+    --radius-panel: var(--radius-2xl);
+    --radius-pill: var(--radius-full);
+    --radius-sheet: 24px 24px 24px 0px;
+
     --stroke-hairline: 0.5px;
     --stroke-thin: 1px;
     --stroke-regular: 1.5px;

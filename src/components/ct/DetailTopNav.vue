@@ -19,14 +19,17 @@ const props = withDefaults(
     mobileBackAriaLabel?: string
     /** When false, mobile nav is single row (no search bar). Use for object viewers. */
     mobileShowSearch?: boolean
+    /** When true, show transcript button in mobile nav. */
+    mobileShowTranscriptButton?: boolean
   }>(),
-  { mobileShowSearch: true }
+  { mobileShowSearch: true, mobileShowTranscriptButton: false }
 )
 
 const emit = defineEmits<{
   (e: 'toggle-right-panel'): void
   (e: 'update:searchQuery', value: string): void
   (e: 'searchSubmit', value: string): void
+  (e: 'show-transcript'): void
 }>()
 
 const route = useRoute()
@@ -58,14 +61,14 @@ function onSearchSubmit(value: string) {
   <!-- Desktop nav: single row with Explore / Collections toggles -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-3 md:px-4"
     aria-label="Detail navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
       <Button
         :variant="isExploreActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink
@@ -78,7 +81,7 @@ function onSearchSubmit(value: string) {
       <Button
         :variant="isCollectionsActive ? 'navActive' : 'nav'"
         size="lg"
-        class="gap-2 rounded-md"
+        class="gap-2"
         as-child
       >
         <RouterLink
@@ -95,7 +98,7 @@ function onSearchSubmit(value: string) {
         :model-value="searchQuery ?? ''"
         class="w-full max-w-2xl md:max-w-3xl"
         placeholder-brand="EtnoExplorer"
-        input-class="h-11 w-full rounded-xl text-[15px]"
+        input-class="h-11 w-full text-[15px]"
         @update:model-value="emit('update:searchQuery', $event)"
         @submit="onSearchSubmit"
       />
@@ -112,12 +115,12 @@ function onSearchSubmit(value: string) {
     class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Detail navigation"
   >
-    <div class="flex h-14 shrink-0 items-center justify-center pl-2 pr-3 py-1">
+    <div class="flex h-14 shrink-0 items-center justify-center px-2 pt-3 pb-1">
       <div class="flex h-10 w-full items-center justify-between gap-2">
         <Button
           variant="primary"
           size="icon"
-          class="h-10 w-10 shrink-0 rounded-lg p-2 [&_svg]:size-6"
+          class="h-10 w-10 shrink-0 p-2 [&_svg]:size-6"
           :aria-label="props.mobileBackAriaLabel ?? 'Späť do Explore'"
           @click="goBackToExplore"
         >
@@ -134,12 +137,24 @@ function onSearchSubmit(value: string) {
             {{ props.mobileContextId }}
           </span>
         </div>
-        <MobileMenu />
+        <div class="flex items-center gap-2">
+          <Button
+            v-if="props.mobileShowTranscriptButton"
+            variant="nav"
+            size="sm"
+            class="h-10 px-3 text-sm font-semibold md:hidden"
+            aria-label="Zobraziť prepis"
+            @click="emit('show-transcript')"
+          >
+            Prepis
+          </Button>
+          <MobileMenu />
+        </div>
       </div>
     </div>
     <div
       v-if="props.mobileShowSearch"
-      class="flex items-center gap-2 px-4 pb-2.5"
+      class="flex items-center gap-2 px-2 py-2"
     >
       <SearchInput
         :model-value="searchQuery ?? ''"

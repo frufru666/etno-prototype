@@ -29,7 +29,7 @@ const userDialogOpen = ref(false)
 const dialogInitialView = ref<'login' | 'register'>('login')
 const { isLoggedIn, logout } = useAuth()
 
-const btnClass = 'rounded-md focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
+const btnClass = 'focus-visible:outline-2 focus-visible:outline-primary-500 focus-visible:outline-offset-2'
 
 async function openLoginModal() {
   dialogInitialView.value = 'login'

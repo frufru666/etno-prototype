@@ -34,32 +34,36 @@ function getPillLabel(pill: { label: string; value: string }) {
 <template>
   <div
     v-if="pills.length > 0"
-    class="flex flex-wrap items-center gap-2 border-b border-border bg-background px-4 py-3 md:px-6"
+    class="border-b border-border bg-background px-4 py-3 md:px-6"
   >
-    <span class="text-label-small text-muted-foreground">Aplikované filtre:</span>
-    <template v-for="pill in pills" :key="`${pill.key}-${pill.value}`">
-      <span
-        class="inline-flex h-6 items-center gap-1 rounded-full bg-primary-100 px-2 text-label-small font-medium leading-4 text-primary-600"
+    <div class="flex items-center justify-between gap-3">
+      <span class="text-sm font-semibold text-muted-foreground">Aplikované filtre</span>
+      <Button
+        variant="link"
+        class="h-auto p-0 text-sm font-semibold text-destructive underline-offset-4 hover:text-destructive/90"
+        @click="emit('clear')"
       >
-        {{ getPillLabel(pill) }}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          class="h-4 w-4 rounded-full p-0 text-primary-600 hover:bg-primary-200 hover:text-primary-600"
-          aria-label="Odstrániť filter"
-          @click.stop="emit('remove', pill.key, pill.value)"
+        Odstrániť filtre
+      </Button>
+    </div>
+    <div class="mt-2 flex flex-wrap items-center gap-2">
+      <template v-for="pill in pills" :key="`${pill.key}-${pill.value}`">
+        <span
+          class="inline-flex h-6 items-center gap-1 rounded-full bg-primary-100 px-2 text-label-small font-medium leading-4 text-primary-600"
         >
-          <PhX class="h-4 w-4" />
-        </Button>
-      </span>
-    </template>
-    <Button
-      variant="link"
-      class="h-auto p-0 text-sm text-primary-600 underline-offset-4 hover:text-primary-700"
-      @click="emit('clear')"
-    >
-      Odstrániť filtre
-    </Button>
+          {{ getPillLabel(pill) }}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            class="h-4 w-4 rounded-full p-0 text-primary-600 hover:bg-primary-200 hover:text-primary-600"
+            aria-label="Odstrániť filter"
+            @click.stop="emit('remove', pill.key, pill.value)"
+          >
+            <PhX class="h-4 w-4" />
+          </Button>
+        </span>
+      </template>
+    </div>
   </div>
 </template>

@@ -265,7 +265,7 @@ onUnmounted(() => {
           type="button"
           variant="outline"
           size="sm"
-          class="gap-2 rounded-md border-0 shadow-sm"
+          class="gap-2 border-0 shadow-sm"
           aria-label="Zavrieť filter"
           @click="filterOpen = false"
         >
@@ -277,7 +277,7 @@ onUnmounted(() => {
           type="button"
           variant="primary"
           size="sm"
-          class="gap-2 rounded-md font-semibold shadow-sm"
+          class="gap-2 font-semibold shadow-sm"
           aria-label="Filter"
           @click="filterOpen = true"
         >
@@ -395,9 +395,9 @@ onUnmounted(() => {
           <div
             v-show="mobileExploreTab === 'list'"
             ref="resultsPanelRef"
-            class="fixed left-0 right-0 bottom-0 z-[20] rounded-[24px_24px_24px_0] bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
+            class="fixed left-0 right-0 bottom-0 z-[20] rounded-sheet bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
             :style="{
-              top: '56px',
+              top: '68px',
               paddingBottom: '80px',
             }"
           >
@@ -457,7 +457,7 @@ onUnmounted(() => {
                 type="button"
                 variant="secondary"
                 size="icon"
-                class="h-10 w-10 shrink-0 rounded-xl border-0"
+                class="h-10 w-10 shrink-0 border-0"
                 aria-label="Center map on all pins"
                 @click="mapViewRef?.fitBounds?.()"
               >
@@ -475,7 +475,7 @@ onUnmounted(() => {
                 type="button"
                 variant="secondary"
                 size="icon"
-                class="h-10 w-10 shrink-0 rounded-xl border-0"
+                class="h-10 w-10 shrink-0 border-0"
                 aria-label="Locate me"
                 @click="mapViewRef?.locate?.()"
               >
