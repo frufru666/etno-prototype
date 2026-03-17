@@ -50,7 +50,7 @@ const mobileHeaderTitle = computed(() => {
   <!-- Desktop nav: single row with Explore / Collections toggles -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 focus-within:outline-none"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-3 md:px-4 focus-within:outline-none"
     aria-label="Main navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
@@ -104,7 +104,7 @@ const mobileHeaderTitle = computed(() => {
     class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Main navigation"
   >
-    <div class="flex h-14 shrink-0 items-center justify-center pl-2 pr-3 py-1">
+    <div class="flex h-14 shrink-0 items-center justify-center px-2 pt-3 pb-1">
       <div class="flex h-10 w-full items-center justify-between gap-2">
         <span class="truncate text-lg font-bold tracking-tight text-foreground">
           {{ props.mobileTitle ?? mobileHeaderTitle }}
@@ -115,7 +115,7 @@ const mobileHeaderTitle = computed(() => {
     <!-- Explore: Filter + Search row (Figma) -->
     <div
       v-if="props.mobileShowFilterRow"
-      class="flex shrink-0 items-center gap-3 px-2 pb-2 pt-1"
+      class="flex shrink-0 items-center gap-3 px-2 py-2"
     >
       <Button
         type="button"
@@ -138,7 +138,7 @@ const mobileHeaderTitle = computed(() => {
     <!-- Collections / Info: search-only row when not using Filter row -->
     <div
       v-else-if="props.mobileShowSearch"
-      class="flex items-center gap-2 px-2 pb-2"
+      class="flex items-center gap-2 px-2 py-2"
     >
       <SearchInput
         class="flex-1 min-w-0"

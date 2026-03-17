@@ -61,7 +61,7 @@ function onSearchSubmit(value: string) {
   <!-- Desktop nav: single row with Explore / Collections toggles -->
   <nav
     v-if="!isMobile"
-    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-4 md:px-6"
+    class="fixed top-0 left-0 right-0 z-50 flex h-[57px] items-center border-b border-border bg-background px-3 md:px-4"
     aria-label="Detail navigation"
   >
     <div class="flex min-w-0 flex-shrink-0 items-center gap-3">
@@ -115,7 +115,7 @@ function onSearchSubmit(value: string) {
     class="fixed top-0 left-0 right-0 z-50 flex flex-col border-b border-border bg-background"
     aria-label="Detail navigation"
   >
-    <div class="flex h-14 shrink-0 items-center justify-center pl-2 pr-3 py-1">
+    <div class="flex h-14 shrink-0 items-center justify-center px-2 pt-3 pb-1">
       <div class="flex h-10 w-full items-center justify-between gap-2">
         <Button
           variant="primary"
@@ -154,7 +154,7 @@ function onSearchSubmit(value: string) {
     </div>
     <div
       v-if="props.mobileShowSearch"
-      class="flex items-center gap-2 px-4 pb-2.5"
+      class="flex items-center gap-2 px-2 py-2"
     >
       <SearchInput
         :model-value="searchQuery ?? ''"

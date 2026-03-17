@@ -10,13 +10,13 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="fixed left-1/2 bottom-2 z-40 flex h-10 w-[264px] -translate-x-1/2 items-center justify-center rounded-control border-0 bg-primary-500 px-2 py-1.5"
+    class="fixed left-1/2 bottom-2 z-40 flex h-10 w-[264px] -translate-x-1/2 items-center justify-center rounded-full border-0 bg-primary-500 px-2 py-1.5"
     role="tablist"
     aria-label="Map or list view"
   >
     <button
       type="button"
-      class="flex-1 h-full rounded-lg border-0 py-2 text-sm font-bold leading-[8px] tracking-tight align-middle transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
+      class="flex-1 h-full rounded-full border-0 py-2 text-sm font-bold leading-[8px] tracking-tight align-middle transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
       :class="
         modelValue === 'map'
           ? 'bg-view-switcher-active text-primary-500'
@@ -30,7 +30,7 @@ const emit = defineEmits<{
     </button>
     <button
       type="button"
-      class="flex-1 h-full rounded-lg border-0 py-2 text-sm font-bold leading-[8px] tracking-tight align-middle transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
+      class="flex-1 h-full rounded-full border-0 py-2 text-sm font-bold leading-[8px] tracking-tight align-middle transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-500"
       :class="
         modelValue === 'list'
           ? 'bg-view-switcher-active text-primary-500'

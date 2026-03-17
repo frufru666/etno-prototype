@@ -397,7 +397,7 @@ onUnmounted(() => {
             ref="resultsPanelRef"
             class="fixed left-0 right-0 bottom-0 z-[20] rounded-sheet bg-[#fafafa] overflow-y-auto overscroll-contain touch-manipulation"
             :style="{
-              top: '56px',
+              top: '68px',
               paddingBottom: '80px',
             }"
           >

@@ -15,7 +15,7 @@ const emit = defineEmits<{
 
 <template>
   <header
-    class="flex h-10 shrink-0 items-center justify-between border-b border-border bg-background pl-2 pr-3 py-1"
+    class="flex h-10 shrink-0 items-center justify-between border-b border-border bg-background px-2 py-2"
     role="banner"
   >
     <Button
