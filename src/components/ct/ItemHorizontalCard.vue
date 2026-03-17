@@ -34,7 +34,9 @@ const authorDisplay = props.item.authors?.[0]?.name;
 /** Thumbnail URL: use item's thumbnail if we had one; for now use same placeholder as map pins */
 const thumbnailUrl = (() => {
   const id = props.item.id;
-  const hash = id.split("").reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+  const hash = id
+    .split("")
+    .reduce((a: number, c: string) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
   const hasPlaceholder = Math.abs(hash) % 10 < 8;
   return hasPlaceholder
     ? `https://picsum.photos/seed/${encodeURIComponent(id)}/144/144`
