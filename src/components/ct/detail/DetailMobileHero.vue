@@ -3,7 +3,7 @@ import type { EtnoItem } from '@/data/mockData'
 import { Button } from '@/components/ui/button'
 import MediaTypeIcon from '@/components/ct/MediaTypeIcon.vue'
 
-defineProps<{
+const props = defineProps<{
   item: EtnoItem
   ctaLabel: string
 }>()

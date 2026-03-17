@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import type { MetadataSection } from '@/data/mockData'
+import type { MediaType } from '@/data/mockData'
 import {
   METADATA_SECTIONS,
   abstractDisplay,
   getCollectionsForItem,
   getDocumentsForItem,
   getDocumentItems,
+  getMediaType,
   type EtnoItem,
 } from '@/data/mockData'
 import { PhCaretRight } from '@phosphor-icons/vue'
@@ -59,6 +61,21 @@ const effectiveHeaderMode = (() => {
   return props.headerMode ?? 'full'
 })()
 
+function typeChipClass(mediaType: MediaType): string {
+  switch (mediaType) {
+    case 'image':
+      return 'border-purple-200 bg-purple-50 text-purple-700'
+    case 'video':
+      return 'border-secondary-300 bg-secondary-100 text-secondary-800'
+    case 'audio':
+      return 'border-green-200 bg-green-50 text-green-800'
+    case 'pdf':
+      return 'border-amber-200 bg-amber-50 text-amber-800'
+    default:
+      return 'border-muted-foreground/30 bg-muted/50 text-muted-foreground'
+  }
+}
+
 /** True if section has at least one visible field (or is Geografické with map). */
 function sectionHasContent(section: MetadataSection): boolean {
   if (section.title === 'Geografické údaje' && props.item.hasMap && props.item.lat != null && props.item.lng != null) return true
@@ -73,11 +90,11 @@ function sectionHasContent(section: MetadataSection): boolean {
   <component :is="mobile ? 'div' : ScrollArea" :class="mobile ? '' : 'h-full'">
     <div
       class="flex flex-col"
-      :class="mobile ? 'px-4 py-5' : showPanelHeader ? 'p-4' : 'p-6'"
+      :class="mobile ? 'px-4 py-5' : showPanelHeader ? 'px-4 pt-0 pb-0' : 'p-6'"
     >
       <div
         v-if="showPanelHeader && !mobile"
-        class="sticky top-0 z-20 -mx-4 bg-background flex items-center justify-between gap-2 border-b border-border px-4 pb-4 pt-4 mb-4"
+        class="sticky top-0 z-20 -mx-4 flex min-h-[52px] shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 mb-4"
       >
         <div class="flex min-w-0 items-center gap-2">
           <h3 class="truncate text-lg font-bold text-foreground">Detail</h3>
@@ -105,11 +122,11 @@ function sectionHasContent(section: MetadataSection): boolean {
         >
           {{ item.id }}
         </span>
-        <h2 class="text-2xl font-bold tracking-tight text-foreground">
+        <h2 class="text-2xl font-bold tracking-tight text-foreground pb-4">
           {{ item.title }}
         </h2>
 
-        <div class="mb-4">
+        <div class="mb-4 mt-3">
           <h4 class="mb-1 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
             Základné údaje
           </h4>
@@ -125,7 +142,12 @@ function sectionHasContent(section: MetadataSection): boolean {
             </div>
             <div class="flex items-baseline border-b border-border py-2.5 last:border-b-0">
               <span class="shrink-0 text-label-small text-muted-foreground" :class="labelWidthClass">Typ dokumentu</span>
-              <span class="min-w-0 flex-1 pl-2 text-sm font-medium text-foreground">{{ item.documentType }}</span>
+              <span
+                class="inline-flex max-w-full items-center gap-1 truncate rounded-full border px-2 py-0.5 text-sm font-medium"
+                :class="typeChipClass(getMediaType(item.documentType))"
+              >
+                {{ item.documentType }}
+              </span>
             </div>
             <div
               v-if="item.researchCollection"
