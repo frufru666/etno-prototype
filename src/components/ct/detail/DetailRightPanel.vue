@@ -56,9 +56,7 @@ const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 function sectionHasContent(section: MetadataSection): boolean {
   if (section.title === 'Geografické údaje' && props.item.hasMap && props.item.lat != null && props.item.lng != null) return true
   for (const field of section.fields) {
-    if (field.key === 'abstract') return true
-    if (field.key === 'keywords' && props.item.keywords?.length) return true
-    if (field.key !== 'abstract' && field.key !== 'keywords' && field.getValue(props.item) != null) return true
+    if (field.getValue(props.item) != null) return true
   }
   return false
 }
@@ -163,7 +161,35 @@ function sectionHasContent(section: MetadataSection): boolean {
         </Button>
       </div>
 
-      <!-- 3. Metadata sections -->
+      <!-- 3. Abstrakt -->
+      <div class="mb-7">
+        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          ABSTRAKT
+        </h4>
+        <p class="text-sm text-foreground">
+          {{ abstractDisplay(item) }}
+        </p>
+      </div>
+
+      <!-- 4. Kľúčové slová -->
+      <div v-if="item.keywords?.length" class="mb-7">
+        <h4 class="mb-2 text-label-small font-bold uppercase tracking-wide text-muted-foreground">
+          KĽÚČOVÉ SLOVÁ
+        </h4>
+        <div class="flex flex-wrap gap-1.5">
+          <Badge
+            v-for="kw in item.keywords"
+            :key="kw"
+            variant="outline"
+            class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+            @click="openExploreWithFilter('keywords', kw)"
+          >
+            {{ kw }}
+          </Badge>
+        </div>
+      </div>
+
+      <!-- 5. Metadata sections -->
       <div class="mb-4">
         <template
           v-for="section in METADATA_SECTIONS"
@@ -176,42 +202,7 @@ function sectionHasContent(section: MetadataSection): boolean {
             <div class="mb-6 flex flex-col">
               <template v-for="field in section.fields" :key="field.key">
                 <div
-                  v-if="field.key === 'abstract'"
-                  class="flex flex-col gap-1.5 border-b border-border py-2.5 last:border-b-0"
-                >
-                  <span class="text-label-small font-medium text-muted-foreground">
-                    {{ field.label }}
-                  </span>
-                  <p class="w-full text-sm text-foreground">
-                    {{ abstractDisplay(item) }}
-                  </p>
-                </div>
-
-                <div
-                  v-else-if="field.key === 'keywords' && item.keywords?.length"
-                  class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
-                >
-                  <span
-                    class="shrink-0 text-label-small text-muted-foreground"
-                    :class="labelWidthClass"
-                  >
-                    {{ field.label }}
-                  </span>
-                  <span class="min-w-0 flex-1 pl-2 flex flex-wrap gap-1.5">
-                    <Badge
-                      v-for="kw in item.keywords"
-                      :key="kw"
-                      variant="outline"
-                      class="cursor-pointer border-primary-200 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
-                      @click="openExploreWithFilter('keywords', kw)"
-                    >
-                      {{ kw }}
-                    </Badge>
-                  </span>
-                </div>
-
-                <div
-                  v-else-if="field.key !== 'abstract' && field.key !== 'keywords' && field.getValue(item) != null"
+                  v-if="field.getValue(item) != null"
                   class="flex items-baseline border-b border-border py-2.5 last:border-b-0"
                 >
                   <span
