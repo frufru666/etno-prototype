@@ -35,9 +35,7 @@ const mobileViewerFullscreen = ref(false);
 const mobileMapFullscreen = ref(false);
 const transcriptVisible = ref(false);
 
-const mobileContextLabel = computed(() =>
-  fromCollectionSlug.value ? "Collection Item Detail" : "Item detail",
-);
+const mobileContextLabel = computed(() => "Detail");
 
 const mobileBackTargetName = computed(() =>
   fromCollectionSlug.value ? "collection-detail" : "explore",
@@ -173,7 +171,7 @@ const mobileCtaLabel = computed(() => {
 
 watch(
   item,
-  (it) => {
+  (it: typeof item.value) => {
     if (it == null && route.name === "detail")
       router.replace({ name: "explore" });
     else {
@@ -336,7 +334,7 @@ watch(
             <DetailRightPanel
               :item="item"
               :mobile="true"
-              :hide-header="true"
+              header-mode="noId"
               @open-map-fullscreen="openMapFullscreen"
               @show-transcript="onShowTranscriptFromPanel"
             />

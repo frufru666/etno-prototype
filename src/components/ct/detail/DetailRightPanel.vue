@@ -22,10 +22,12 @@ const props = withDefaults(
     mobile?: boolean
     /** When true, hide ID/title/author (e.g. when shown in mobile hero block above) */
     hideHeader?: boolean
+    /** Controls header visibility and ID rendering. */
+    headerMode?: 'full' | 'noId' | 'hidden'
     /** When true, show desktop panel controls in the header row. */
     showPanelHeader?: boolean
   }>(),
-  { hideHeader: false, showPanelHeader: false }
+  { hideHeader: false, showPanelHeader: false, headerMode: 'full' }
 )
 
 const emit = defineEmits<{
@@ -52,6 +54,11 @@ function formatCoords(item: EtnoItem): string {
 
 const labelWidthClass = props.mobile ? 'w-[130px]' : 'w-[152px]'
 
+const effectiveHeaderMode = (() => {
+  if (props.hideHeader) return 'hidden'
+  return props.headerMode ?? 'full'
+})()
+
 /** True if section has at least one visible field (or is Geografické with map). */
 function sectionHasContent(section: MetadataSection): boolean {
   if (section.title === 'Geografické údaje' && props.item.hasMap && props.item.lat != null && props.item.lng != null) return true
@@ -70,7 +77,7 @@ function sectionHasContent(section: MetadataSection): boolean {
     >
       <div
         v-if="showPanelHeader && !mobile"
-        class="flex items-center justify-between gap-2 border-b border-border pb-4 mb-4"
+        class="sticky top-0 z-20 -mx-4 bg-background flex items-center justify-between gap-2 border-b border-border px-4 pb-4 pt-4 mb-4"
       >
         <div class="flex min-w-0 items-center gap-2">
           <h3 class="truncate text-lg font-bold text-foreground">Detail</h3>
@@ -91,9 +98,9 @@ function sectionHasContent(section: MetadataSection): boolean {
       </div>
 
       <!-- 1. Header: Názov + Základné údaje (table format, same as other sections) -->
-      <div v-if="!hideHeader" class="mb-5 space-y-1">
+      <div v-if="effectiveHeaderMode !== 'hidden'" class="mb-5 space-y-1">
         <span
-          v-if="!showPanelHeader"
+          v-if="!showPanelHeader && effectiveHeaderMode === 'full'"
           class="inline-block font-mono text-label-small text-primary-500 bg-primary-50 px-2 py-0.5 rounded"
         >
           {{ item.id }}
